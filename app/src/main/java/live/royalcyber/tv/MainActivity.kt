@@ -1,16 +1,22 @@
 package live.royalcyber.tv
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.PopupMenu
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
@@ -22,31 +28,141 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var playerView: PlayerView
     private lateinit var channelRecycler: RecyclerView
+    private lateinit var channelAdapter: ChannelAdapter
+
     private lateinit var searchButton: ImageButton
     private lateinit var searchBox: EditText
 
-    private lateinit var channelAdapter: ChannelAdapter
+    private lateinit var qualityButton: ImageButton
+    private lateinit var fullscreenButton: ImageButton
+
+    private lateinit var mainScrollView: ScrollView
 
     private var player: ExoPlayer? = null
 
-    /*
-     * আপাতত একটি পরীক্ষামূলক Channel রাখা হয়েছে।
-     *
-     * পরে এখানে তোমার আসল Channel List
-     * Name + Logo + M3U8 URL দিয়ে যুক্ত করব।
-     */
+    private var isFullscreen = false
+
+    // =====================================================
+    // CHANNEL LIST
+    // =====================================================
+
     private val channels = listOf(
 
         Channel(
-            name = "RoyalCyber TV",
-            logo = "",
-            streamUrl =
-                "https://tvsen6.aynaott.com/Epm7WrFa/index.m3u8"
-        )
+            name = "T Sports",
+            logo = "https://yt3.googleusercontent.com/IFgAG_o_AdtX4IauErKIzuFGCj0m4QyH81Q1Uq8H-2Si9ul3vmXkLihDUnn6-QI3xiMZech0AQ=s900-c-k-c0x00ffffff-no-rj",
+            streamUrl = "https://tvsen5.aynaott.com/TnMn5kZz8aLm/index.m3u8"
+        ),
 
+        Channel(
+            name = "Sony Aath",
+            logo = "https://upload.wikimedia.org/wikipedia/en/6/64/Sony_Aath_Logo.png",
+            streamUrl = "https://live20.bozztv.com/giatvplayout7/giatv-209611/index.m3u8"
+        ),
+
+        Channel(
+            name = "Jamuna TV",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpAd7TpOPf8Jbo71Y9Pke4Y7APhCsQu0sJeV121SbGzErsYmogJaf9SZs&s=10",
+            streamUrl = "https://stream.ottplus.live/live/jamuna_tv_abr/index.m3u8"
+        ),
+
+        Channel(
+            name = "Channel S",
+            logo = "https://upload.wikimedia.org/wikipedia/en/a/aa/Channel_S_Bangladesh_Logo.png",
+            streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/channels.stream/live-orgin/channels.stream/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "Ekhon TV",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/Ekhon_Logo.svg/1280px-Ekhon_Logo.svg.png",
+            streamUrl = "https://tvsen6.aynaott.com/fbgZV3X17hwWcyfZ4pdb/index.m3u8"
+        ),
+
+        Channel(
+            name = "Nexus TV",
+            logo = "https://yt3.googleusercontent.com/acZUkF66bm_ut3x__Ut9lCkfc8UXAR-IvsKEqQk_bEgyceypzynXcdR65e9rVnKdGRWsSRRgOg=s900-c-k-c0x00ffffff-no-rj",
+            streamUrl = "https://tvsen6.aynaott.com/Epm7WrFa/index.m3u8"
+        ),
+
+        Channel(
+            name = "NTV",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBajLCVfnTQd8X3xf8XZkLJIzNKdj35CqJww&s",
+            streamUrl = "https://tvsen5.aynaott.com/xV4jEKf3D9zc/tracks-v1a1/mono.ts.m3u8"
+        ),
+
+        Channel(
+            name = "RTV",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl6_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
+            streamUrl = "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/rtv-sg.stream/index.m3u8"
+        ),
+
+        Channel(
+            name = "Deepto TV",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/0/00/Logo_of_Deepto_TV.svg/250px-Logo_of_Deepto_TV.svg.png",
+            streamUrl = "https://byphdgllyk.gpcdn.net/hls/deeptotv/0_1/index.m3u8"
+        ),
+
+        Channel(
+            name = "My TV",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTwzEuhaRG7YKVDoXfXDYcdlvNkShrJje8Em3lzCPghg&s",
+            streamUrl = "https://tvsen6.aynaott.com/XMpHaEf0ANBhv8w6NWR7/index.m3u8"
+        ),
+
+        Channel(
+            name = "Bangla Vision HD",
+            logo = "https://s4.gifyu.com/images/image5c0bfa6b281be803.png",
+            streamUrl = "https://stream.ottplus.live/live/bangla_vision_abr/index.m3u8"
+        ),
+
+        Channel(
+            name = "Maasranga TV HD",
+            logo = "https://upload.wikimedia.org/wikipedia/en/3/39/Maasranga_Television_Logo.jpg",
+            streamUrl = "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"
+        ),
+
+        Channel(
+            name = "Channel i HD",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1740567626692.png",
+            streamUrl = "https://tvsen6.aynaott.com/FNHpYvGZ7FkCE10PwTHm/index.m3u8"
+        ),
+
+        Channel(
+            name = "Desh TV",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/2/25/Desh_tv_logo.jpg",
+            streamUrl = "https://tvsen6.aynaott.com/ryFkXfd1a4CQ7mMdc820/index.m3u8"
+        ),
+
+        Channel(
+            name = "Ananda TV",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Logo_of_Ananda_TV.svg/1280px-Logo_of_Ananda_TV.svg.png",
+            streamUrl = "https://tvsen6.aynaott.com/LeUAm4F1iixYns3s3Non/index.m3u8"
+        ),
+
+        Channel(
+            name = "Ekushey TV HD",
+            logo = "https://s4.gifyu.com/images/image534fa27d7683f33d.png",
+            streamUrl = "https://tvsen6.aynaott.com/y4mEVZNAbeNWTbd6Z2Pw/index.m3u8"
+        ),
+
+        Channel(
+            name = "Asian TV HD",
+            logo = "https://assets-prod.services.toffeelive.com/MyK__poBEef-9-uVmf5l/posters/1eadef5b-28e7-4dc2-b42f-c67a3357c9a0.png",
+            streamUrl = "https://stream.ottplus.live/live/asian_tv_abr/index.m3u8"
+        ),
+
+        Channel(
+            name = "Boishakhi TV",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f2/Boishakhi_Tv_Logo.png",
+            streamUrl = "https://tvsen6.aynaott.com/1d3uG9VCgrR9DRtWZM57/index.m3u8"
+        )
     )
 
+    // =====================================================
+    // ON CREATE
+    // =====================================================
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -57,21 +173,21 @@ class MainActivity : AppCompatActivity() {
 
         setupSearch()
 
+        setupPlayer()
+
+        setupQualityButton()
+
+        setupFullscreenButton()
+
         setupBottomMenu()
 
-        initializePlayer()
-
-        /*
-         * অ্যাপ চালু হলে প্রথম Channel
-         * automatically চালু হবে।
-         */
         if (channels.isNotEmpty()) {
             playChannel(channels[0])
         }
     }
 
     // =====================================================
-    // FIND VIEWS
+    // INITIALIZE VIEWS
     // =====================================================
 
     private fun initializeViews() {
@@ -87,6 +203,15 @@ class MainActivity : AppCompatActivity() {
 
         searchBox =
             findViewById(R.id.search_box)
+
+        qualityButton =
+            findViewById(R.id.quality_button)
+
+        fullscreenButton =
+            findViewById(R.id.fullscreen_button)
+
+        mainScrollView =
+            findViewById(R.id.main_scroll_view)
     }
 
     // =====================================================
@@ -95,9 +220,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupChannelList() {
 
-        /*
-         * ৩টি Channel এক লাইনে।
-         */
         channelRecycler.layoutManager =
             GridLayoutManager(this, 3)
 
@@ -107,7 +229,6 @@ class MainActivity : AppCompatActivity() {
                 onChannelClick = { channel ->
 
                     playChannel(channel)
-
                 }
             )
 
@@ -119,32 +240,20 @@ class MainActivity : AppCompatActivity() {
     // PLAYER
     // =====================================================
 
-    private fun initializePlayer() {
+    private fun setupPlayer() {
 
-        val httpDataSourceFactory =
-            DefaultHttpDataSource.Factory()
-                .setAllowCrossProtocolRedirects(true)
-
-        val playerInstance =
+        player =
             ExoPlayer.Builder(this)
                 .build()
 
-        player = playerInstance
-
         playerView.player =
-            playerInstance
+            player
 
-        /*
-         * Player controller চালু।
-         *
-         * এখান থেকেই Play / Pause
-         * কাজ করবে।
-         */
         playerView.useController = true
 
         playerView.keepScreenOn = true
 
-        playerInstance.addListener(
+        player?.addListener(
             object : Player.Listener {
 
                 override fun onPlayerError(
@@ -153,7 +262,7 @@ class MainActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this@MainActivity,
-                        "ভিডিও চালু করা যাচ্ছে না",
+                        "এই Channel চালু করা যাচ্ছে না",
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -165,43 +274,42 @@ class MainActivity : AppCompatActivity() {
     // PLAY CHANNEL
     // =====================================================
 
-    private fun playChannel(channel: Channel) {
+    private fun playChannel(
+        channel: Channel
+    ) {
 
-        val url = channel.streamUrl
+        val url =
+            channel.streamUrl.trim()
 
-        if (url.isBlank()) {
+        if (url.isEmpty()) {
 
             Toast.makeText(
                 this,
-                "এই Channel-এর Stream URL নেই",
+                "Stream URL পাওয়া যায়নি",
                 Toast.LENGTH_SHORT
             ).show()
 
             return
         }
 
-        val httpDataSourceFactory =
+        val dataSourceFactory =
             DefaultHttpDataSource.Factory()
                 .setAllowCrossProtocolRedirects(true)
 
-        val hlsMediaSource =
+        val mediaSource =
             HlsMediaSource.Factory(
-                httpDataSourceFactory
+                dataSourceFactory
             ).createMediaSource(
                 MediaItem.fromUri(url)
             )
 
         player?.apply {
 
-            /*
-             * আগের Channel বন্ধ করে
-             * নতুন Channel সেট করা হচ্ছে।
-             */
             stop()
 
             clearMediaItems()
 
-            setMediaSource(hlsMediaSource)
+            setMediaSource(mediaSource)
 
             prepare()
 
@@ -210,12 +318,14 @@ class MainActivity : AppCompatActivity() {
             play()
         }
 
-        /*
-         * উপরের Current Channel Name পরিবর্তন।
-         */
-        findViewById<android.widget.TextView>(
+        findViewById<TextView>(
             R.id.current_channel_name
         ).text = channel.name
+
+        mainScrollView.smoothScrollTo(
+            0,
+            0
+        )
     }
 
     // =====================================================
@@ -224,10 +334,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSearch() {
 
-        /*
-         * Search icon চাপলে Search Box
-         * Show / Hide হবে।
-         */
         searchButton.setOnClickListener {
 
             if (searchBox.visibility == View.GONE) {
@@ -246,11 +352,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /*
-         * Search লিখলে Channel List filter হবে।
-         */
         searchBox.addTextChangedListener(
-            object : TextWatcher {
+            object : android.text.TextWatcher {
 
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -273,7 +376,7 @@ class MainActivity : AppCompatActivity() {
                             ?.lowercase()
                             ?: ""
 
-                    val filteredChannels =
+                    val result =
                         if (query.isEmpty()) {
 
                             channels
@@ -285,20 +388,194 @@ class MainActivity : AppCompatActivity() {
                                 it.name
                                     .lowercase()
                                     .contains(query)
-
                             }
                         }
 
                     channelAdapter.updateList(
-                        filteredChannels
+                        result
                     )
                 }
 
                 override fun afterTextChanged(
-                    s: Editable?
+                    s: android.text.Editable?
                 ) {
                 }
             }
+        )
+    }
+
+    // =====================================================
+    // QUALITY
+    // =====================================================
+
+    private fun setupQualityButton() {
+
+        qualityButton.setOnClickListener {
+
+            showQualityMenu()
+        }
+    }
+
+    private fun showQualityMenu() {
+
+        val popup =
+            PopupMenu(
+                this,
+                qualityButton
+            )
+
+        popup.menu.add("Auto")
+
+        popup.menu.add("1080p")
+
+        popup.menu.add("720p")
+
+        popup.menu.add("480p")
+
+        popup.menu.add("360p")
+
+        popup.setOnMenuItemClickListener { item ->
+
+            when (item.title.toString()) {
+
+                "Auto" -> {
+
+                    setVideoQuality(null)
+                }
+
+                "1080p" -> {
+
+                    setVideoQuality(1080)
+                }
+
+                "720p" -> {
+
+                    setVideoQuality(720)
+                }
+
+                "480p" -> {
+
+                    setVideoQuality(480)
+                }
+
+                "360p" -> {
+
+                    setVideoQuality(360)
+                }
+            }
+
+            true
+        }
+
+        popup.show()
+    }
+
+    // =====================================================
+    // SET VIDEO QUALITY
+    // =====================================================
+
+    private fun setVideoQuality(
+        height: Int?
+    ) {
+
+        val exoPlayer =
+            player ?: return
+
+        if (height == null) {
+
+            exoPlayer.trackSelectionParameters =
+                exoPlayer.trackSelectionParameters
+                    .buildUpon()
+                    .clearOverridesOfType(
+                        C.TRACK_TYPE_VIDEO
+                    )
+                    .setMaxVideoSize(
+                        Int.MAX_VALUE,
+                        Int.MAX_VALUE
+                    )
+                    .build()
+
+            Toast.makeText(
+                this,
+                "Quality: Auto",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        exoPlayer.trackSelectionParameters =
+            exoPlayer.trackSelectionParameters
+                .buildUpon()
+                .setMaxVideoSize(
+                    Int.MAX_VALUE,
+                    height
+                )
+                .build()
+
+        Toast.makeText(
+            this,
+            "Quality: ${height}p",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    // =====================================================
+    // FULLSCREEN
+    // =====================================================
+
+    private fun setupFullscreenButton() {
+
+        fullscreenButton.setOnClickListener {
+
+            if (isFullscreen) {
+
+                exitFullscreen()
+
+            } else {
+
+                enterFullscreen()
+            }
+        }
+    }
+
+    private fun enterFullscreen() {
+
+        isFullscreen = true
+
+        requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        window.insetsController?.let {
+
+            it.hide(
+                WindowInsets.Type.statusBars() or
+                        WindowInsets.Type.navigationBars()
+            )
+
+            it.systemBarsBehavior =
+                WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
+        fullscreenButton.setImageResource(
+            android.R.drawable.ic_menu_revert
+        )
+    }
+
+    private fun exitFullscreen() {
+
+        isFullscreen = false
+
+        requestedOrientation =
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        window.insetsController?.show(
+            WindowInsets.Type.statusBars() or
+                    WindowInsets.Type.navigationBars()
+        )
+
+        fullscreenButton.setImageResource(
+            android.R.drawable.ic_menu_crop
         )
     }
 
@@ -309,34 +586,30 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomMenu() {
 
         /*
-         * Home
+         * HOME
+         *
+         * এখন Home চাপলে অ্যাপ বন্ধ হবে না।
+         * শুধু উপরে যাবে।
+         *
+         * পরে Movie / Drama / Web Series
+         * যোগ করলে এখান থেকেই navigation
+         * করা যাবে।
          */
+
         findViewById<View>(
             R.id.menu_home
         ).setOnClickListener {
 
-            val scrollView =
-                findViewById<android.widget.ScrollView>(
-                    android.R.id.content
-                )
-
-            /*
-             * Home button চাপলে উপরের দিকে
-             * যাওয়ার জন্য player area-তে scroll।
-             */
-            channelRecycler.rootView
-                .parent
-
-            Toast.makeText(
-                this,
-                "Home",
-                Toast.LENGTH_SHORT
-            ).show()
+            mainScrollView.smoothScrollTo(
+                0,
+                0
+            )
         }
 
         /*
-         * Notification
+         * NOTIFICATION
          */
+
         findViewById<View>(
             R.id.menu_notification
         ).setOnClickListener {
@@ -349,8 +622,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         /*
-         * Update
+         * UPDATE
          */
+
         findViewById<View>(
             R.id.menu_update
         ).setOnClickListener {
@@ -363,17 +637,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         /*
-         * Channel
+         * CHANNEL
          */
+
         findViewById<View>(
             R.id.menu_channel
         ).setOnClickListener {
 
-            channelRecycler.requestFocus()
+            channelRecycler.post {
 
-            channelRecycler.smoothScrollToPosition(
-                0
-            )
+                mainScrollView.smoothScrollTo(
+                    0,
+                    channelRecycler.top
+                )
+            }
         }
     }
 
@@ -405,10 +682,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        super.onDestroy()
-
         player?.release()
 
         player = null
+
+        super.onDestroy()
     }
 }
