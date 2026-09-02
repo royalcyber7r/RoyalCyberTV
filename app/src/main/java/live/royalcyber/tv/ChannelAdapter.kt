@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 data class Channel(
     val name: String,
@@ -18,7 +19,9 @@ class ChannelAdapter(
     private val onChannelClick: (Channel) -> Unit
 ) : RecyclerView.Adapter<ChannelAdapter.ChannelViewHolder>() {
 
-    class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ChannelViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView) {
 
         val logo: ImageView =
             itemView.findViewById(R.id.channel_logo)
@@ -51,11 +54,18 @@ class ChannelAdapter(
 
         holder.name.text = channel.name
 
-        holder.logo.setImageResource(
-            android.R.drawable.sym_def_app_icon
-        )
+        Glide.with(holder.itemView.context)
+            .load(channel.logo)
+            .placeholder(
+                android.R.drawable.sym_def_app_icon
+            )
+            .error(
+                android.R.drawable.sym_def_app_icon
+            )
+            .into(holder.logo)
 
         holder.itemView.setOnClickListener {
+
             onChannelClick(channel)
         }
     }
@@ -64,8 +74,12 @@ class ChannelAdapter(
         return channels.size
     }
 
-    fun updateList(newList: List<Channel>) {
+    fun updateList(
+        newList: List<Channel>
+    ) {
+
         channels = newList
+
         notifyDataSetChanged()
     }
 }
