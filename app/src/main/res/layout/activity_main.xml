@@ -30,6 +30,7 @@
             <!-- ================================================= -->
 
             <LinearLayout
+                android:id="@+id/header_layout"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:orientation="horizontal"
@@ -104,51 +105,56 @@
             <!-- ================================================= -->
 
             <FrameLayout
-    android:id="@+id/player_container"
-    android:layout_width="match_parent"
-    android:layout_height="220dp"
-    android:background="#000000">
+                android:id="@+id/player_container"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="#000000">
 
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
-        app:use_controller="true"
-        app:show_buffering="when_playing"
-        app:resize_mode="fit" />
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/player_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:keepScreenOn="true"
+                    app:use_controller="true"
+                    app:show_buffering="when_playing"
+                    app:resize_mode="fit" />
 
-    <!-- PLAYER TOP BUTTONS -->
+                <!-- PLAYER TOP BUTTONS -->
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:orientation="horizontal"
-        android:padding="6dp">
+                <LinearLayout
+                    android:id="@+id/player_top_buttons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
 
-        <ImageButton
-            android:id="@+id/quality_button"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="#66000000"
-            android:src="@android:drawable/ic_menu_manage"
-            android:tint="#FFFFFF"
-            android:contentDescription="Video Quality" />
+                    <!-- QUALITY -->
 
-        <ImageButton
-            android:id="@+id/fullscreen_button"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="5dp"
-            android:background="#66000000"
-            android:src="@android:drawable/ic_menu_crop"
-            android:tint="#FFFFFF"
-            android:contentDescription="Fullscreen" />
+                    <ImageButton
+                        android:id="@+id/quality_button"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:background="#66000000"
+                        android:src="@android:drawable/ic_menu_manage"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Video Quality" />
 
-    </LinearLayout>
+                    <!-- FULLSCREEN -->
 
-</FrameLayout>
+                    <ImageButton
+                        android:id="@+id/fullscreen_button"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="5dp"
+                        android:background="#66000000"
+                        android:src="@android:drawable/ic_menu_crop"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Fullscreen" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
 
             <!-- ================================================= -->
@@ -209,6 +215,7 @@
             <!-- ================================================= -->
 
             <LinearLayout
+                android:id="@+id/footer_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -217,7 +224,6 @@
                 android:paddingEnd="20dp"
                 android:paddingBottom="25dp"
                 android:background="#111111">
-
 
                 <!-- ROYALCYBER -->
 
@@ -459,7 +465,6 @@
         android:gravity="center"
         android:background="#111111"
         android:elevation="8dp">
-
 
         <!-- HOME -->
 
