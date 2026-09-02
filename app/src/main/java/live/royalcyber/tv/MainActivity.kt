@@ -3,26 +3,30 @@ package live.royalcyber.tv
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.ui.PlayerView
+
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
 
     private var isFullscreen = false
+
 
     // =====================================================
     // CHANNEL LIST
@@ -92,7 +97,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "RTV",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl6_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
             streamUrl = "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/rtv-sg.stream/index.m3u8"
         ),
 
@@ -157,6 +162,7 @@ class MainActivity : AppCompatActivity() {
         )
     )
 
+
     // =====================================================
     // ON CREATE
     // =====================================================
@@ -182,9 +188,12 @@ class MainActivity : AppCompatActivity() {
         setupBottomMenu()
 
         if (channels.isNotEmpty()) {
+
             playChannel(channels[0])
+
         }
     }
+
 
     // =====================================================
     // INITIALIZE VIEWS
@@ -214,6 +223,7 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.main_scroll_view)
     }
 
+
     // =====================================================
     // CHANNEL LIST
     // =====================================================
@@ -229,12 +239,14 @@ class MainActivity : AppCompatActivity() {
                 onChannelClick = { channel ->
 
                     playChannel(channel)
+
                 }
             )
 
         channelRecycler.adapter =
             channelAdapter
     }
+
 
     // =====================================================
     // PLAYER
@@ -249,9 +261,14 @@ class MainActivity : AppCompatActivity() {
         playerView.player =
             player
 
-        playerView.useController = true
+        playerView.useController =
+            true
 
-        playerView.keepScreenOn = true
+        playerView.keepScreenOn =
+            true
+
+        playerView.controllerShowTimeoutMs =
+            5000
 
         player?.addListener(
             object : Player.Listener {
@@ -269,6 +286,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
+
 
     // =====================================================
     // PLAY CHANNEL
@@ -309,24 +327,32 @@ class MainActivity : AppCompatActivity() {
 
             clearMediaItems()
 
-            setMediaSource(mediaSource)
+            setMediaSource(
+                mediaSource
+            )
 
             prepare()
 
-            playWhenReady = true
+            playWhenReady =
+                true
 
             play()
         }
 
         findViewById<TextView>(
             R.id.current_channel_name
-        ).text = channel.name
+        ).text =
+            channel.name
 
-        mainScrollView.smoothScrollTo(
-            0,
-            0
-        )
+        if (!isFullscreen) {
+
+            mainScrollView.smoothScrollTo(
+                0,
+                0
+            )
+        }
     }
+
 
     // =====================================================
     // SEARCH
@@ -336,7 +362,10 @@ class MainActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
 
-            if (searchBox.visibility == View.GONE) {
+            if (
+                searchBox.visibility ==
+                View.GONE
+            ) {
 
                 searchBox.visibility =
                     View.VISIBLE
@@ -387,7 +416,9 @@ class MainActivity : AppCompatActivity() {
 
                                 it.name
                                     .lowercase()
-                                    .contains(query)
+                                    .contains(
+                                        query
+                                    )
                             }
                         }
 
@@ -404,8 +435,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+
     // =====================================================
-    // QUALITY
+    // QUALITY BUTTON
     // =====================================================
 
     private fun setupQualityButton() {
@@ -413,8 +445,14 @@ class MainActivity : AppCompatActivity() {
         qualityButton.setOnClickListener {
 
             showQualityMenu()
+
         }
     }
+
+
+    // =====================================================
+    // QUALITY MENU
+    // =====================================================
 
     private fun showQualityMenu() {
 
@@ -436,31 +474,43 @@ class MainActivity : AppCompatActivity() {
 
         popup.setOnMenuItemClickListener { item ->
 
-            when (item.title.toString()) {
+            when (
+                item.title.toString()
+            ) {
 
                 "Auto" -> {
 
-                    setVideoQuality(null)
+                    setVideoQuality(
+                        null
+                    )
                 }
 
                 "1080p" -> {
 
-                    setVideoQuality(1080)
+                    setVideoQuality(
+                        1080
+                    )
                 }
 
                 "720p" -> {
 
-                    setVideoQuality(720)
+                    setVideoQuality(
+                        720
+                    )
                 }
 
                 "480p" -> {
 
-                    setVideoQuality(480)
+                    setVideoQuality(
+                        480
+                    )
                 }
 
                 "360p" -> {
 
-                    setVideoQuality(360)
+                    setVideoQuality(
+                        360
+                    )
                 }
             }
 
@@ -470,8 +520,9 @@ class MainActivity : AppCompatActivity() {
         popup.show()
     }
 
+
     // =====================================================
-    // SET VIDEO QUALITY
+    // VIDEO QUALITY
     // =====================================================
 
     private fun setVideoQuality(
@@ -520,8 +571,9 @@ class MainActivity : AppCompatActivity() {
         ).show()
     }
 
+
     // =====================================================
-    // FULLSCREEN
+    // FULLSCREEN BUTTON
     // =====================================================
 
     private fun setupFullscreenButton() {
@@ -539,45 +591,78 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    // =====================================================
+    // ENTER FULLSCREEN
+    // =====================================================
+
     private fun enterFullscreen() {
 
-        isFullscreen = true
+        isFullscreen =
+            true
 
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        window.insetsController?.let {
-
-            it.hide(
-                WindowInsets.Type.statusBars() or
-                        WindowInsets.Type.navigationBars()
+        val controller =
+            WindowCompat.getInsetsController(
+                window,
+                window.decorView
             )
 
-            it.systemBarsBehavior =
-                WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+        controller.hide(
+            WindowInsetsCompat.Type.systemBars()
+        )
+
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat
+                .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         fullscreenButton.setImageResource(
             android.R.drawable.ic_menu_revert
         )
+
+        Toast.makeText(
+            this,
+            "Fullscreen Mode",
+            Toast.LENGTH_SHORT
+        ).show()
     }
+
+
+    // =====================================================
+    // EXIT FULLSCREEN
+    // =====================================================
 
     private fun exitFullscreen() {
 
-        isFullscreen = false
+        isFullscreen =
+            false
 
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        window.insetsController?.show(
-            WindowInsets.Type.statusBars() or
-                    WindowInsets.Type.navigationBars()
+        val controller =
+            WindowCompat.getInsetsController(
+                window,
+                window.decorView
+            )
+
+        controller.show(
+            WindowInsetsCompat.Type.systemBars()
         )
 
         fullscreenButton.setImageResource(
             android.R.drawable.ic_menu_crop
         )
+
+        Toast.makeText(
+            this,
+            "Fullscreen বন্ধ হয়েছে",
+            Toast.LENGTH_SHORT
+        ).show()
     }
+
 
     // =====================================================
     // BOTTOM MENU
@@ -585,16 +670,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupBottomMenu() {
 
-        /*
-         * HOME
-         *
-         * এখন Home চাপলে অ্যাপ বন্ধ হবে না।
-         * শুধু উপরে যাবে।
-         *
-         * পরে Movie / Drama / Web Series
-         * যোগ করলে এখান থেকেই navigation
-         * করা যাবে।
-         */
+        // HOME
 
         findViewById<View>(
             R.id.menu_home
@@ -606,9 +682,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        /*
-         * NOTIFICATION
-         */
+
+        // NOTIFICATION
 
         findViewById<View>(
             R.id.menu_notification
@@ -621,9 +696,8 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        /*
-         * UPDATE
-         */
+
+        // UPDATE
 
         findViewById<View>(
             R.id.menu_update
@@ -636,9 +710,8 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        /*
-         * CHANNEL
-         */
+
+        // CHANNEL
 
         findViewById<View>(
             R.id.menu_channel
@@ -654,6 +727,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     // =====================================================
     // RESUME
     // =====================================================
@@ -664,6 +738,7 @@ class MainActivity : AppCompatActivity() {
 
         player?.play()
     }
+
 
     // =====================================================
     // PAUSE
@@ -676,6 +751,7 @@ class MainActivity : AppCompatActivity() {
         player?.pause()
     }
 
+
     // =====================================================
     // DESTROY
     // =====================================================
@@ -684,7 +760,8 @@ class MainActivity : AppCompatActivity() {
 
         player?.release()
 
-        player = null
+        player =
+            null
 
         super.onDestroy()
     }
