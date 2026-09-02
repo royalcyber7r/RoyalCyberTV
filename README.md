@@ -1,6 +1,6 @@
 # Royal Cyber TV
 
-একটি ১-চ্যানেলের Android HLS/M3U8 test app।
+একটি ১৭চ্যানেলের Android HLS/M3U8 test app।
 
 ## Stream
 
