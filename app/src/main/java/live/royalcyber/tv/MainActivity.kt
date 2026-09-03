@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "RTV",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Rtv_bangladesh.svg/250px-Rtv_bangladesh.svg.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
             streamUrl = "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/rtv-sg.stream/index.m3u8"
         ),
 
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Maasranga TV HD",
-            logo = "https://upload.wikimedia.org/wikipedia/en/3/39/Maasranga_Television_Logo.jpg",
+            logo = "https://mail.maasranga.tv/public/customize/newImage/logo.png",
             streamUrl = "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"
         ),
 
@@ -155,13 +155,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Desh TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/2/25/Desh_tv_logo.jpg",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE2kgVly8CFmeDPj2EhppbImQK6jrwwfPUrvHJb1Ipzw&s",
             streamUrl = "https://tvsen6.aynaott.com/ryFkXfd1a4CQ7mMdc820/index.m3u8"
         ),
 
         Channel(
             name = "Ananda TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Logo_of_Ananda_TV.svg/1280px-Logo_of_Ananda_TV.svg.png",
+            logo = "https://assets-prod.services.toffeelive.com/wCM3l5sBEef-9-uVXFvD/posters/d80f7aee-5bd7-4edc-97eb-ead0e3ebbe09.png",
             streamUrl = "https://tvsen6.aynaott.com/LeUAm4F1iixYns3s3Non/index.m3u8"
         ),
 
@@ -179,7 +179,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Boishakhi TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f2/Boishakhi_Tv_Logo.png",
+            logo = "https://static.wikia.nocookie.net/etv-gspn-bangla/images/c/ce/Boishakhi_TV_2022.png/revision/latest?cb=20241009111526",
             streamUrl = "https://tvsen6.aynaott.com/1d3uG9VCgrR9DRtWZM57/index.m3u8"
         ),
 
@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "A Sports",
-            logo = "https://upload.wikimedia.org/wikipedia/en/0/0c/A_Sports_Logo.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+            logo = "https://play-lh.googleusercontent.com/9SeOWItRm9aisiTN7QJO1cSeRbpj_XJBc-_R0b7QND_r_BFop59qRw5pWxAUl3beku_PKJoO7gJO9ZYM2-FimWM=w600-h300-pc0xffffff-pd",
             streamUrl = "https://tvsen6.aynaott.com/zv68oqPDu7MZZwmHhRxt/index.m3u8"
         ),
 
@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Channel 24 HD",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Logo_of_Channel_24_%28Bangladesh%29.svg/1280px-Logo_of_Channel_24_%28Bangladesh%29.svg.png",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjuXLcjAW56Ye_oenufM9FYvXh6AnOESdt5JbLbA3RRpXkNTgbRqH51OC8&s=10",
             streamUrl = "https://stream.ottplus.live/live/channel_24_abr/index.m3u8"
         ),
 
