@@ -136,9 +136,11 @@ class UpdateActivity : AppCompatActivity() {
 
             try {
 
-                connection =
+                val apiUrl =
                     URL(GITHUB_API)
-                        .openConnection()
+
+                connection =
+                    apiUrl.openConnection()
                             as HttpURLConnection
 
 
@@ -146,13 +148,17 @@ class UpdateActivity : AppCompatActivity() {
                     "GET"
 
                 connection.connectTimeout =
-                    15000
+                    20000
 
                 connection.readTimeout =
-                    15000
+                    20000
+
+                connection.useCaches =
+                    false
 
                 connection.instanceFollowRedirects =
                     true
+
 
                 connection.setRequestProperty(
                     "Accept",
@@ -161,8 +167,14 @@ class UpdateActivity : AppCompatActivity() {
 
                 connection.setRequestProperty(
                     "User-Agent",
-                    "RoyalCyberTV-Android"
+                    "RoyalCyberTV Android App"
                 )
+
+                connection.setRequestProperty(
+                    "X-GitHub-Api-Version",
+                    "2022-11-28"
+                )
+
 
                 connection.connect()
 
@@ -177,7 +189,7 @@ class UpdateActivity : AppCompatActivity() {
                 ) {
 
                     throw Exception(
-                        "GitHub API Error: HTTP $responseCode"
+                        "GitHub API HTTP $responseCode"
                     )
                 }
 
@@ -193,7 +205,7 @@ class UpdateActivity : AppCompatActivity() {
                 if (response.isBlank()) {
 
                     throw Exception(
-                        "GitHub API empty response"
+                        "GitHub API থেকে কোনো response পাওয়া যায়নি"
                     )
                 }
 
@@ -226,10 +238,14 @@ class UpdateActivity : AppCompatActivity() {
                 if (tagName.isEmpty()) {
 
                     throw Exception(
-                        "GitHub Release tag পাওয়া যায়নি"
+                        "Latest Release-এর tag পাওয়া যায়নি"
                     )
                 }
 
+
+                /*
+                 * GitHub Release থেকে RoyalCyberTV.apk খোঁজা
+                 */
 
                 var downloadUrl =
                     ""
@@ -280,10 +296,14 @@ class UpdateActivity : AppCompatActivity() {
                 if (downloadUrl.isEmpty()) {
 
                     throw Exception(
-                        "GitHub Release-এ $APK_NAME পাওয়া যায়নি"
+                        "Latest Release-এ $APK_NAME পাওয়া যায়নি"
                     )
                 }
 
+
+                /*
+                 * Release Version
+                 */
 
                 val latestVersionCode =
                     extractVersionCode(
@@ -291,16 +311,18 @@ class UpdateActivity : AppCompatActivity() {
                     )
 
 
+                /*
+                 * Installed App Version
+                 */
+
                 val currentVersionCode =
                     getCurrentVersionCode()
 
 
-                if (
-                    latestVersionCode <= 0
-                ) {
+                if (latestVersionCode <= 0) {
 
                     throw Exception(
-                        "Invalid version tag: $tagName"
+                        "Release version বুঝতে পারিনি: $tagName"
                     )
                 }
 
@@ -321,21 +343,16 @@ class UpdateActivity : AppCompatActivity() {
 
 
                         messageText.text =
-                            if (
-                                releaseBody.isNotBlank()
-                            ) {
+                            when {
 
-                                releaseBody
+                                releaseBody.isNotBlank() ->
+                                    releaseBody
 
-                            } else if (
-                                releaseName.isNotBlank()
-                            ) {
+                                releaseName.isNotBlank() ->
+                                    releaseName
 
-                                releaseName
-
-                            } else {
-
-                                "New version is now available with important fixes. Please update now to continue watching."
+                                else ->
+                                    "New version is available with important fixes. Please update now to continue watching."
                             }
 
 
@@ -407,6 +424,10 @@ class UpdateActivity : AppCompatActivity() {
             return
         }
 
+
+        /*
+         * Android 8+ Unknown Sources Permission
+         */
 
         if (
             Build.VERSION.SDK_INT >=
@@ -486,19 +507,27 @@ class UpdateActivity : AppCompatActivity() {
                             as HttpURLConnection
 
 
+                connection.requestMethod =
+                    "GET"
+
                 connection.connectTimeout =
-                    15000
+                    20000
 
                 connection.readTimeout =
-                    30000
+                    60000
+
+                connection.useCaches =
+                    false
 
                 connection.instanceFollowRedirects =
                     true
 
+
                 connection.setRequestProperty(
                     "User-Agent",
-                    "RoyalCyberTV-Android"
+                    "RoyalCyberTV Android App"
                 )
+
 
                 connection.connect()
 
@@ -554,6 +583,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 if (apkFile.exists()) {
+
                     apkFile.delete()
                 }
 
@@ -602,7 +632,7 @@ class UpdateActivity : AppCompatActivity() {
                                         downloaded *
                                             100L /
                                             totalBytes
-                                        ).toInt()
+                                    ).toInt()
 
 
                                 handler.post {
@@ -791,49 +821,100 @@ class UpdateActivity : AppCompatActivity() {
     }
 
 
+    /*
+     * GitHub Release Tag থেকে Version Code বের করা
+     *
+     * build-125  -> 125
+     * build-126  -> 126
+     * v1.0.2     -> 2
+     * 1.0.2      -> 2
+     */
+
     private fun extractVersionCode(
         tag: String
     ): Int {
 
         val cleanTag =
             tag.trim()
-                .removePrefix("v")
-                .removePrefix("V")
 
 
-        val parts =
-            cleanTag.split(".")
+        /*
+         * build-125 / build_125 / build 125
+         */
+
+        val buildRegex =
+            Regex(
+                "(?i)build[-_ ]?(\\d+)"
+            )
 
 
-        if (parts.isNotEmpty()) {
-
-            val lastPart =
-                parts.last()
-                    .filter {
-                        it.isDigit()
-                    }
+        val buildMatch =
+            buildRegex.find(
+                cleanTag
+            )
 
 
-            val lastNumber =
-                lastPart.toIntOrNull()
+        if (buildMatch != null) {
 
-
-            if (
-                lastNumber != null &&
-                lastNumber > 0
-            ) {
-
-                return lastNumber
-            }
+            return buildMatch
+                .groupValues[1]
+                .toIntOrNull()
+                ?: 0
         }
 
 
-        return cleanTag
-            .filter {
-                it.isDigit()
-            }
-            .toIntOrNull()
-            ?: 0
+        /*
+         * v1.0.2 / 1.0.2
+         */
+
+        val versionRegex =
+            Regex(
+                "^[vV]?(\\d+)\\.(\\d+)\\.(\\d+)"
+            )
+
+
+        val versionMatch =
+            versionRegex.find(
+                cleanTag
+            )
+
+
+        if (versionMatch != null) {
+
+            return versionMatch
+                .groupValues[3]
+                .toIntOrNull()
+                ?: 0
+        }
+
+
+        /*
+         * অন্য কোনো tag হলে শেষের সংখ্যা নেওয়া
+         */
+
+        val numberRegex =
+            Regex(
+                "(\\d+)"
+            )
+
+
+        val matches =
+            numberRegex.findAll(
+                cleanTag
+            ).toList()
+
+
+        if (matches.isNotEmpty()) {
+
+            return matches
+                .last()
+                .value
+                .toIntOrNull()
+                ?: 0
+        }
+
+
+        return 0
     }
 
 
@@ -843,20 +924,25 @@ class UpdateActivity : AppCompatActivity() {
 
         val cleanTag =
             tag.trim()
-                .removePrefix("v")
-                .removePrefix("V")
 
 
-        return if (
-            cleanTag.isNotEmpty()
+        if (
+            cleanTag.startsWith(
+                "build-",
+                ignoreCase = true
+            )
         ) {
 
-            cleanTag
-
-        } else {
-
-            "1.0.0"
+            return cleanTag
         }
+
+
+        return cleanTag
+            .removePrefix("v")
+            .removePrefix("V")
+            .ifEmpty {
+                "1.0.0"
+            }
     }
 
 
