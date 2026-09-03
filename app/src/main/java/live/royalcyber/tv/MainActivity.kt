@@ -129,9 +129,61 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Global Tv",
+            logo = "https://globaltvbd.com/storage/settings/01KVWJD176R6VT9GC3B9KEJBWK.png",
+            streamUrl = "https://stream.ottplus.live/live/global_tv_abr/index.m3u8"
+        ),
+
+        Channel(
+            name = "Joo Music",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbNd6fN0L21ZYgbAtkKGaS-t-cqTGfbk0svw&s",
+            streamUrl = "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
+        ),
+        Channel(
+            name = "Party Music",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1778083145889.png",
+            streamUrl = "https://nomawnoijl.gpcdn.net/akash/partyuniverse/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "Akash 8 BN",
+            logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/5e7e35a1e640364eb38c06c67dee7179.png",
+            streamUrl = "https://cdn-4.pishow.tv/live/969/master.m3u8"
+        ),
+
+        Channel(
+            name = "Net Tv",
+            logo = "https://i.imgur.com/EWmshtx.png",
+            streamUrl = "https://unlimited1-us.dps.live/nettv/nettv.smil/playlist.m3u8"
+        ),
+       Channel(
+            name = "TNT Sports ARG Premium",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f4/TNT_Sports_Premium_%28Argentina%29.png",
+            streamUrl = "https://1nyaler.streamhostingcdn.top/stream/30/index.m3u8"
+        ),
+        Channel(
             name = "Sony Aath",
             logo = "https://upload.wikimedia.org/wikipedia/en/6/64/Sony_Aath_Logo.png",
             streamUrl = "https://live20.bozztv.com/giatvplayout7/giatv-209611/index.m3u8"
+        ),
+
+        Channel(
+            name = "Deluxe Music",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8"
+        ),
+
+        Channel(
+            name = "Retro Music",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://stream.mediawork.cz/retrotv/smil:retrotv2.smil/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "EBS Kids",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"
+      
         ),
 
         Channel(
@@ -172,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "RTV",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
+            logo = "https://www.jagobd.com/wp-content/uploads/2017/01/rtvbd.jpg?x95285",
             streamUrl = "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/rtv-sg.stream/index.m3u8"
         ),
 
@@ -214,7 +266,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Ananda TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Logo_of_Ananda_TV.svg/1280px-Logo_of_Ananda_TV.svg.png",
+            logo = "https://www.jagobd.com/wp-content/uploads/2018/04/Anandatvupdate.jpg?x95285",
             streamUrl = "https://tvsen6.aynaott.com/LeUAm4F1iixYns3s3Non/index.m3u8"
         ),
 
@@ -232,7 +284,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Boishakhi TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f2/Boishakhi_Tv_Logo.png",
+            logo = "https://www.jagobd.com/wp-content/uploads/2015/10/BoishakhiTV-150x1501.jpg?x95285",
             streamUrl = "https://tvsen6.aynaott.com/1d3uG9VCgrR9DRtWZM57/index.m3u8"
         ),
 
@@ -298,7 +350,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Channel 24 HD",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Logo_of_Channel_24_%28Bangladesh%29.svg/1280px-Logo_of_Channel_24_%28Bangladesh%29.svg.png",
+            logo = "https://www.jagobd.com/wp-content/uploads/2016/02/channel24.jpg?x95285",
             streamUrl = "https://stream.ottplus.live/live/channel_24_abr/index.m3u8"
         ),
 
@@ -360,6 +412,13 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Al Arabiya Al Hadath HD",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/b/b9/Al-arabiya-al-hadath.jpg",
+            streamUrl = "https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_720p/chunks.m3u8"
+        ),
+
+
+        Channel(
             name = "DD Sports",
             logo = "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/DD_Sports_logo.svg/1280px-DD_Sports_logo.svg.png",
             streamUrl = "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8"
@@ -373,7 +432,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Green TV",
-            logo = "https://upload.wikimedia.org/wikipedia/en/2/20/Green_TV_Logo.png",
+            logo = "https://www.jagobd.com/wp-content/uploads/2022/12/green-tv.jpg",
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/greentv.stream/live-orgin/greentv.stream/playlist.m3u8"
         ),
 
