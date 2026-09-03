@@ -57,9 +57,6 @@
 
                 <!-- ================================================= -->
                 <!-- ROYAL CYBER LOGO -->
-                <!-- File:
-                     app/src/main/res/drawable/royalcyber_logo.png
-                -->
                 <!-- ================================================= -->
 
                 <ImageView
@@ -236,6 +233,8 @@
                             android:textSize="15sp"
                             android:textStyle="bold"
 
+                            android:includeFontPadding="false"
+
                             android:background="@android:color/transparent"
 
                             android:clickable="true"
@@ -244,6 +243,7 @@
 
                         <!-- ================================================= -->
                         <!-- PLAY / PAUSE -->
+                        <!-- NO BLACK BACKGROUND -->
                         <!-- ================================================= -->
 
                         <TextView
@@ -257,15 +257,17 @@
                             android:text="▶"
                             android:textColor="#FFFFFF"
 
-                            android:textSize="34sp"
-                            android:textStyle="bold"
+                            android:textSize="38sp"
+                            android:textStyle="normal"
 
-                            android:background="#66000000"
+                            android:includeFontPadding="false"
+
+                            android:background="@android:color/transparent"
 
                             android:clickable="true"
                             android:focusable="true"
 
-                            android:elevation="8dp" />
+                            android:elevation="0dp" />
 
 
                         <!-- ================================================= -->
@@ -285,6 +287,8 @@
 
                             android:textSize="15sp"
                             android:textStyle="bold"
+
+                            android:includeFontPadding="false"
 
                             android:background="@android:color/transparent"
 
@@ -328,38 +332,40 @@
                         android:layout_gravity="bottom"
 
                         android:layout_marginStart="18dp"
-                        android:layout_marginEnd="62dp"
-                        android:layout_marginBottom="9dp"
+                        android:layout_marginEnd="60dp"
+                        android:layout_marginBottom="10dp"
 
                         android:background="#FFFFFF" />
 
 
                     <!-- ================================================= -->
-                    <!-- FULLSCREEN -->
+                    <!-- FULLSCREEN BUTTON -->
                     <!-- ================================================= -->
 
                     <ImageButton
                         android:id="@+id/fullscreen_button"
 
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
 
                         android:layout_gravity="bottom|end"
 
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginBottom="1dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginBottom="2dp"
 
                         android:background="@android:color/transparent"
 
-                        android:src="@android:drawable/ic_menu_crop"
+                        android:src="@drawable/exo_styled_controls_fullscreen_enter"
                         android:tint="#FFFFFF"
 
-                        android:padding="8dp"
+                        android:padding="9dp"
 
                         android:contentDescription="Fullscreen"
 
                         android:clickable="true"
-                        android:focusable="true" />
+                        android:focusable="true"
+
+                        android:elevation="0dp" />
 
 
                 </FrameLayout>
@@ -468,7 +474,7 @@
                 android:id="@+id/footer_layout"
 
                 android:layout_width="match_parent"
-                android:layout_height="125dp"
+                android:layout_height="135dp"
 
                 android:orientation="vertical"
 
@@ -488,10 +494,10 @@
                     android:text="Follow Us"
 
                     android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textStyle="normal"
 
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="12dp" />
 
 
                 <!-- ================================================= -->
@@ -500,10 +506,9 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="45dp"
 
                     android:orientation="horizontal"
-
                     android:gravity="center">
 
 
@@ -514,16 +519,15 @@
                     <ImageView
                         android:id="@+id/footer_facebook"
 
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
 
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                        android:padding="5dp"
+                        android:padding="2dp"
 
-                        android:src="@android:drawable/ic_menu_share"
-                        android:tint="#FFFFFF"
+                        android:src="@drawable/ic_facebook"
 
                         android:contentDescription="Facebook"
 
@@ -538,16 +542,15 @@
                     <ImageView
                         android:id="@+id/footer_youtube"
 
-                        android:layout_width="34dp"
+                        android:layout_width="40dp"
                         android:layout_height="34dp"
 
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                        android:padding="5dp"
+                        android:padding="1dp"
 
-                        android:src="@android:drawable/ic_media_play"
-                        android:tint="#FFFFFF"
+                        android:src="@drawable/ic_youtube"
 
                         android:contentDescription="YouTube"
 
@@ -562,16 +565,15 @@
                     <ImageView
                         android:id="@+id/footer_instagram"
 
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
 
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                        android:padding="5dp"
+                        android:padding="1dp"
 
-                        android:src="@android:drawable/ic_menu_camera"
-                        android:tint="#FFFFFF"
+                        android:src="@drawable/ic_instagram"
 
                         android:contentDescription="Instagram"
 
@@ -586,16 +588,15 @@
                     <ImageView
                         android:id="@+id/footer_tiktok"
 
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
 
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                        android:padding="5dp"
+                        android:padding="2dp"
 
-                        android:src="@android:drawable/ic_menu_info_details"
-                        android:tint="#FFFFFF"
+                        android:src="@drawable/ic_tiktok"
 
                         android:contentDescription="TikTok"
 
