@@ -12,6 +12,19 @@ android {
         minSdk = 23
         targetSdk = 35
 
+        /*
+         * GitHub Actions থেকে:
+         *
+         * -PversionCode=132
+         * -PversionName=1.0.132
+         *
+         * দেওয়া হবে।
+         *
+         * Local build হলে default:
+         * versionCode = 1
+         * versionName = 1.0
+         */
+
         versionCode =
             (project.findProperty("versionCode") as String?)
                 ?.toIntOrNull()
@@ -23,8 +36,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility =
+            JavaVersion.VERSION_17
+
+        targetCompatibility =
+            JavaVersion.VERSION_17
     }
 
     kotlinOptions {
@@ -34,21 +50,31 @@ android {
     /*
      * Release APK signing
      *
-     * GitHub Actions থেকে signing properties দেওয়া হবে।
+     * GitHub Actions থেকে signing properties
+     * দেওয়া হলে Release APK signed হবে।
      */
     signingConfigs {
         create("release") {
+
             val storeFilePath =
-                project.findProperty("RELEASE_STORE_FILE") as String?
+                project.findProperty(
+                    "RELEASE_STORE_FILE"
+                ) as String?
 
             val storePasswordValue =
-                project.findProperty("RELEASE_STORE_PASSWORD") as String?
+                project.findProperty(
+                    "RELEASE_STORE_PASSWORD"
+                ) as String?
 
             val keyAliasValue =
-                project.findProperty("RELEASE_KEY_ALIAS") as String?
+                project.findProperty(
+                    "RELEASE_KEY_ALIAS"
+                ) as String?
 
             val keyPasswordValue =
-                project.findProperty("RELEASE_KEY_PASSWORD") as String?
+                project.findProperty(
+                    "RELEASE_KEY_PASSWORD"
+                ) as String?
 
             if (
                 storeFilePath != null &&
@@ -56,6 +82,7 @@ android {
                 keyAliasValue != null &&
                 keyPasswordValue != null
             ) {
+
                 storeFile =
                     file(storeFilePath)
 
@@ -75,14 +102,19 @@ android {
 
         getByName("release") {
 
-            isMinifyEnabled = false
+            isMinifyEnabled =
+                false
 
             signingConfig =
-                signingConfigs.getByName("release")
+                signingConfigs.getByName(
+                    "release"
+                )
         }
 
         getByName("debug") {
-            isMinifyEnabled = false
+
+            isMinifyEnabled =
+                false
         }
     }
 }
@@ -90,14 +122,29 @@ android {
 dependencies {
 
     // AndroidX
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(
+        "androidx.core:core-ktx:1.15.0"
+    )
+
+    implementation(
+        "androidx.appcompat:appcompat:1.7.0"
+    )
 
     // Media3 / ExoPlayer
-    implementation("androidx.media3:media3-exoplayer:1.5.1")
-    implementation("androidx.media3:media3-exoplayer-hls:1.5.1")
-    implementation("androidx.media3:media3-ui:1.5.1")
+    implementation(
+        "androidx.media3:media3-exoplayer:1.5.1"
+    )
+
+    implementation(
+        "androidx.media3:media3-exoplayer-hls:1.5.1"
+    )
+
+    implementation(
+        "androidx.media3:media3-ui:1.5.1"
+    )
 
     // RecyclerView
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation(
+        "androidx.recyclerview:recyclerview:1.3.2"
+    )
 }
