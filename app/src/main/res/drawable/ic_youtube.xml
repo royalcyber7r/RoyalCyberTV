@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="48dp"
-    android:height="48dp"
-    android:viewportWidth="48"
-    android:viewportHeight="48">
 
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="32dp"
+    android:viewportWidth="576"
+    android:viewportHeight="512">
+
+    <!-- YouTube body -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M43,14c-1,-3 -3,-5 -6,-6C32,7 24,7 24,7S16,7 11,8c-3,1 -5,3 -6,6c-1,4 -1,10 -1,10s0,6 1,10c1,3 3,5 6,6c5,1 13,1 13,1s8,0 13,-1c3,-1 5,-3 6,-6c1,-4 1,-10 1,-10s0,-6 -1,-10zM20,31V17l12,7 -12,7z" />
+        android:pathData="M549.66,124.08C543.38,100.43 524.87,81.81 501.37,75.49C458.78,64 288,64 288,64C288,64 117.22,64 74.63,75.49C51.13,81.81 32.62,100.43 26.34,124.08C14.93,166.95 14.93,256.39 14.93,256.39C14.93,256.39 14.93,345.83 26.34,388.7C32.62,412.35 51.13,429.9 74.63,436.22C117.22,448 288,448 288,448C288,448 458.78,448 501.37,436.22C524.87,429.9 543.38,412.35 549.66,388.7C561.07,345.83 561.07,256.39 561.07,256.39C561.07,256.39 561.07,166.95 549.66,124.08Z" />
+
+    <!-- Play triangle -->
+    <path
+        android:fillColor="#111111"
+        android:pathData="M232.15,337.59L232.15,175.19L374.89,256.39Z" />
 
 </vector>
