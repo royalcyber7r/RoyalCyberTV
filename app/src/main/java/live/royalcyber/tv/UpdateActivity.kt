@@ -15,7 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 
-import org.json.JSONObject
+import org.json.JSONArray
 
 import java.io.File
 import java.net.HttpURLConnection
@@ -45,8 +45,15 @@ class UpdateActivity : AppCompatActivity() {
 
     companion object {
 
+        /*
+         * IMPORTANT:
+         * releases/latest ব্যবহার করা হচ্ছে না।
+         *
+         * GitHub Releases List API ব্যবহার করা হচ্ছে।
+         */
+
         private const val GITHUB_API =
-            "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases/latest"
+            "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=10"
 
         private const val APK_NAME =
             "RoyalCyberTV.apk"
@@ -160,6 +167,10 @@ class UpdateActivity : AppCompatActivity() {
                     true
 
 
+                /*
+                 * GitHub API Headers
+                 */
+
                 connection.setRequestProperty(
                     "Accept",
                     "application/vnd.github+json"
@@ -189,7 +200,7 @@ class UpdateActivity : AppCompatActivity() {
                 ) {
 
                     throw Exception(
-                        "GitHub API HTTP $responseCode"
+                        "GitHub Releases API HTTP $responseCode"
                     )
                 }
 
@@ -205,66 +216,115 @@ class UpdateActivity : AppCompatActivity() {
                 if (response.isBlank()) {
 
                     throw Exception(
-                        "GitHub API থেকে কোনো response পাওয়া যায়নি"
-                    )
-                }
-
-
-                val json =
-                    JSONObject(response)
-
-
-                val tagName =
-                    json.optString(
-                        "tag_name",
-                        ""
-                    ).trim()
-
-
-                val releaseName =
-                    json.optString(
-                        "name",
-                        ""
-                    ).trim()
-
-
-                val releaseBody =
-                    json.optString(
-                        "body",
-                        ""
-                    ).trim()
-
-
-                if (tagName.isEmpty()) {
-
-                    throw Exception(
-                        "Latest Release-এর tag পাওয়া যায়নি"
+                        "GitHub থেকে কোনো response পাওয়া যায়নি"
                     )
                 }
 
 
                 /*
-                 * GitHub Release থেকে RoyalCyberTV.apk খোঁজা
+                 * Releases List
                  */
 
-                var downloadUrl =
-                    ""
+                val releases =
+                    JSONArray(response)
 
 
-                val assets =
-                    json.optJSONArray(
-                        "assets"
+                if (releases.length() == 0) {
+
+                    throw Exception(
+                        "GitHub-এ কোনো Release পাওয়া যায়নি"
                     )
+                }
 
 
-                if (assets != null) {
+                /*
+                 * প্রথমটি হলো latest published release
+                 */
+
+                var selectedRelease = null as org.json.JSONObject?
+
+                var selectedTag = ""
+
+                var selectedName = ""
+
+                var selectedBody = ""
+
+                var selectedDownloadUrl = ""
+
+
+                /*
+                 * প্রথম 10টি Release-এর মধ্যে
+                 * RoyalCyberTV.apk খোঁজা হবে।
+                 *
+                 * Draft Release বাদ দেওয়া হবে।
+                 */
+
+                for (
+                    i in 0 until releases.length()
+                ) {
+
+                    val release =
+                        releases.getJSONObject(i)
+
+
+                    val draft =
+                        release.optBoolean(
+                            "draft",
+                            false
+                        )
+
+
+                    val prerelease =
+                        release.optBoolean(
+                            "prerelease",
+                            false
+                        )
+
+
+                    if (draft) {
+                        continue
+                    }
+
+
+                    /*
+                     * প্রথমে normal release নেওয়া হবে।
+                     *
+                     * prerelease হলে পরেও fallback হিসেবে
+                     * ব্যবহার করা যাবে।
+                     */
+
+                    val tagName =
+                        release.optString(
+                            "tag_name",
+                            ""
+                        ).trim()
+
+
+                    if (tagName.isEmpty()) {
+                        continue
+                    }
+
+
+                    val assets =
+                        release.optJSONArray(
+                            "assets"
+                        )
+
+
+                    if (assets == null) {
+                        continue
+                    }
+
+
+                    var foundApkUrl = ""
+
 
                     for (
-                        i in 0 until assets.length()
+                        j in 0 until assets.length()
                     ) {
 
                         val asset =
-                            assets.getJSONObject(i)
+                            assets.getJSONObject(j)
 
 
                         val assetName =
@@ -281,7 +341,7 @@ class UpdateActivity : AppCompatActivity() {
                             )
                         ) {
 
-                            downloadUrl =
+                            foundApkUrl =
                                 asset.optString(
                                     "browser_download_url",
                                     ""
@@ -290,24 +350,84 @@ class UpdateActivity : AppCompatActivity() {
                             break
                         }
                     }
+
+
+                    if (foundApkUrl.isEmpty()) {
+                        continue
+                    }
+
+
+                    /*
+                     * Valid Release পাওয়া গেছে
+                     */
+
+                    if (
+                        selectedRelease == null ||
+                        (!prerelease)
+                    ) {
+
+                        selectedRelease =
+                            release
+
+                        selectedTag =
+                            tagName
+
+                        selectedName =
+                            release.optString(
+                                "name",
+                                ""
+                            ).trim()
+
+                        selectedBody =
+                            release.optString(
+                                "body",
+                                ""
+                            ).trim()
+
+                        selectedDownloadUrl =
+                            foundApkUrl
+                    }
+
+
+                    /*
+                     * Normal release পেলে
+                     * আর খোঁজার দরকার নেই।
+                     */
+
+                    if (!prerelease) {
+                        break
+                    }
                 }
 
 
-                if (downloadUrl.isEmpty()) {
+                if (
+                    selectedRelease == null ||
+                    selectedTag.isEmpty()
+                ) {
 
                     throw Exception(
-                        "Latest Release-এ $APK_NAME পাওয়া যায়নি"
+                        "GitHub Release-এ $APK_NAME পাওয়া যায়নি"
+                    )
+                }
+
+
+                if (
+                    selectedDownloadUrl.isEmpty()
+                ) {
+
+                    throw Exception(
+                        "$APK_NAME-এর download URL পাওয়া যায়নি"
                     )
                 }
 
 
                 /*
-                 * Release Version
+                 * GitHub Release Version
                  */
 
                 val latestVersionCode =
                     extractVersionCode(
-                        tagName
+                        selectedTag
                     )
 
 
@@ -319,15 +439,21 @@ class UpdateActivity : AppCompatActivity() {
                     getCurrentVersionCode()
 
 
-                if (latestVersionCode <= 0) {
+                if (
+                    latestVersionCode <= 0
+                ) {
 
                     throw Exception(
-                        "Release version বুঝতে পারিনি: $tagName"
+                        "Release version বুঝতে পারিনি: $selectedTag"
                     )
                 }
 
 
                 handler.post {
+
+                    /*
+                     * Debug/Status information
+                     */
 
                     if (
                         latestVersionCode >
@@ -335,21 +461,21 @@ class UpdateActivity : AppCompatActivity() {
                     ) {
 
                         apkUrl =
-                            downloadUrl
+                            selectedDownloadUrl
 
 
                         versionText.text =
-                            "Version ${formatVersion(tagName)} is now available"
+                            "Version ${formatVersion(selectedTag)} is now available"
 
 
                         messageText.text =
                             when {
 
-                                releaseBody.isNotBlank() ->
-                                    releaseBody
+                                selectedBody.isNotBlank() ->
+                                    selectedBody
 
-                                releaseName.isNotBlank() ->
-                                    releaseName
+                                selectedName.isNotBlank() ->
+                                    selectedName
 
                                 else ->
                                     "New version is available with important fixes. Please update now to continue watching."
@@ -528,6 +654,11 @@ class UpdateActivity : AppCompatActivity() {
                     "RoyalCyberTV Android App"
                 )
 
+                connection.setRequestProperty(
+                    "Accept",
+                    "application/octet-stream"
+                )
+
 
                 connection.connect()
 
@@ -571,7 +702,14 @@ class UpdateActivity : AppCompatActivity() {
                     !downloadDirectory.exists()
                 ) {
 
-                    downloadDirectory.mkdirs()
+                    if (
+                        !downloadDirectory.mkdirs()
+                    ) {
+
+                        throw Exception(
+                            "Download folder তৈরি করা যায়নি"
+                        )
+                    }
                 }
 
 
@@ -822,12 +960,15 @@ class UpdateActivity : AppCompatActivity() {
 
 
     /*
-     * GitHub Release Tag থেকে Version Code বের করা
+     * GitHub Release Tag থেকে Version Code
      *
-     * build-125  -> 125
-     * build-126  -> 126
-     * v1.0.2     -> 2
-     * 1.0.2      -> 2
+     * build-127 -> 127
+     * build-126 -> 126
+     * build_125 -> 125
+     * build 124 -> 124
+     *
+     * v1.0.2 -> 2
+     * 1.0.2  -> 2
      */
 
     private fun extractVersionCode(
@@ -839,7 +980,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * build-125 / build_125 / build 125
+         * build-127
+         * build_127
+         * build 127
          */
 
         val buildRegex =
@@ -864,7 +1007,8 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * v1.0.2 / 1.0.2
+         * v1.0.2
+         * 1.0.2
          */
 
         val versionRegex =
@@ -889,7 +1033,8 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * অন্য কোনো tag হলে শেষের সংখ্যা নেওয়া
+         * অন্য কোনো Tag হলে
+         * শেষের সংখ্যা নেওয়া হবে
          */
 
         val numberRegex =
@@ -899,9 +1044,11 @@ class UpdateActivity : AppCompatActivity() {
 
 
         val matches =
-            numberRegex.findAll(
-                cleanTag
-            ).toList()
+            numberRegex
+                .findAll(
+                    cleanTag
+                )
+                .toList()
 
 
         if (matches.isNotEmpty()) {
@@ -929,6 +1076,17 @@ class UpdateActivity : AppCompatActivity() {
         if (
             cleanTag.startsWith(
                 "build-",
+                ignoreCase = true
+            )
+        ) {
+
+            return cleanTag
+        }
+
+
+        if (
+            cleanTag.startsWith(
+                "build_",
                 ignoreCase = true
             )
         ) {
