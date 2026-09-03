@@ -1,12 +1,17 @@
 package live.royalcyber.tv
 
+import android.graphics.BitmapFactory
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.Executors
 
 data class Channel(
     val name: String,
@@ -19,9 +24,11 @@ class ChannelAdapter(
     private val onChannelClick: (Channel) -> Unit
 ) : RecyclerView.Adapter<ChannelAdapter.ChannelViewHolder>() {
 
-    class ChannelViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    private val executor = Executors.newFixedThreadPool(4)
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    class ChannelViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
 
         val logo: ImageView =
             itemView.findViewById(R.id.channel_logo)
@@ -54,20 +61,76 @@ class ChannelAdapter(
 
         holder.name.text = channel.name
 
-        Glide.with(holder.itemView.context)
-            .load(channel.logo)
-            .placeholder(
-                android.R.drawable.sym_def_app_icon
-            )
-            .error(
-                android.R.drawable.sym_def_app_icon
-            )
-            .into(holder.logo)
+        holder.logo.setImageResource(
+            android.R.drawable.sym_def_app_icon
+        )
+
+        loadImage(
+            channel.logo,
+            holder.logo
+        )
 
         holder.itemView.setOnClickListener {
-
             onChannelClick(channel)
         }
+    }
+
+    private fun loadImage(
+        imageUrl: String,
+        imageView: ImageView
+    ) {
+
+        executor.execute {
+
+            try {
+
+                val url = URL(imageUrl)
+
+                val connection =
+                    url.openConnection()
+                        as HttpURLConnection
+
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+                connection.doInput = true
+
+                connection.connect()
+
+                val bitmap =
+                    BitmapFactory.decodeStream(
+                        connection.inputStream
+                    )
+
+                connection.disconnect()
+
+                if (bitmap != null) {
+
+                    mainHandler.post {
+
+                        if (imageView.tag == imageUrl ||
+                            imageView.tag == null
+                        ) {
+
+                            imageView.setImageBitmap(
+                                bitmap
+                            )
+                        }
+                    }
+                }
+
+            } catch (_: Exception) {
+
+                mainHandler.post {
+
+                    imageView.setImageResource(
+                        android.R.drawable
+                            .sym_def_app_icon
+                    )
+                }
+            }
+        }
+
+        imageView.tag = imageUrl
     }
 
     override fun getItemCount(): Int {
@@ -81,5 +144,9 @@ class ChannelAdapter(
         channels = newList
 
         notifyDataSetChanged()
+    }
+
+    fun shutdown() {
+        executor.shutdownNow()
     }
 }
