@@ -15,7 +15,7 @@ jobs:
     steps:
 
       # ==========================================
-      # 1. Checkout
+      # 1. Checkout Repository
       # ==========================================
 
       - name: Checkout Repository
@@ -35,7 +35,7 @@ jobs:
 
 
       # ==========================================
-      # 3. Setup Gradle
+      # 3. Setup Gradle 8.11.1
       # ==========================================
 
       - name: Setup Gradle
@@ -59,61 +59,93 @@ jobs:
 
           VERSION_NAME="1.0.${BUILD_NUMBER}"
 
-          echo "BUILD_NUMBER=$BUILD_NUMBER"
-          echo "VERSION_CODE=$VERSION_CODE"
-          echo "VERSION_NAME=$VERSION_NAME"
+          echo "=========================================="
+          echo "RoyalCyberTV Version Information"
+          echo "=========================================="
+          echo "Build Number : $BUILD_NUMBER"
+          echo "Version Code : $VERSION_CODE"
+          echo "Version Name : $VERSION_NAME"
+          echo "=========================================="
 
           echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
 
 
       # ==========================================
-      # 5. Build Debug APK
+      # 5. Check Gradle
+      # ==========================================
+
+      - name: Check Gradle
+        run: |
+
+          gradle --version
+
+
+      # ==========================================
+      # 6. Build Debug APK
       # ==========================================
 
       - name: Build APK
         run: |
 
-          ./gradlew assembleDebug \
+          gradle assembleDebug \
             -PversionCode=${{ steps.version.outputs.version_code }} \
             -PversionName=${{ steps.version.outputs.version_name }} \
             --stacktrace
 
 
       # ==========================================
-      # 6. Rename APK
+      # 7. Check APK
+      # ==========================================
+
+      - name: Check APK
+        shell: bash
+        run: |
+
+          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "ERROR: APK file was not generated!"
+            exit 1
+          fi
+
+          echo "APK successfully generated:"
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
+
+
+      # ==========================================
+      # 8. Rename APK
       # ==========================================
 
       - name: Rename APK
         shell: bash
         run: |
 
-          BUILD_NUMBER="${{ steps.version.outputs.version_code }}"
-
           mkdir -p release
 
           cp \
             app/build/outputs/apk/debug/app-debug.apk \
-            "release/RoyalCyberTV.apk"
+            release/RoyalCyberTV.apk
 
-          echo "APK:"
+          echo "Final APK:"
           ls -lh release/RoyalCyberTV.apk
 
 
       # ==========================================
-      # 7. Upload Artifact
+      # 9. Upload GitHub Actions Artifact
       # ==========================================
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
+
           name: RoyalCyberTV-Build-${{ steps.version.outputs.version_code }}
+
           path: release/RoyalCyberTV.apk
+
           if-no-files-found: error
 
 
       # ==========================================
-      # 8. Create GitHub Release
+      # 10. Create GitHub Release
       # ==========================================
 
       - name: Create GitHub Release
@@ -131,9 +163,12 @@ jobs:
 
             Version Name: ${{ steps.version.outputs.version_name }}
 
+            Build Number: ${{ github.run_number }}
+
           files: |
             release/RoyalCyberTV.apk
 
           generate_release_notes: false
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
