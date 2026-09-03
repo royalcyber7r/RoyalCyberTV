@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <vector
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="1080dp"
@@ -5,6 +7,7 @@
     android:viewportWidth="1080"
     android:viewportHeight="650">
 
+    <!-- Background -->
     <path
         android:fillColor="#A7DCEC"
         android:pathData="M0,0 L1080,0 L1080,650 L0,650 Z" />
@@ -12,44 +15,75 @@
     <!-- Cloud -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M0,560 C90,520 130,580 190,545 C250,510 300,555 350,535 C410,510 450,570 520,545 C600,515 630,570 700,545 C780,515 830,570 900,540 C960,515 1010,545 1080,530 L1080,650 L0,650 Z" />
+        android:pathData="M0,560
+        C90,520 130,580 190,545
+        C250,510 300,555 350,535
+        C410,510 450,570 520,545
+        C600,515 630,570 700,545
+        C780,515 830,570 900,540
+        C960,515 1010,545 1080,530
+        L1080,650
+        L0,650 Z" />
 
-    <!-- Rocket body -->
+    <!-- Rocket Body -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M540,75 C430,150 400,300 435,475 L645,475 C680,300 650,150 540,75 Z" />
+        android:pathData="M540,75
+        C430,150 400,300 435,475
+        L645,475
+        C680,300 650,150 540,75 Z" />
 
-    <!-- Rocket top -->
+    <!-- Rocket Top -->
     <path
         android:fillColor="#C83E12"
-        android:pathData="M540,75 L470,155 L610,155 Z" />
+        android:pathData="M540,75
+        L470,155
+        L610,155 Z" />
 
-    <!-- Window -->
+    <!-- Window Outer -->
     <path
         android:fillColor="#343440"
-        android:pathData="M540,205 A58,58 0,1 0,540 321 A58,58 0,1 0,540 205 Z" />
+        android:pathData="M540,195
+        C575,195 600,220 600,255
+        C600,290 575,315 540,315
+        C505,315 480,290 480,255
+        C480,220 505,195 540,195 Z" />
 
+    <!-- Window Inner -->
     <path
         android:fillColor="#A7DCEC"
-        android:pathData="M540,218 A45,45 0,1 0,540 308 A45,45 0,1 0,540 218 Z" />
+        android:pathData="M540,215
+        C565,215 580,232 580,255
+        C580,278 565,295 540,295
+        C515,295 500,278 500,255
+        C500,232 515,215 540,215 Z" />
 
-    <!-- Left fin -->
+    <!-- Left Fin -->
     <path
         android:fillColor="#C83E12"
-        android:pathData="M435,360 C375,390 350,460 360,520 C400,495 430,455 455,410 Z" />
+        android:pathData="M435,360
+        C375,390 350,460 360,520
+        C400,495 430,455 455,410 Z" />
 
-    <!-- Right fin -->
+    <!-- Right Fin -->
     <path
         android:fillColor="#C83E12"
-        android:pathData="M645,360 C705,390 730,460 720,520 C680,495 650,455 625,410 Z" />
+        android:pathData="M645,360
+        C705,390 730,460 720,520
+        C680,495 650,455 625,410 Z" />
 
-    <!-- Center flame -->
+    <!-- Flame -->
     <path
         android:fillColor="#C83E12"
-        android:pathData="M515,470 C500,535 520,570 540,605 C560,570 580,535 565,470 Z" />
+        android:pathData="M515,470
+        C500,535 520,570 540,605
+        C560,570 580,535 565,470 Z" />
 
+    <!-- Flame Inner -->
     <path
         android:fillColor="#FFD52A"
-        android:pathData="M525,480 C520,530 535,550 540,570 C545,550 560,530 555,480 Z" />
+        android:pathData="M525,480
+        C520,530 535,550 540,570
+        C545,550 560,530 555,480 Z" />
 
 </vector>
