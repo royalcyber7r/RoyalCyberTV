@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="48dp"
-    android:height="48dp"
-    android:viewportWidth="48"
-    android:viewportHeight="48">
 
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Outer Instagram rounded square -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M14,6h20c4.4,0 8,3.6 8,8v20c0,4.4 -3.6,8 -8,8H14c-4.4,0 -8,-3.6 -8,-8V14c0,-4.4 3.6,-8 8,-8zM24,15c-5,0 -9,4 -9,9s4,9 9,9 9,-4 9,-9 -4,-9 -9,-9zM35,12c-1.7,0 -3,1.3 -3,3s1.3,3 3,3 3,-1.3 3,-3 -1.3,-3 -3,-3zM24,20c2.2,0 4,1.8 4,4s-1.8,4 -4,4 -4,-1.8 -4,-4 1.8,-4 4,-4z" />
+        android:fillType="evenOdd"
+        android:pathData="M349.33,0L162.67,0C73.12,0 0,73.12 0,162.67L0,349.33C0,438.88 73.12,512 162.67,512L349.33,512C438.88,512 512,438.88 512,349.33L512,162.67C512,73.12 438.88,0 349.33,0ZM349.33,58C406.88,58 454,105.12 454,162.67L454,349.33C454,406.88 406.88,454 349.33,454L162.67,454C105.12,454 58,406.88 58,349.33L58,162.67C58,105.12 105.12,58 162.67,58Z" />
+
+    <!-- Camera lens -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M256,136C189.73,136 136,189.73 136,256C136,322.27 189.73,376 256,376C322.27,376 376,322.27 376,256C376,189.73 322.27,136 256,136ZM256,188C293.56,188 324,218.44 324,256C324,293.56 293.56,324 256,324C218.44,324 188,293.56 188,256C188,218.44 218.44,188 256,188Z" />
+
+    <!-- Small camera dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M396,108A30,30 0,1 0,396 168A30,30 0,1 0,396 108" />
 
 </vector>
