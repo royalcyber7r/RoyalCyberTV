@@ -112,6 +112,11 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "ATN Music",
+            logo = "https://yt3.googleusercontent.com/fl29COpVoSRu4iXG505zsyWag0d9kdB-I-C2mm8h7ePDiT2SSTqGWyt93ObOHWcLdh0wa7yd=s900-c-k-c0x00ffffff-no-rj",
+            streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI/atnmusic.stream/playlist.m3uhttps      ),
+
+        Channel(
             name = "Channel S",
             logo = "https://upload.wikimedia.org/wikipedia/en/a/aa/Channel_S_Bangladesh_Logo.png",
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/channels.stream/live-orgin/channels.stream/playlist.m3u8"
