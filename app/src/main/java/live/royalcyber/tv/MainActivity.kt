@@ -4,17 +4,13 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -36,6 +32,7 @@ import androidx.media3.ui.PlayerView
 
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,33 +58,38 @@ class MainActivity : AppCompatActivity() {
     private lateinit var footerInstagram: ImageView
     private lateinit var footerTiktok: ImageView
 
-    /* ---------------- PLAYER CONTROLS ---------------- */
+    /* ================= PLAYER CONTROLS ================= */
 
+    private lateinit var playerControls: View
     private lateinit var playPauseButton: TextView
     private lateinit var rewindButton: TextView
     private lateinit var forwardButton: TextView
     private lateinit var liveText: TextView
-    private lateinit var controlOverlay: View
 
     private var player: ExoPlayer? = null
+
     private var currentChannel: Channel? = null
 
     private var isFullscreen = false
+
     private var normalPlayerHeight = 220
 
     private var searchWasVisible = false
 
-    private val handler = Handler(Looper.getMainLooper())
+    private val handler =
+        Handler(Looper.getMainLooper())
 
-    private val hideControlsRunnable = Runnable {
-        if (!isFullscreen) {
-            controlOverlay.visibility = View.VISIBLE
+    private val hideControlsRunnable =
+        Runnable {
+            if (!isFullscreen) {
+                playerControls.visibility = View.GONE
+            }
         }
-    }
 
-    /* ============================================================
+
+    /* =========================================================
        CHANNEL LIST
-       ============================================================ */
+       ========================================================= */
 
     private val channels = listOf(
 
@@ -272,22 +274,35 @@ class MainActivity : AppCompatActivity() {
         )
     )
 
-    /* ============================================================
-       ON CREATE
-       ============================================================ */
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /* =========================================================
+       ON CREATE
+       ========================================================= */
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(
+            R.layout.activity_main
+        )
 
         initializeViews()
+
         setupChannelList()
+
         setupSearch()
+
         setupPlayer()
+
         setupPlayerControls()
+
         setupFullscreenButton()
+
         setupBottomMenu()
+
         setupSocialLinks()
 
         mainScrollView.post {
@@ -299,25 +314,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       INITIALIZE VIEWS
-       ============================================================ */
+
+    /* =========================================================
+       INITIALIZE
+       ========================================================= */
 
     private fun initializeViews() {
 
-        playerView = findViewById(R.id.player_view)
-        playerContainer = findViewById(R.id.player_container)
+        playerView =
+            findViewById(R.id.player_view)
 
-        channelRecycler = findViewById(R.id.channel_recycler)
+        playerContainer =
+            findViewById(R.id.player_container)
 
-        searchButton = findViewById(R.id.search_button)
-        searchBox = findViewById(R.id.search_box)
+        channelRecycler =
+            findViewById(R.id.channel_recycler)
 
-        fullscreenButton = findViewById(R.id.fullscreen_button)
+        searchButton =
+            findViewById(R.id.search_button)
 
-        mainScrollView = findViewById(R.id.main_scroll_view)
+        searchBox =
+            findViewById(R.id.search_box)
 
-        headerLayout = findViewById(R.id.header_layout)
+        fullscreenButton =
+            findViewById(R.id.fullscreen_button)
+
+        mainScrollView =
+            findViewById(R.id.main_scroll_view)
+
+        headerLayout =
+            findViewById(R.id.header_layout)
 
         currentChannelName =
             findViewById(R.id.current_channel_name)
@@ -343,9 +369,7 @@ class MainActivity : AppCompatActivity() {
         footerTiktok =
             findViewById(R.id.footer_tiktok)
 
-        /* Player Controls */
-
-        controlOverlay =
+        playerControls =
             findViewById(R.id.player_controls)
 
         playPauseButton =
@@ -361,37 +385,53 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.live_text)
     }
 
-    /* ============================================================
-       CHANNEL RECYCLER
-       ============================================================ */
+
+    /* =========================================================
+       CHANNEL LIST
+       ========================================================= */
 
     private fun setupChannelList() {
 
         channelRecycler.layoutManager =
-            GridLayoutManager(this, 3)
+            GridLayoutManager(
+                this,
+                3
+            )
 
-        channelAdapter = ChannelAdapter(
-            channels = channels,
-            onChannelClick = { channel ->
-                playChannel(channel)
-            }
+        channelAdapter =
+            ChannelAdapter(
+                channels = channels,
+                onChannelClick = { channel ->
+                    playChannel(channel)
+                }
+            )
+
+        channelRecycler.adapter =
+            channelAdapter
+
+        channelRecycler.isNestedScrollingEnabled =
+            false
+
+        channelRecycler.setHasFixedSize(
+            false
         )
-
-        channelRecycler.adapter = channelAdapter
-
-        channelRecycler.isNestedScrollingEnabled = false
-
-        channelRecycler.setHasFixedSize(false)
 
         updateRecyclerHeight()
     }
 
+
     private fun updateRecyclerHeight() {
 
-        if (!::channelAdapter.isInitialized) return
-        if (!::channelRecycler.isInitialized) return
+        if (!::channelAdapter.isInitialized) {
+            return
+        }
 
-        val itemCount = channelAdapter.itemCount
+        if (!::channelRecycler.isInitialized) {
+            return
+        }
+
+        val itemCount =
+            channelAdapter.itemCount
 
         val columns = 3
 
@@ -410,7 +450,10 @@ class MainActivity : AppCompatActivity() {
         val bottomPaddingDp = 15
 
         val heightPx =
-            (rows * rowHeightDp + bottomPaddingDp) * density
+            (
+                rows * rowHeightDp +
+                    bottomPaddingDp
+                ) * density
 
         val params =
             channelRecycler.layoutParams
@@ -422,25 +465,29 @@ class MainActivity : AppCompatActivity() {
             params
     }
 
-    /* ============================================================
-       PLAYER
-       ============================================================ */
+
+    /* =========================================================
+       PLAYER SETUP
+       ========================================================= */
 
     private fun setupPlayer() {
 
         player =
-            ExoPlayer.Builder(this).build()
+            ExoPlayer.Builder(this)
+                .build()
 
         playerView.player =
             player
 
         /*
-         * আমরা ExoPlayer-এর Default Controller ব্যবহার করছি না।
-         * কারণ YouTube-এর মতো Custom Controller ব্যবহার করা হবে।
+         * Default Media3 controller বন্ধ।
+         * আমাদের Custom YouTube-style controller ব্যবহার হবে।
          */
-        playerView.useController = false
+        playerView.useController =
+            false
 
-        playerView.keepScreenOn = true
+        playerView.keepScreenOn =
+            true
 
         playerView.setShowBuffering(
             PlayerView.SHOW_BUFFERING_WHEN_PLAYING
@@ -455,8 +502,12 @@ class MainActivity : AppCompatActivity() {
                 override fun onIsPlayingChanged(
                     isPlaying: Boolean
                 ) {
-                    updatePlayPauseButton(isPlaying)
+
+                    updatePlayPauseButton(
+                        isPlaying
+                    )
                 }
+
 
                 override fun onPlaybackStateChanged(
                     playbackState: Int
@@ -464,25 +515,19 @@ class MainActivity : AppCompatActivity() {
 
                     when (playbackState) {
 
-                        Player.STATE_READY -> {
-
-                            liveText.text =
-                                "●  LIVE"
-
-                            liveText.setTextColor(
-                                Color.WHITE
-                            )
-                        }
-
                         Player.STATE_BUFFERING -> {
 
                             liveText.text =
                                 "●  BUFFERING..."
-
-                            liveText.setTextColor(
-                                Color.WHITE
-                            )
                         }
+
+
+                        Player.STATE_READY -> {
+
+                            liveText.text =
+                                "●  LIVE"
+                        }
+
 
                         Player.STATE_ENDED -> {
 
@@ -492,10 +537,12 @@ class MainActivity : AppCompatActivity() {
                             resumePlayback()
                         }
 
+
                         Player.STATE_IDLE -> {
                         }
                     }
                 }
+
 
                 override fun onPlayerError(
                     error: PlaybackException
@@ -511,104 +558,123 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /* ============================================================
-       CUSTOM PLAYER CONTROLS
-       ============================================================ */
+
+    /* =========================================================
+       PLAYER CONTROLS
+       ========================================================= */
 
     private fun setupPlayerControls() {
 
         /*
-         * Center Play / Pause
+         * CENTER PLAY / PAUSE
          */
+
         playPauseButton.setOnClickListener {
 
             val exoPlayer =
                 player ?: return@setOnClickListener
 
-            if (
+            when {
+
                 exoPlayer.playbackState ==
-                Player.STATE_IDLE ||
+                        Player.STATE_IDLE -> {
+
+                    resumePlayback()
+                }
+
+
                 exoPlayer.playbackState ==
-                Player.STATE_ENDED
-            ) {
+                        Player.STATE_ENDED -> {
 
-                resumePlayback()
+                    resumePlayback()
+                }
 
-            } else if (exoPlayer.isPlaying) {
 
-                exoPlayer.pause()
+                exoPlayer.isPlaying -> {
 
-            } else {
+                    exoPlayer.pause()
+                }
 
-                exoPlayer.play()
+
+                else -> {
+
+                    exoPlayer.play()
+                }
             }
 
             updatePlayPauseButton(
                 exoPlayer.isPlaying
             )
+
+            showControlsTemporarily()
         }
 
+
         /*
-         * 10 Seconds Back
+         * 10 SECOND BACK
          */
+
         rewindButton.setOnClickListener {
 
             val exoPlayer =
                 player ?: return@setOnClickListener
 
-            if (!exoPlayer.isCurrentMediaItemLive) {
+            exoPlayer.seekBack()
 
-                exoPlayer.seekBack()
-            }
+            showControlsTemporarily()
         }
 
+
         /*
-         * 10 Seconds Forward
+         * 10 SECOND FORWARD
          */
+
         forwardButton.setOnClickListener {
 
             val exoPlayer =
                 player ?: return@setOnClickListener
 
-            if (!exoPlayer.isCurrentMediaItemLive) {
+            exoPlayer.seekForward()
 
-                exoPlayer.seekForward()
-            }
+            showControlsTemporarily()
         }
 
+
         /*
-         * Video-তে Touch করলে Controller দেখা যাবে
+         * VIDEO TAP
          */
+
         playerView.setOnClickListener {
 
             if (
-                controlOverlay.visibility ==
+                playerControls.visibility ==
                 View.VISIBLE
             ) {
 
-                controlOverlay.visibility =
+                playerControls.visibility =
                     View.GONE
+
+                handler.removeCallbacks(
+                    hideControlsRunnable
+                )
 
             } else {
 
-                controlOverlay.visibility =
+                playerControls.visibility =
                     View.VISIBLE
 
                 showControlsTemporarily()
             }
         }
 
-        /*
-         * Fullscreen আলাদা Button।
-         * তাই playerView-এর Touch fullscreen-এ বাধা দেবে না।
-         */
 
         updatePlayPauseButton(false)
     }
 
-    /* ============================================================
+
+    /* =========================================================
        PLAY / PAUSE ICON
-       ============================================================ */
+       ========================================================= */
 
     private fun updatePlayPauseButton(
         isPlaying: Boolean
@@ -626,9 +692,10 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    /* ============================================================
-       SHOW CONTROLS
-       ============================================================ */
+
+    /* =========================================================
+       CONTROL AUTO HIDE
+       ========================================================= */
 
     private fun showControlsTemporarily() {
 
@@ -645,9 +712,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
+
+    /* =========================================================
        PLAY CHANNEL
-       ============================================================ */
+       ========================================================= */
 
     private fun playChannel(
         channel: Channel
@@ -672,7 +740,9 @@ class MainActivity : AppCompatActivity() {
 
         val dataSourceFactory =
             DefaultHttpDataSource.Factory()
-                .setAllowCrossProtocolRedirects(true)
+                .setAllowCrossProtocolRedirects(
+                    true
+                )
 
         val mediaSource =
             HlsMediaSource.Factory(
@@ -705,10 +775,10 @@ class MainActivity : AppCompatActivity() {
         liveText.text =
             "●  LIVE"
 
-        updatePlayPauseButton(true)
-
-        controlOverlay.visibility =
+        playerControls.visibility =
             View.VISIBLE
+
+        updatePlayPauseButton(true)
 
         showControlsTemporarily()
 
@@ -724,28 +794,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       RESUME PLAYBACK
-       ============================================================ */
+
+    /* =========================================================
+       RESUME
+       ========================================================= */
 
     private fun resumePlayback() {
 
         val exoPlayer =
             player ?: return
 
-        val channel =
-            currentChannel
-
         if (
             exoPlayer.playbackState ==
-            Player.STATE_IDLE ||
+                Player.STATE_IDLE ||
             exoPlayer.playbackState ==
-            Player.STATE_ENDED
+                Player.STATE_ENDED
         ) {
 
-            if (channel != null) {
+            currentChannel?.let {
 
-                playChannel(channel)
+                playChannel(it)
 
                 return
             }
@@ -759,9 +827,10 @@ class MainActivity : AppCompatActivity() {
         updatePlayPauseButton(true)
     }
 
-    /* ============================================================
+
+    /* =========================================================
        SEARCH
-       ============================================================ */
+       ========================================================= */
 
     private fun setupSearch() {
 
@@ -769,7 +838,7 @@ class MainActivity : AppCompatActivity() {
 
             if (
                 searchBox.visibility ==
-                View.GONE
+                    View.GONE
             ) {
 
                 searchBox.visibility =
@@ -786,6 +855,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         searchBox.addTextChangedListener(
             object : android.text.TextWatcher {
 
@@ -796,6 +866,7 @@ class MainActivity : AppCompatActivity() {
                     after: Int
                 ) {
                 }
+
 
                 override fun onTextChanged(
                     s: CharSequence?,
@@ -821,7 +892,9 @@ class MainActivity : AppCompatActivity() {
 
                                 it.name
                                     .lowercase()
-                                    .contains(query)
+                                    .contains(
+                                        query
+                                    )
                             }
                         }
 
@@ -834,6 +907,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+
                 override fun afterTextChanged(
                     s: android.text.Editable?
                 ) {
@@ -842,9 +916,10 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /* ============================================================
-       FULLSCREEN BUTTON
-       ============================================================ */
+
+    /* =========================================================
+       FULLSCREEN
+       ========================================================= */
 
     private fun setupFullscreenButton() {
 
@@ -861,13 +936,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       ENTER FULLSCREEN
-       ============================================================ */
 
     private fun enterFullscreen() {
 
-        if (isFullscreen) return
+        if (isFullscreen) {
+            return
+        }
 
         isFullscreen =
             true
@@ -907,7 +981,7 @@ class MainActivity : AppCompatActivity() {
             applyFullscreenPlayerSize()
         }
 
-        controlOverlay.visibility =
+        playerControls.visibility =
             View.VISIBLE
 
         handler.removeCallbacks(
@@ -915,13 +989,12 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /* ============================================================
-       FULLSCREEN PLAYER SIZE
-       ============================================================ */
 
     private fun applyFullscreenPlayerSize() {
 
-        if (!isFullscreen) return
+        if (!isFullscreen) {
+            return
+        }
 
         val displayMetrics =
             resources.displayMetrics
@@ -942,13 +1015,12 @@ class MainActivity : AppCompatActivity() {
             params
     }
 
-    /* ============================================================
-       EXIT FULLSCREEN
-       ============================================================ */
 
     private fun exitFullscreen() {
 
-        if (!isFullscreen) return
+        if (!isFullscreen) {
+            return
+        }
 
         isFullscreen =
             false
@@ -966,7 +1038,10 @@ class MainActivity : AppCompatActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT
 
         params.height =
-            (normalPlayerHeight * density).toInt()
+            (
+                normalPlayerHeight *
+                    density
+                ).toInt()
 
         playerContainer.layoutParams =
             params
@@ -989,16 +1064,12 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.visibility =
             View.VISIBLE
 
-        if (searchWasVisible) {
-
-            searchBox.visibility =
+        searchBox.visibility =
+            if (searchWasVisible) {
                 View.VISIBLE
-
-        } else {
-
-            searchBox.visibility =
+            } else {
                 View.GONE
-        }
+            }
 
         showSystemBars()
 
@@ -1012,15 +1083,16 @@ class MainActivity : AppCompatActivity() {
             updateRecyclerHeight()
         }
 
-        controlOverlay.visibility =
+        playerControls.visibility =
             View.VISIBLE
 
         showControlsTemporarily()
     }
 
-    /* ============================================================
+
+    /* =========================================================
        SYSTEM BARS
-       ============================================================ */
+       ========================================================= */
 
     private fun hideSystemBars() {
 
@@ -1044,6 +1116,7 @@ class MainActivity : AppCompatActivity() {
                 .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
+
     private fun showSystemBars() {
 
         WindowCompat.setDecorFitsSystemWindows(
@@ -1062,9 +1135,10 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /* ============================================================
+
+    /* =========================================================
        CONFIGURATION
-       ============================================================ */
+       ========================================================= */
 
     override fun onConfigurationChanged(
         newConfig: Configuration
@@ -1094,8 +1168,10 @@ class MainActivity : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT
 
                 params.height =
-                    (normalPlayerHeight * density)
-                        .toInt()
+                    (
+                        normalPlayerHeight *
+                            density
+                        ).toInt()
 
                 playerContainer.layoutParams =
                     params
@@ -1103,9 +1179,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
+
+    /* =========================================================
        BOTTOM MENU
-       ============================================================ */
+       ========================================================= */
 
     private fun setupBottomMenu() {
 
@@ -1122,6 +1199,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         findViewById<View>(
             R.id.menu_notification
         ).setOnClickListener {
@@ -1133,6 +1211,7 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
+
         findViewById<View>(
             R.id.menu_update
         ).setOnClickListener {
@@ -1143,6 +1222,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
 
         findViewById<View>(
             R.id.menu_channel
@@ -1158,9 +1238,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       SOCIAL LINKS
-       ============================================================ */
+
+    /* =========================================================
+       SOCIAL
+       ========================================================= */
 
     private fun setupSocialLinks() {
 
@@ -1195,9 +1276,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       OPEN URL
-       ============================================================ */
 
     private fun openUrl(
         url: String
@@ -1225,9 +1303,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       APP RESUME
-       ============================================================ */
+
+    /* =========================================================
+       RESUME
+       ========================================================= */
 
     override fun onResume() {
 
@@ -1237,9 +1316,9 @@ class MainActivity : AppCompatActivity() {
 
             if (
                 it.playbackState ==
-                Player.STATE_IDLE ||
+                    Player.STATE_IDLE ||
                 it.playbackState ==
-                Player.STATE_ENDED
+                    Player.STATE_ENDED
             ) {
 
                 resumePlayback()
@@ -1255,9 +1334,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /* ============================================================
-       APP PAUSE
-       ============================================================ */
+
+    /* =========================================================
+       PAUSE
+       ========================================================= */
 
     override fun onPause() {
 
@@ -1266,9 +1346,10 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    /* ============================================================
+
+    /* =========================================================
        DESTROY
-       ============================================================ */
+       ========================================================= */
 
     override fun onDestroy() {
 
