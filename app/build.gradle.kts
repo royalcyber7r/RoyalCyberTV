@@ -11,8 +11,15 @@ android {
         applicationId = "live.royalcyber.tv"
         minSdk = 23
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+
+        versionCode =
+            (project.findProperty("versionCode") as String?)
+                ?.toIntOrNull()
+                ?: 1
+
+        versionName =
+            (project.findProperty("versionName") as String?)
+                ?: "1.0"
     }
 
     compileOptions {
@@ -22,6 +29,61 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    /*
+     * Release APK signing
+     *
+     * GitHub Actions থেকে signing properties দেওয়া হবে।
+     */
+    signingConfigs {
+        create("release") {
+            val storeFilePath =
+                project.findProperty("RELEASE_STORE_FILE") as String?
+
+            val storePasswordValue =
+                project.findProperty("RELEASE_STORE_PASSWORD") as String?
+
+            val keyAliasValue =
+                project.findProperty("RELEASE_KEY_ALIAS") as String?
+
+            val keyPasswordValue =
+                project.findProperty("RELEASE_KEY_PASSWORD") as String?
+
+            if (
+                storeFilePath != null &&
+                storePasswordValue != null &&
+                keyAliasValue != null &&
+                keyPasswordValue != null
+            ) {
+                storeFile =
+                    file(storeFilePath)
+
+                storePassword =
+                    storePasswordValue
+
+                keyAlias =
+                    keyAliasValue
+
+                keyPassword =
+                    keyPasswordValue
+            }
+        }
+    }
+
+    buildTypes {
+
+        getByName("release") {
+
+            isMinifyEnabled = false
+
+            signingConfig =
+                signingConfigs.getByName("release")
+        }
+
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
     }
 }
 
@@ -35,6 +97,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.5.1")
     implementation("androidx.media3:media3-exoplayer-hls:1.5.1")
     implementation("androidx.media3:media3-ui:1.5.1")
+
+    // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-    
 }
