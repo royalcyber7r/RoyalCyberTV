@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
@@ -224,53 +223,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeViews() {
 
-        playerView =
-            findViewById(R.id.player_view)
+        playerView = findViewById(R.id.player_view)
 
-        playerContainer =
-            findViewById(R.id.player_container)
+        playerContainer = findViewById(R.id.player_container)
 
-        channelRecycler =
-            findViewById(R.id.channel_recycler)
+        channelRecycler = findViewById(R.id.channel_recycler)
 
-        searchButton =
-            findViewById(R.id.search_button)
+        searchButton = findViewById(R.id.search_button)
 
-        searchBox =
-            findViewById(R.id.search_box)
+        searchBox = findViewById(R.id.search_box)
 
-        fullscreenButton =
-            findViewById(R.id.fullscreen_button)
+        fullscreenButton = findViewById(R.id.fullscreen_button)
 
-        mainScrollView =
-            findViewById(R.id.main_scroll_view)
+        mainScrollView = findViewById(R.id.main_scroll_view)
 
-        headerLayout =
-            findViewById(R.id.header_layout)
+        headerLayout = findViewById(R.id.header_layout)
 
-        currentChannelName =
-            findViewById(R.id.current_channel_name)
+        currentChannelName = findViewById(R.id.current_channel_name)
 
-        channelTitle =
-            findViewById(R.id.channel_title)
+        channelTitle = findViewById(R.id.channel_title)
 
-        footerLayout =
-            findViewById(R.id.footer_layout)
+        footerLayout = findViewById(R.id.footer_layout)
 
-        bottomNavigation =
-            findViewById(R.id.bottom_navigation)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        footerFacebook =
-            findViewById(R.id.footer_facebook)
+        footerFacebook = findViewById(R.id.footer_facebook)
 
-        footerYoutube =
-            findViewById(R.id.footer_youtube)
+        footerYoutube = findViewById(R.id.footer_youtube)
 
-        footerInstagram =
-            findViewById(R.id.footer_instagram)
+        footerInstagram = findViewById(R.id.footer_instagram)
 
-        footerTiktok =
-            findViewById(R.id.footer_tiktok)
+        footerTiktok = findViewById(R.id.footer_tiktok)
     }
 
 
@@ -287,16 +270,13 @@ class MainActivity : AppCompatActivity() {
             ChannelAdapter(
                 channels = channels,
                 onChannelClick = { channel ->
-
                     playChannel(channel)
                 }
             )
 
-        channelRecycler.adapter =
-            channelAdapter
+        channelRecycler.adapter = channelAdapter
 
-        channelRecycler.isNestedScrollingEnabled =
-            false
+        channelRecycler.isNestedScrollingEnabled = false
 
         channelRecycler.setHasFixedSize(false)
 
@@ -305,7 +285,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // FIX 18 CHANNEL DISPLAY
+    // RECYCLER HEIGHT
     // =========================================================
 
     private fun updateRecyclerHeight() {
@@ -318,8 +298,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val itemCount =
-            channelAdapter.itemCount
+        val itemCount = channelAdapter.itemCount
 
         val columns = 3
 
@@ -333,12 +312,7 @@ class MainActivity : AppCompatActivity() {
         val density =
             resources.displayMetrics.density
 
-        /*
-         * item_channel.xml-এর প্রতিটি item-এর
-         * জন্য প্রায় 125dp height রাখা হয়েছে।
-         */
-
-        val rowHeightDp = 125
+        val rowHeightDp = 145
 
         val bottomPaddingDp = 15
 
@@ -351,11 +325,9 @@ class MainActivity : AppCompatActivity() {
         val params =
             channelRecycler.layoutParams
 
-        params.height =
-            heightPx.toInt()
+        params.height = heightPx.toInt()
 
-        channelRecycler.layoutParams =
-            params
+        channelRecycler.layoutParams = params
     }
 
 
@@ -368,27 +340,17 @@ class MainActivity : AppCompatActivity() {
         player =
             ExoPlayer.Builder(this).build()
 
-        playerView.player =
-            player
+        playerView.player = player
 
         playerView.useController = true
-playerView.controllerAutoShow = true
-playerView.controllerHideOnTouch = true
 
-        /*
-         * Media3-এর নিজস্ব controller ব্যবহার হচ্ছে।
-         *
-         * তাই Play/Pause button ভিডিওর
-         * মাঝখানে YouTube-এর মতো দেখাবে।
-         */
+        playerView.controllerAutoShow = true
 
-        
+        playerView.controllerHideOnTouch = true
 
-        playerView.controllerShowTimeoutMs =
-            5000
+        playerView.controllerShowTimeoutMs = 5000
 
-        playerView.keepScreenOn =
-            true
+        playerView.keepScreenOn = true
 
         playerView.setShowBuffering(
             PlayerView.SHOW_BUFFERING_WHEN_PLAYING
@@ -451,14 +413,11 @@ playerView.controllerHideOnTouch = true
 
             clearMediaItems()
 
-            setMediaSource(
-                mediaSource
-            )
+            setMediaSource(mediaSource)
 
             prepare()
 
-            playWhenReady =
-                true
+            playWhenReady = true
 
             play()
         }
@@ -487,24 +446,19 @@ playerView.controllerHideOnTouch = true
 
         searchButton.setOnClickListener {
 
-            if (searchBox.visibility ==
-                View.GONE
-            ) {
+            if (searchBox.visibility == View.GONE) {
 
-                searchBox.visibility =
-                    View.VISIBLE
+                searchBox.visibility = View.VISIBLE
 
                 searchBox.requestFocus()
 
             } else {
 
-                searchBox.visibility =
-                    View.GONE
+                searchBox.visibility = View.GONE
 
                 searchBox.text.clear()
             }
         }
-
 
         searchBox.addTextChangedListener(
             object : TextWatcher {
@@ -516,7 +470,6 @@ playerView.controllerHideOnTouch = true
                     after: Int
                 ) {
                 }
-
 
                 override fun onTextChanged(
                     s: CharSequence?,
@@ -530,7 +483,6 @@ playerView.controllerHideOnTouch = true
                             ?.trim()
                             ?.lowercase()
                             ?: ""
-
 
                     val result =
                         if (query.isEmpty()) {
@@ -547,16 +499,12 @@ playerView.controllerHideOnTouch = true
                             }
                         }
 
-
-                    channelAdapter.updateList(
-                        result
-                    )
+                    channelAdapter.updateList(result)
 
                     channelRecycler.post {
                         updateRecyclerHeight()
                     }
                 }
-
 
                 override fun afterTextChanged(
                     s: Editable?
@@ -602,62 +550,29 @@ playerView.controllerHideOnTouch = true
         searchWasVisible =
             searchBox.visibility == View.VISIBLE
 
-
-        /*
-         * Landscape
-         */
-
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
+        headerLayout.visibility = View.GONE
 
-        /*
-         * Hide all other UI
-         */
+        searchBox.visibility = View.GONE
 
-        headerLayout.visibility =
-            View.GONE
+        currentChannelName.visibility = View.GONE
 
-        searchBox.visibility =
-            View.GONE
+        channelTitle.visibility = View.GONE
 
-        currentChannelName.visibility =
-            View.GONE
+        channelRecycler.visibility = View.GONE
 
-        channelTitle.visibility =
-            View.GONE
+        footerLayout.visibility = View.GONE
 
-        channelRecycler.visibility =
-            View.GONE
-
-        footerLayout.visibility =
-            View.GONE
-
-        bottomNavigation.visibility =
-            View.GONE
-
-
-        /*
-         * Scroll একদম উপরে
-         */
+        bottomNavigation.visibility = View.GONE
 
         mainScrollView.scrollTo(
             0,
             0
         )
 
-
-        /*
-         * Hide system bars
-         */
-
         hideSystemBars()
-
-
-        /*
-         * Orientation change হওয়ার পর
-         * player height screen অনুযায়ী হবে।
-         */
 
         window.decorView.post {
 
@@ -679,12 +594,21 @@ playerView.controllerHideOnTouch = true
         val displayMetrics =
             resources.displayMetrics
 
+        val screenWidth =
+            displayMetrics.widthPixels
+
         val screenHeight =
             displayMetrics.heightPixels
 
         val params =
             playerContainer.layoutParams
 
+        // IMPORTANT:
+        // Landscape fullscreen-এ পুরো screen width নেবে
+        params.width =
+            ViewGroup.LayoutParams.MATCH_PARENT
+
+        // Landscape fullscreen-এ পুরো screen height নেবে
         params.height =
             screenHeight
 
@@ -710,18 +634,8 @@ playerView.controllerHideOnTouch = true
 
         isFullscreen = false
 
-
-        /*
-         * Portrait
-         */
-
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-
-        /*
-         * Restore player height
-         */
 
         val density =
             resources.displayMetrics.density
@@ -729,58 +643,39 @@ playerView.controllerHideOnTouch = true
         val params =
             playerContainer.layoutParams
 
+        // Normal portrait width
+        params.width =
+            ViewGroup.LayoutParams.MATCH_PARENT
+
+        // Normal player height
         params.height =
             (normalPlayerHeight * density).toInt()
 
         playerContainer.layoutParams =
             params
 
+        headerLayout.visibility = View.VISIBLE
 
-        /*
-         * Restore UI
-         */
+        currentChannelName.visibility = View.VISIBLE
 
-        headerLayout.visibility =
-            View.VISIBLE
+        channelTitle.visibility = View.VISIBLE
 
-        currentChannelName.visibility =
-            View.VISIBLE
+        channelRecycler.visibility = View.VISIBLE
 
-        channelTitle.visibility =
-            View.VISIBLE
+        footerLayout.visibility = View.VISIBLE
 
-        channelRecycler.visibility =
-            View.VISIBLE
-
-        footerLayout.visibility =
-            View.VISIBLE
-
-        bottomNavigation.visibility =
-            View.VISIBLE
-
+        bottomNavigation.visibility = View.VISIBLE
 
         if (searchWasVisible) {
 
-            searchBox.visibility =
-                View.VISIBLE
+            searchBox.visibility = View.VISIBLE
 
         } else {
 
-            searchBox.visibility =
-                View.GONE
+            searchBox.visibility = View.GONE
         }
 
-
-        /*
-         * Show system bars
-         */
-
         showSystemBars()
-
-
-        /*
-         * Scroll top
-         */
 
         mainScrollView.post {
 
@@ -852,17 +747,15 @@ playerView.controllerHideOnTouch = true
         newConfig: Configuration
     ) {
 
-        super.onConfigurationChanged(
-            newConfig
-        )
+        super.onConfigurationChanged(newConfig)
 
         window.decorView.post {
 
             if (isFullscreen) {
 
-                applyFullscreenPlayerSize()
-
                 hideSystemBars()
+
+                applyFullscreenPlayerSize()
 
             } else {
 
@@ -871,6 +764,9 @@ playerView.controllerHideOnTouch = true
 
                 val params =
                     playerContainer.layoutParams
+
+                params.width =
+                    ViewGroup.LayoutParams.MATCH_PARENT
 
                 params.height =
                     (
@@ -904,7 +800,6 @@ playerView.controllerHideOnTouch = true
             }
         }
 
-
         findViewById<View>(
             R.id.menu_notification
         ).setOnClickListener {
@@ -916,7 +811,6 @@ playerView.controllerHideOnTouch = true
             ).show()
         }
 
-
         findViewById<View>(
             R.id.menu_update
         ).setOnClickListener {
@@ -927,7 +821,6 @@ playerView.controllerHideOnTouch = true
                 Toast.LENGTH_SHORT
             ).show()
         }
-
 
         findViewById<View>(
             R.id.menu_channel
@@ -957,7 +850,6 @@ playerView.controllerHideOnTouch = true
             )
         }
 
-
         footerYoutube.setOnClickListener {
 
             openUrl(
@@ -965,14 +857,12 @@ playerView.controllerHideOnTouch = true
             )
         }
 
-
         footerInstagram.setOnClickListener {
 
             openUrl(
                 "https://www.instagram.com/crimeworld06266"
             )
         }
-
 
         footerTiktok.setOnClickListener {
 
