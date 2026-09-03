@@ -3,25 +3,37 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:orientation="vertical"
     android:background="#000000">
 
+
+    <!-- ===================================================== -->
+    <!-- MAIN SCROLL -->
+    <!-- ===================================================== -->
+
     <ScrollView
         android:id="@+id/main_scroll_view"
+
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+
         android:fillViewport="true"
         android:background="#000000"
         android:overScrollMode="never">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:orientation="vertical"
             android:background="#000000">
+
 
             <!-- ================================================= -->
             <!-- HEADER -->
@@ -29,66 +41,110 @@
 
             <LinearLayout
                 android:id="@+id/header_layout"
+
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
+
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+
                 android:paddingStart="15dp"
-                android:paddingEnd="10dp"
+                android:paddingEnd="8dp"
+
                 android:background="#111111">
 
-                <ImageView
+
+                <!-- APP LOGO -->
+                <!-- এখানে mipmap/ic_launcher ব্যবহার করা হয়নি -->
+
+                <TextView
                     android:id="@+id/app_logo"
+
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="Royal Cyber TV" />
+
+                    android:gravity="center"
+
+                    android:text="R"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+
+                    android:background="#111111" />
+
+
+                <!-- APP NAME -->
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="10dp"
+
                     android:text="ROYALCYBERITV"
+
                     android:textColor="#FFFFFF"
-                    android:textSize="24sp"
+                    android:textSize="23sp"
                     android:textStyle="bold"
+
                     android:singleLine="true" />
+
+
+                <!-- SEARCH -->
 
                 <ImageButton
                     android:id="@+id/search_button"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+
                     android:background="@android:color/transparent"
+
                     android:src="@android:drawable/ic_menu_search"
                     android:tint="#FFFFFF"
+
                     android:padding="10dp"
+
                     android:contentDescription="Search"
+
                     android:clickable="true"
                     android:focusable="true" />
 
             </LinearLayout>
 
+
+            <!-- ================================================= -->
             <!-- SEARCH BOX -->
+            <!-- ================================================= -->
 
             <EditText
                 android:id="@+id/search_box"
+
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
+
                 android:hint="Search Channel..."
+
                 android:textColor="#FFFFFF"
                 android:textColorHint="#888888"
+
                 android:textSize="16sp"
+
                 android:singleLine="true"
+
                 android:background="#222222"
+
                 android:visibility="gone" />
+
 
             <!-- ================================================= -->
             <!-- PLAYER -->
@@ -96,146 +152,195 @@
 
             <FrameLayout
                 android:id="@+id/player_container"
+
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
+
                 android:background="#000000">
+
 
                 <!-- VIDEO -->
 
                 <androidx.media3.ui.PlayerView
                     android:id="@+id/player_view"
+
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+
                     android:background="#000000"
+
                     android:keepScreenOn="true"
+
                     app:use_controller="false"
                     app:show_buffering="when_playing"
                     app:resize_mode="fit" />
 
+
                 <!-- ================================================= -->
-                <!-- CUSTOM YOUTUBE STYLE CONTROLS -->
+                <!-- CUSTOM CONTROLS -->
                 <!-- ================================================= -->
 
                 <FrameLayout
                     android:id="@+id/player_controls"
+
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+
                     android:background="@android:color/transparent"
-                    android:clickable="false">
 
-                    <!-- TOP LEFT -->
-                    <TextView
-                        android:id="@+id/player_back_button"
-                        android:layout_width="55dp"
-                        android:layout_height="55dp"
-                        android:layout_gravity="top|start"
-                        android:gravity="center"
-                        android:text="⌄"
-                        android:textColor="#FFFFFF"
-                        android:textSize="38sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
+                    android:clickable="false"
+                    android:focusable="false">
 
+
+                    <!-- ================================================= -->
                     <!-- CENTER CONTROLS -->
+                    <!-- ================================================= -->
 
                     <LinearLayout
-                        android:id="@+id/center_controls"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+
                         android:layout_gravity="center"
+
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
+
 
                         <!-- REWIND -->
 
                         <TextView
                             android:id="@+id/rewind_button"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+
                             android:gravity="center"
+
                             android:text="↶&#10;10"
+
                             android:textColor="#FFFFFF"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans"
+
                             android:background="@android:color/transparent"
+
                             android:clickable="true"
                             android:focusable="true" />
 
-                        <!-- PLAY PAUSE -->
+
+                        <!-- ================================================= -->
+                        <!-- CENTER PLAY PAUSE -->
+                        <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/play_pause_button"
-                            android:layout_width="82dp"
-                            android:layout_height="82dp"
+
+                            android:layout_width="78dp"
+                            android:layout_height="78dp"
+
                             android:gravity="center"
+
                             android:text="▶"
+
                             android:textColor="#FFFFFF"
-                            android:textSize="38sp"
+                            android:textSize="36sp"
                             android:textStyle="bold"
+
                             android:background="@drawable/player_center_button"
+
                             android:clickable="true"
                             android:focusable="true"
+
                             android:elevation="8dp" />
+
 
                         <!-- FORWARD -->
 
                         <TextView
                             android:id="@+id/forward_button"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
+
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+
                             android:gravity="center"
+
                             android:text="↷&#10;10"
+
                             android:textColor="#FFFFFF"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans"
+
                             android:background="@android:color/transparent"
+
                             android:clickable="true"
                             android:focusable="true" />
 
                     </LinearLayout>
 
-                    <!-- LIVE TEXT -->
+
+                    <!-- ================================================= -->
+                    <!-- LIVE -->
+                    <!-- ================================================= -->
 
                     <TextView
                         android:id="@+id/live_text"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+
                         android:layout_gravity="bottom|start"
+
                         android:layout_marginStart="20dp"
                         android:layout_marginBottom="18dp"
+
                         android:text="●  LIVE"
+
                         android:textColor="#FFFFFF"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textStyle="bold" />
 
-                    <!-- BOTTOM LINE -->
+
+                    <!-- ================================================= -->
+                    <!-- PROGRESS LINE -->
+                    <!-- ================================================= -->
 
                     <View
-                        android:id="@+id/live_progress_line"
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
+
                         android:layout_gravity="bottom"
+
                         android:layout_marginStart="20dp"
-                        android:layout_marginEnd="80dp"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="75dp"
+                        android:layout_marginBottom="9dp"
+
                         android:background="#FFFFFF" />
 
+
+                    <!-- ================================================= -->
                     <!-- FULLSCREEN -->
+                    <!-- ================================================= -->
 
                     <ImageButton
                         android:id="@+id/fullscreen_button"
+
                         android:layout_width="52dp"
                         android:layout_height="52dp"
+
                         android:layout_gravity="bottom|end"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="4dp"
+
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="3dp"
+
                         android:background="@android:color/transparent"
-                        android:padding="10dp"
+
                         android:src="@android:drawable/ic_menu_crop"
                         android:tint="#FFFFFF"
+
+                        android:padding="10dp"
+
                         android:contentDescription="Fullscreen"
+
                         android:clickable="true"
                         android:focusable="true" />
 
@@ -243,38 +348,52 @@
 
             </FrameLayout>
 
+
             <!-- ================================================= -->
             <!-- CURRENT CHANNEL -->
             <!-- ================================================= -->
 
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:orientation="vertical"
+
                 android:paddingStart="28dp"
                 android:paddingTop="15dp"
                 android:paddingEnd="20dp"
                 android:paddingBottom="15dp"
+
                 android:background="#111111">
+
 
                 <TextView
                     android:id="@+id/current_channel_name"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:text="T Sports"
+
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:text="Live"
+
                     android:textColor="#FF2020"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
+
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
+
 
             <!-- ================================================= -->
             <!-- CHANNEL TITLE -->
@@ -282,16 +401,22 @@
 
             <TextView
                 android:id="@+id/channel_title"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:paddingStart="28dp"
                 android:paddingTop="25dp"
                 android:paddingBottom="15dp"
+
                 android:text="Live TV Channels"
+
                 android:textColor="#FFFFFF"
                 android:textSize="28sp"
                 android:textStyle="bold"
+
                 android:background="#000000" />
+
 
             <!-- ================================================= -->
             <!-- CHANNEL GRID -->
@@ -299,14 +424,20 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channel_recycler"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="15dp"
+
                 android:clipToPadding="false"
+
                 android:background="#000000"
+
                 android:overScrollMode="never" />
+
 
             <!-- ================================================= -->
             <!-- FOOTER -->
@@ -314,50 +445,77 @@
 
             <LinearLayout
                 android:id="@+id/footer_layout"
+
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
+
                 android:orientation="horizontal"
                 android:gravity="center"
+
                 android:background="#111111">
+
 
                 <ImageView
                     android:id="@+id/footer_facebook"
+
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+
                     android:layout_margin="12dp"
+
                     android:src="@android:drawable/ic_menu_share"
                     android:tint="#FFFFFF"
+
                     android:clickable="true"
+
                     android:contentDescription="Facebook" />
+
 
                 <ImageView
                     android:id="@+id/footer_youtube"
+
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+
                     android:layout_margin="12dp"
+
                     android:src="@android:drawable/ic_media_play"
                     android:tint="#FFFFFF"
+
                     android:clickable="true"
+
                     android:contentDescription="YouTube" />
+
 
                 <ImageView
                     android:id="@+id/footer_instagram"
+
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+
                     android:layout_margin="12dp"
+
                     android:src="@android:drawable/ic_menu_camera"
                     android:tint="#FFFFFF"
+
                     android:clickable="true"
+
                     android:contentDescription="Instagram" />
+
 
                 <ImageView
                     android:id="@+id/footer_tiktok"
+
                     android:layout_width="50dp"
                     android:layout_height="50dp"
+
                     android:layout_margin="12dp"
+
                     android:src="@android:drawable/ic_menu_info_details"
                     android:tint="#FFFFFF"
+
                     android:clickable="true"
+
                     android:contentDescription="TikTok" />
 
             </LinearLayout>
@@ -366,126 +524,180 @@
 
     </ScrollView>
 
+
     <!-- ========================================================= -->
     <!-- BOTTOM NAVIGATION -->
     <!-- ========================================================= -->
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
+
         android:layout_width="match_parent"
         android:layout_height="70dp"
+
         android:orientation="horizontal"
+
         android:gravity="center"
+
         android:background="#111111"
+
         android:elevation="8dp">
+
 
         <!-- HOME -->
 
         <LinearLayout
             android:id="@+id/menu_home"
+
             android:layout_width="0dp"
             android:layout_height="match_parent"
+
             android:layout_weight="1"
+
             android:gravity="center"
+
             android:orientation="vertical"
+
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⌂"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:text="⌂"
+
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
                 android:text="Home"
+
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
         </LinearLayout>
+
 
         <!-- NOTIFICATION -->
 
         <LinearLayout
             android:id="@+id/menu_notification"
+
             android:layout_width="0dp"
             android:layout_height="match_parent"
+
             android:layout_weight="1"
+
             android:gravity="center"
+
             android:orientation="vertical"
+
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="♟"
-                android:textColor="#FFFFFF"
-                android:textSize="25sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:text="♟"
+
+                android:textColor="#FFFFFF"
+                android:textSize="25sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
                 android:text="Notification"
+
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
         </LinearLayout>
+
 
         <!-- UPDATE -->
 
         <LinearLayout
             android:id="@+id/menu_update"
+
             android:layout_width="0dp"
             android:layout_height="match_parent"
+
             android:layout_weight="1"
+
             android:gravity="center"
+
             android:orientation="vertical"
+
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⟳"
-                android:textColor="#FFFFFF"
-                android:textSize="28sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:text="⟳"
+
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
                 android:text="Update"
+
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
         </LinearLayout>
 
+
         <!-- CHANNEL -->
 
         <LinearLayout
             android:id="@+id/menu_channel"
+
             android:layout_width="0dp"
             android:layout_height="match_parent"
+
             android:layout_weight="1"
+
             android:gravity="center"
+
             android:orientation="vertical"
+
             android:clickable="true"
             android:focusable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="▶"
-                android:textColor="#FFFFFF"
-                android:textSize="25sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:text="▶"
+
+                android:textColor="#FFFFFF"
+                android:textSize="25sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
                 android:text="Channel"
+
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
