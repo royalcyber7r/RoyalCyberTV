@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 
 import org.json.JSONArray
+import org.json.JSONObject
 
 import java.io.File
 import java.net.HttpURLConnection
@@ -46,14 +47,13 @@ class UpdateActivity : AppCompatActivity() {
     companion object {
 
         /*
-         * IMPORTANT:
-         * releases/latest ব্যবহার করা হচ্ছে না।
+         * GitHub Releases List API
          *
-         * GitHub Releases List API ব্যবহার করা হচ্ছে।
+         * Private repository নয়,
+         * তাই Public repository থেকে কাজ করবে।
          */
-
         private const val GITHUB_API =
-            "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=10"
+            "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=100"
 
         private const val APK_NAME =
             "RoyalCyberTV.apk"
@@ -128,6 +128,12 @@ class UpdateActivity : AppCompatActivity() {
         checkLatestRelease()
     }
 
+
+    /*
+     * =========================================================
+     * CHECK LATEST RELEASE
+     * =========================================================
+     */
 
     private fun checkLatestRelease() {
 
@@ -222,7 +228,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * Releases List
+                 * JSON Array
                  */
 
                 val releases =
@@ -238,25 +244,36 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * প্রথমটি হলো latest published release
+                 * =================================================
+                 * সবচেয়ে বড় BUILD NUMBER-এর RELEASE নির্বাচন করা হবে
+                 * =================================================
                  */
 
-                var selectedRelease = null as org.json.JSONObject?
+                var selectedRelease: JSONObject? =
+                    null
 
-                var selectedTag = ""
+                var selectedTag =
+                    ""
 
-                var selectedName = ""
+                var selectedName =
+                    ""
 
-                var selectedBody = ""
+                var selectedBody =
+                    ""
 
-                var selectedDownloadUrl = ""
+                var selectedDownloadUrl =
+                    ""
+
+                var selectedVersionCode =
+                    0
 
 
                 /*
-                 * প্রথম 10টি Release-এর মধ্যে
-                 * RoyalCyberTV.apk খোঁজা হবে।
+                 * সব Release পরীক্ষা করা হবে
                  *
-                 * Draft Release বাদ দেওয়া হবে।
+                 * কারণ API-এর প্রথম Release-ই
+                 * সবসময় আমাদের APK-এর সবচেয়ে বড় build
+                 * নাও হতে পারে।
                  */
 
                 for (
@@ -267,16 +284,13 @@ class UpdateActivity : AppCompatActivity() {
                         releases.getJSONObject(i)
 
 
+                    /*
+                     * Draft Release বাদ
+                     */
+
                     val draft =
                         release.optBoolean(
                             "draft",
-                            false
-                        )
-
-
-                    val prerelease =
-                        release.optBoolean(
-                            "prerelease",
                             false
                         )
 
@@ -287,10 +301,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * প্রথমে normal release নেওয়া হবে।
-                     *
-                     * prerelease হলে পরেও fallback হিসেবে
-                     * ব্যবহার করা যাবে।
+                     * Tag
                      */
 
                     val tagName =
@@ -305,6 +316,10 @@ class UpdateActivity : AppCompatActivity() {
                     }
 
 
+                    /*
+                     * APK Assets
+                     */
+
                     val assets =
                         release.optJSONArray(
                             "assets"
@@ -316,8 +331,13 @@ class UpdateActivity : AppCompatActivity() {
                     }
 
 
-                    var foundApkUrl = ""
+                    var foundApkUrl =
+                        ""
 
+
+                    /*
+                     * RoyalCyberTV.apk খোঁজা
+                     */
 
                     for (
                         j in 0 until assets.length()
@@ -352,18 +372,58 @@ class UpdateActivity : AppCompatActivity() {
                     }
 
 
-                    if (foundApkUrl.isEmpty()) {
+                    /*
+                     * APK না থাকলে এই Release বাদ
+                     */
+
+                    if (
+                        foundApkUrl.isEmpty()
+                    ) {
+
                         continue
                     }
 
 
                     /*
-                     * Valid Release পাওয়া গেছে
+                     * Release Build Number
+                     */
+
+                    val releaseVersionCode =
+                        extractVersionCode(
+                            tagName
+                        )
+
+
+                    /*
+                     * Version বুঝতে না পারলে বাদ
+                     */
+
+                    if (
+                        releaseVersionCode <= 0
+                    ) {
+
+                        continue
+                    }
+
+
+                    /*
+                     * =================================================
+                     * সবচেয়ে বড় VERSION CODE নির্বাচন
+                     * =================================================
+                     *
+                     * যেমন:
+                     *
+                     * build-99
+                     * build-125
+                     * build-127
+                     *
+                     * তাহলে build-127 নেওয়া হবে।
                      */
 
                     if (
                         selectedRelease == null ||
-                        (!prerelease)
+                        releaseVersionCode >
+                        selectedVersionCode
                     ) {
 
                         selectedRelease =
@@ -386,23 +446,19 @@ class UpdateActivity : AppCompatActivity() {
 
                         selectedDownloadUrl =
                             foundApkUrl
-                    }
 
-
-                    /*
-                     * Normal release পেলে
-                     * আর খোঁজার দরকার নেই।
-                     */
-
-                    if (!prerelease) {
-                        break
+                        selectedVersionCode =
+                            releaseVersionCode
                     }
                 }
 
 
+                /*
+                 * কোনো valid Release পাওয়া যায়নি
+                 */
+
                 if (
-                    selectedRelease == null ||
-                    selectedTag.isEmpty()
+                    selectedRelease == null
                 ) {
 
                     throw Exception(
@@ -422,16 +478,6 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * GitHub Release Version
-                 */
-
-                val latestVersionCode =
-                    extractVersionCode(
-                        selectedTag
-                    )
-
-
-                /*
                  * Installed App Version
                  */
 
@@ -439,24 +485,14 @@ class UpdateActivity : AppCompatActivity() {
                     getCurrentVersionCode()
 
 
-                if (
-                    latestVersionCode <= 0
-                ) {
-
-                    throw Exception(
-                        "Release version বুঝতে পারিনি: $selectedTag"
-                    )
-                }
-
+                /*
+                 * UI Update
+                 */
 
                 handler.post {
 
-                    /*
-                     * Debug/Status information
-                     */
-
                     if (
-                        latestVersionCode >
+                        selectedVersionCode >
                         currentVersionCode
                     ) {
 
@@ -464,9 +500,17 @@ class UpdateActivity : AppCompatActivity() {
                             selectedDownloadUrl
 
 
+                        /*
+                         * Version display
+                         */
+
                         versionText.text =
                             "Version ${formatVersion(selectedTag)} is now available"
 
+
+                        /*
+                         * Release message
+                         */
 
                         messageText.text =
                             when {
@@ -488,12 +532,17 @@ class UpdateActivity : AppCompatActivity() {
                         updateButton.isEnabled =
                             true
 
+
                     } else {
+
+                        /*
+                         * App already latest
+                         */
 
                         Toast.makeText(
                             this@UpdateActivity,
-                            "আপনার App সর্বশেষ Version-এ আছে",
-                            Toast.LENGTH_SHORT
+                            "আপনার App সর্বশেষ Version-এ আছে\nCurrent: $currentVersionCode | Latest: $selectedVersionCode",
+                            Toast.LENGTH_LONG
                         ).show()
 
                         finish()
@@ -507,7 +556,8 @@ class UpdateActivity : AppCompatActivity() {
 
                 handler.post {
 
-                    apkUrl = ""
+                    apkUrl =
+                        ""
 
                     updateButton.text =
                         "Try Again"
@@ -535,6 +585,12 @@ class UpdateActivity : AppCompatActivity() {
         }
     }
 
+
+    /*
+     * =========================================================
+     * DOWNLOAD APK
+     * =========================================================
+     */
 
     private fun startDownload() {
 
@@ -623,7 +679,9 @@ class UpdateActivity : AppCompatActivity() {
 
         executor.execute {
 
-            var connection: HttpURLConnection? = null
+            var connection: HttpURLConnection? =
+                null
+
 
             try {
 
@@ -682,6 +740,10 @@ class UpdateActivity : AppCompatActivity() {
                     connection.contentLengthLong
 
 
+                /*
+                 * App-specific Download folder
+                 */
+
                 val downloadDirectory =
                     getExternalFilesDir(
                         "Download"
@@ -713,6 +775,10 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
+                /*
+                 * APK File
+                 */
+
                 val apkFile =
                     File(
                         downloadDirectory,
@@ -725,6 +791,10 @@ class UpdateActivity : AppCompatActivity() {
                     apkFile.delete()
                 }
 
+
+                /*
+                 * Download
+                 */
 
                 connection.inputStream.use { input ->
 
@@ -789,6 +859,10 @@ class UpdateActivity : AppCompatActivity() {
                     }
                 }
 
+
+                /*
+                 * File validation
+                 */
 
                 if (
                     !apkFile.exists() ||
@@ -858,6 +932,12 @@ class UpdateActivity : AppCompatActivity() {
     }
 
 
+    /*
+     * =========================================================
+     * INSTALL APK
+     * =========================================================
+     */
+
     private fun installApk(
         apkFile: File
     ) {
@@ -921,6 +1001,12 @@ class UpdateActivity : AppCompatActivity() {
     }
 
 
+    /*
+     * =========================================================
+     * CURRENT APP VERSION CODE
+     * =========================================================
+     */
+
     private fun getCurrentVersionCode(): Int {
 
         return try {
@@ -960,12 +1046,13 @@ class UpdateActivity : AppCompatActivity() {
 
 
     /*
-     * GitHub Release Tag থেকে Version Code
+     * =========================================================
+     * EXTRACT VERSION CODE
+     * =========================================================
      *
      * build-127 -> 127
-     * build-126 -> 126
-     * build_125 -> 125
-     * build 124 -> 124
+     * build_127 -> 127
+     * build 127 -> 127
      *
      * v1.0.2 -> 2
      * 1.0.2  -> 2
@@ -1033,8 +1120,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * অন্য কোনো Tag হলে
-         * শেষের সংখ্যা নেওয়া হবে
+         * অন্য Tag হলে শেষের সংখ্যা
          */
 
         val numberRegex =
@@ -1051,7 +1137,9 @@ class UpdateActivity : AppCompatActivity() {
                 .toList()
 
 
-        if (matches.isNotEmpty()) {
+        if (
+            matches.isNotEmpty()
+        ) {
 
             return matches
                 .last()
@@ -1064,6 +1152,12 @@ class UpdateActivity : AppCompatActivity() {
         return 0
     }
 
+
+    /*
+     * =========================================================
+     * FORMAT VERSION
+     * =========================================================
+     */
 
     private fun formatVersion(
         tag: String
@@ -1103,6 +1197,12 @@ class UpdateActivity : AppCompatActivity() {
             }
     }
 
+
+    /*
+     * =========================================================
+     * DESTROY
+     * =========================================================
+     */
 
     override fun onDestroy() {
 
