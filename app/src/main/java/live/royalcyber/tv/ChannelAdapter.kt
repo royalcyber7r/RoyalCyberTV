@@ -25,10 +25,13 @@ class ChannelAdapter(
 ) : RecyclerView.Adapter<ChannelAdapter.ChannelViewHolder>() {
 
     private val executor = Executors.newFixedThreadPool(4)
-    private val mainHandler = Handler(Looper.getMainLooper())
 
-    class ChannelViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    private val mainHandler =
+        Handler(Looper.getMainLooper())
+
+    class ChannelViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView) {
 
         val logo: ImageView =
             itemView.findViewById(R.id.channel_logo)
@@ -42,12 +45,13 @@ class ChannelAdapter(
         viewType: Int
     ): ChannelViewHolder {
 
-        val view = LayoutInflater.from(parent.context)
-            .inflate(
-                R.layout.item_channel,
-                parent,
-                false
-            )
+        val view =
+            LayoutInflater.from(parent.context)
+                .inflate(
+                    R.layout.item_channel,
+                    parent,
+                    false
+                )
 
         return ChannelViewHolder(view)
     }
@@ -57,13 +61,20 @@ class ChannelAdapter(
         position: Int
     ) {
 
-        val channel = channels[position]
+        val channel =
+            channels[position]
 
-        holder.name.text = channel.name
+        /*
+         * Channel name hidden.
+         * Every channel shows LIVE.
+         */
+        holder.name.text = "🔴 LIVE"
 
         holder.logo.setImageResource(
             android.R.drawable.sym_def_app_icon
         )
+
+        holder.logo.tag = channel.logo
 
         loadImage(
             channel.logo,
@@ -71,6 +82,7 @@ class ChannelAdapter(
         )
 
         holder.itemView.setOnClickListener {
+
             onChannelClick(channel)
         }
     }
@@ -84,11 +96,12 @@ class ChannelAdapter(
 
             try {
 
-                val url = URL(imageUrl)
+                val url =
+                    URL(imageUrl)
 
                 val connection =
                     url.openConnection()
-                        as HttpURLConnection
+                            as HttpURLConnection
 
                 connection.connectTimeout = 10000
                 connection.readTimeout = 10000
@@ -107,9 +120,7 @@ class ChannelAdapter(
 
                     mainHandler.post {
 
-                        if (imageView.tag == imageUrl ||
-                            imageView.tag == null
-                        ) {
+                        if (imageView.tag == imageUrl) {
 
                             imageView.setImageBitmap(
                                 bitmap
@@ -122,15 +133,16 @@ class ChannelAdapter(
 
                 mainHandler.post {
 
-                    imageView.setImageResource(
-                        android.R.drawable
-                            .sym_def_app_icon
-                    )
+                    if (imageView.tag == imageUrl) {
+
+                        imageView.setImageResource(
+                            android.R.drawable
+                                .sym_def_app_icon
+                        )
+                    }
                 }
             }
         }
-
-        imageView.tag = imageUrl
     }
 
     override fun getItemCount(): Int {
@@ -147,6 +159,7 @@ class ChannelAdapter(
     }
 
     fun shutdown() {
+
         executor.shutdownNow()
     }
 }
