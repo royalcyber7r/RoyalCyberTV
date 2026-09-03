@@ -3,7 +3,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="125dp"
+    android:layout_height="145dp"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="5dp"
@@ -13,23 +13,25 @@
 
     <ImageView
         android:id="@+id/channel_logo"
-        android:layout_width="match_parent"
-        android:layout_height="75dp"
-        android:background="#151515"
-        android:padding="7dp"
+        android:layout_width="82dp"
+        android:layout_height="82dp"
+        android:background="@drawable/channel_circle_bg"
+        android:padding="5dp"
         android:scaleType="fitCenter"
+        android:clipToOutline="true"
         android:contentDescription="Channel Logo" />
 
     <TextView
         android:id="@+id/channel_name"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="Channel"
+        android:text="🔴 LIVE"
         android:textColor="#FFFFFF"
         android:textSize="12sp"
-        android:maxLines="2"
+        android:textStyle="bold"
+        android:maxLines="1"
         android:ellipsize="end" />
 
 </LinearLayout>
