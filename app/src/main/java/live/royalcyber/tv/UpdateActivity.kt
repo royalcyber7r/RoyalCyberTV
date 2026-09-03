@@ -535,18 +535,15 @@ class UpdateActivity : AppCompatActivity() {
 
                     } else {
 
-                        /*
-                         * App already latest
-                         */
+    /*
+     * App already latest
+     *
+     * কোনো Toast দেখানো হবে না।
+     * সরাসরি UpdateActivity বন্ধ হয়ে MainActivity-তে যাবে।
+     */
 
-                        Toast.makeText(
-                            this@UpdateActivity,
-                            "আপনার App সর্বশেষ Version-এ আছে\nCurrent: $currentVersionCode | Latest: $selectedVersionCode",
-                            Toast.LENGTH_LONG
-                        ).show()
-
-                        finish()
-                    }
+    finish()
+}
                 }
 
 
