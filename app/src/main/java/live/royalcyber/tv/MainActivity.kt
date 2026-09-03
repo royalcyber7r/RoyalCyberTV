@@ -38,17 +38,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var playerView: PlayerView
     private lateinit var playerContainer: View
-
     private lateinit var channelRecycler: RecyclerView
     private lateinit var channelAdapter: ChannelAdapter
 
     private lateinit var searchButton: ImageButton
     private lateinit var searchBox: EditText
-
     private lateinit var fullscreenButton: ImageButton
 
     private lateinit var mainScrollView: ScrollView
-
     private lateinit var headerLayout: View
     private lateinit var currentChannelName: TextView
     private lateinit var channelTitle: TextView
@@ -62,10 +59,10 @@ class MainActivity : AppCompatActivity() {
 
     private var player: ExoPlayer? = null
 
+    private var currentChannel: Channel? = null
+
     private var isFullscreen = false
-
     private var normalPlayerHeight = 220
-
     private var searchWasVisible = false
 
 
@@ -119,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "RTV",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Rtv_bangladesh.svg/250px-Rtv_bangladesh.svg.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTuLgXDPQ2Gtl_6XrS_wvA38NE3jrXsY19axu5oqYpiCL4gxGtoRwu3g&s=10",
             streamUrl = "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/rtv-sg.stream/index.m3u8"
         ),
 
@@ -143,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Maasranga TV HD",
-            logo = "https://mail.maasranga.tv/public/customize/newImage/logo.png",
+            logo = "https://upload.wikimedia.org/wikipedia/en/3/39/Maasranga_Television_Logo.jpg",
             streamUrl = "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"
         ),
 
@@ -155,13 +152,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Desh TV",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE2kgVly8CFmeDPj2EhppbImQK6jrwwfPUrvHJb1Ipzw&s",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/2/25/Desh_tv_logo.jpg",
             streamUrl = "https://tvsen6.aynaott.com/ryFkXfd1a4CQ7mMdc820/index.m3u8"
         ),
 
         Channel(
             name = "Ananda TV",
-            logo = "https://assets-prod.services.toffeelive.com/wCM3l5sBEef-9-uVXFvD/posters/d80f7aee-5bd7-4edc-97eb-ead0e3ebbe09.png",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Logo_of_Ananda_TV.svg/1280px-Logo_of_Ananda_TV.svg.png",
             streamUrl = "https://tvsen6.aynaott.com/LeUAm4F1iixYns3s3Non/index.m3u8"
         ),
 
@@ -179,18 +176,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Boishakhi TV",
-            logo = "https://static.wikia.nocookie.net/etv-gspn-bangla/images/c/ce/Boishakhi_TV_2022.png/revision/latest?cb=20241009111526",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f2/Boishakhi_Tv_Logo.png",
             streamUrl = "https://tvsen6.aynaott.com/1d3uG9VCgrR9DRtWZM57/index.m3u8"
         ),
 
-
-        // =====================================================
-        // NEW CHANNELS
-        // =====================================================
-
         Channel(
             name = "A Sports",
-            logo = "https://play-lh.googleusercontent.com/9SeOWItRm9aisiTN7QJO1cSeRbpj_XJBc-_R0b7QND_r_BFop59qRw5pWxAUl3beku_PKJoO7gJO9ZYM2-FimWM=w600-h300-pc0xffffff-pd",
+            logo = "https://upload.wikimedia.org/wikipedia/en/0/0c/A_Sports_Logo.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
             streamUrl = "https://tvsen6.aynaott.com/zv68oqPDu7MZZwmHhRxt/index.m3u8"
         ),
 
@@ -250,7 +242,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Channel 24 HD",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjuXLcjAW56Ye_oenufM9FYvXh6AnOESdt5JbLbA3RRpXkNTgbRqH51OC8&s=10",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Logo_of_Channel_24_%28Bangladesh%29.svg/1280px-Logo_of_Channel_24_%28Bangladesh%29.svg.png",
             streamUrl = "https://stream.ottplus.live/live/channel_24_abr/index.m3u8"
         ),
 
@@ -263,10 +255,11 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // ACTIVITY
+    // ON CREATE
     // =========================================================
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
@@ -296,7 +289,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // FIND VIEWS
+    // INITIALIZE VIEWS
     // =========================================================
 
     private fun initializeViews() {
@@ -336,7 +329,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // CHANNEL RECYCLER
+    // CHANNEL LIST
     // =========================================================
 
     private fun setupChannelList() {
@@ -344,13 +337,12 @@ class MainActivity : AppCompatActivity() {
         channelRecycler.layoutManager =
             GridLayoutManager(this, 3)
 
-        channelAdapter =
-            ChannelAdapter(
-                channels = channels,
-                onChannelClick = { channel ->
-                    playChannel(channel)
-                }
-            )
+        channelAdapter = ChannelAdapter(
+            channels = channels,
+            onChannelClick = { channel ->
+                playChannel(channel)
+            }
+        )
 
         channelRecycler.adapter = channelAdapter
 
@@ -362,22 +354,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    // =========================================================
-    // RECYCLER HEIGHT
-    // =========================================================
-
     private fun updateRecyclerHeight() {
 
-        if (!::channelAdapter.isInitialized) {
-            return
-        }
+        if (!::channelAdapter.isInitialized) return
 
-        if (!::channelRecycler.isInitialized) {
-            return
-        }
+        if (!::channelRecycler.isInitialized) return
 
-        val itemCount =
-            channelAdapter.itemCount
+        val itemCount = channelAdapter.itemCount
 
         val columns = 3
 
@@ -396,10 +379,7 @@ class MainActivity : AppCompatActivity() {
         val bottomPaddingDp = 15
 
         val heightPx =
-            (
-                rows * rowHeightDp +
-                bottomPaddingDp
-            ) * density
+            (rows * rowHeightDp + bottomPaddingDp) * density
 
         val params =
             channelRecycler.layoutParams
@@ -413,13 +393,14 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // PLAYER
+    // EXOPLAYER SETUP
     // =========================================================
 
     private fun setupPlayer() {
 
         player =
-            ExoPlayer.Builder(this).build()
+            ExoPlayer.Builder(this)
+                .build()
 
         playerView.player =
             player
@@ -443,8 +424,47 @@ class MainActivity : AppCompatActivity() {
             PlayerView.SHOW_BUFFERING_WHEN_PLAYING
         )
 
+        /*
+         * Important:
+         * If a live stream reaches ENDED,
+         * pressing Play can start it again.
+         */
+        player?.repeatMode =
+            Player.REPEAT_MODE_ONE
+
+
         player?.addListener(
             object : Player.Listener {
+
+                override fun onPlaybackStateChanged(
+                    playbackState: Int
+                ) {
+
+                    when (playbackState) {
+
+                        Player.STATE_BUFFERING -> {
+                            // Buffering চলছে
+                        }
+
+                        Player.STATE_READY -> {
+                            // Stream ready
+                        }
+
+                        Player.STATE_ENDED -> {
+                            /*
+                             * Stream ended.
+                             * Controller-এর Play button
+                             * আবার playback শুরু করতে পারবে
+                             * কারণ repeat mode ONE রাখা হয়েছে।
+                             */
+                        }
+
+                        Player.STATE_IDLE -> {
+                            // Player এখন idle
+                        }
+                    }
+                }
+
 
                 override fun onPlayerError(
                     error: PlaybackException
@@ -465,9 +485,7 @@ class MainActivity : AppCompatActivity() {
     // PLAY CHANNEL
     // =========================================================
 
-    private fun playChannel(
-        channel: Channel
-    ) {
+    private fun playChannel(channel: Channel) {
 
         val url =
             channel.streamUrl.trim()
@@ -483,9 +501,19 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+
+        /*
+         * বর্তমানে কোন channel চলছে
+         * সেটা মনে রাখা হচ্ছে।
+         */
+        currentChannel =
+            channel
+
+
         val dataSourceFactory =
             DefaultHttpDataSource.Factory()
                 .setAllowCrossProtocolRedirects(true)
+
 
         val mediaSource =
             HlsMediaSource.Factory(
@@ -494,26 +522,38 @@ class MainActivity : AppCompatActivity() {
                 MediaItem.fromUri(url)
             )
 
+
         player?.apply {
 
+            /*
+             * আগের stream পুরোপুরি বন্ধ।
+             */
             stop()
 
             clearMediaItems()
 
-            setMediaSource(
-                mediaSource
-            )
+            /*
+             * নতুন HLS stream সেট।
+             */
+            setMediaSource(mediaSource)
 
+            /*
+             * নতুন stream prepare।
+             */
             prepare()
 
-            playWhenReady =
-                true
+            /*
+             * Play শুরু।
+             */
+            playWhenReady = true
 
             play()
         }
 
+
         currentChannelName.text =
             channel.name
+
 
         if (!isFullscreen) {
 
@@ -525,6 +565,52 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+
+    // =========================================================
+    // RESUME / RETRY PLAYBACK
+    // =========================================================
+
+    private fun resumePlayback() {
+
+        val exoPlayer =
+            player ?: return
+
+        /*
+         * যদি player IDLE বা ENDED থাকে,
+         * তাহলে current channel আবার prepare করা হবে।
+         */
+        if (
+            exoPlayer.playbackState ==
+            Player.STATE_IDLE
+            ||
+            exoPlayer.playbackState ==
+            Player.STATE_ENDED
+        ) {
+
+            val channel =
+                currentChannel
+
+            if (channel != null) {
+
+                playChannel(
+                    channel
+                )
+
+                return
+            }
+        }
+
+
+        /*
+         * Player READY/BUFFERING অবস্থায় থাকলে
+         * শুধু Play করা হবে।
+         */
+        exoPlayer.playWhenReady =
+            true
+
+        exoPlayer.play()
     }
 
 
@@ -555,6 +641,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         searchBox.addTextChangedListener(
             object : TextWatcher {
 
@@ -565,6 +652,7 @@ class MainActivity : AppCompatActivity() {
                     after: Int
                 ) {
                 }
+
 
                 override fun onTextChanged(
                     s: CharSequence?,
@@ -578,6 +666,7 @@ class MainActivity : AppCompatActivity() {
                             ?.trim()
                             ?.lowercase()
                             ?: ""
+
 
                     val result =
                         if (query.isEmpty()) {
@@ -594,14 +683,17 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
+
                     channelAdapter.updateList(
                         result
                     )
+
 
                     channelRecycler.post {
                         updateRecyclerHeight()
                     }
                 }
+
 
                 override fun afterTextChanged(
                     s: Editable?
@@ -638,18 +730,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun enterFullscreen() {
 
-        if (isFullscreen) {
-            return
-        }
+        if (isFullscreen) return
 
-        isFullscreen = true
+        isFullscreen =
+            true
 
         searchWasVisible =
             searchBox.visibility ==
                     View.VISIBLE
 
+
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
 
         headerLayout.visibility =
             View.GONE
@@ -672,12 +765,15 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.visibility =
             View.GONE
 
+
         mainScrollView.scrollTo(
             0,
             0
         )
 
+
         hideSystemBars()
+
 
         window.decorView.post {
 
@@ -687,14 +783,13 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // APPLY FULLSCREEN PLAYER SIZE
+    // FULLSCREEN PLAYER SIZE
     // =========================================================
 
     private fun applyFullscreenPlayerSize() {
 
-        if (!isFullscreen) {
-            return
-        }
+        if (!isFullscreen) return
+
 
         val displayMetrics =
             resources.displayMetrics
@@ -702,19 +797,21 @@ class MainActivity : AppCompatActivity() {
         val screenHeight =
             displayMetrics.heightPixels
 
+
         val params =
             playerContainer.layoutParams
 
-        // Fullscreen width
+
         params.width =
             ViewGroup.LayoutParams.MATCH_PARENT
 
-        // Fullscreen height
         params.height =
             screenHeight
 
+
         playerContainer.layoutParams =
             params
+
 
         mainScrollView.scrollTo(
             0,
@@ -729,34 +826,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun exitFullscreen() {
 
-        if (!isFullscreen) {
-            return
-        }
+        if (!isFullscreen) return
 
-        isFullscreen = false
+        isFullscreen =
+            false
+
 
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+
         val density =
             resources.displayMetrics.density
+
 
         val params =
             playerContainer.layoutParams
 
-        // Normal portrait width
+
         params.width =
             ViewGroup.LayoutParams.MATCH_PARENT
 
-        // Normal player height
         params.height =
-            (
-                normalPlayerHeight *
-                density
-            ).toInt()
+            (normalPlayerHeight * density)
+                .toInt()
+
 
         playerContainer.layoutParams =
             params
+
 
         headerLayout.visibility =
             View.VISIBLE
@@ -776,6 +874,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.visibility =
             View.VISIBLE
 
+
         if (searchWasVisible) {
 
             searchBox.visibility =
@@ -787,7 +886,9 @@ class MainActivity : AppCompatActivity() {
                 View.GONE
         }
 
+
         showSystemBars()
+
 
         mainScrollView.post {
 
@@ -802,7 +903,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // SYSTEM BAR HIDE
+    // SYSTEM BARS
     // =========================================================
 
     private fun hideSystemBars() {
@@ -812,25 +913,24 @@ class MainActivity : AppCompatActivity() {
             false
         )
 
+
         val controller =
             WindowCompat.getInsetsController(
                 window,
                 window.decorView
             )
 
+
         controller.hide(
             WindowInsetsCompat.Type.systemBars()
         )
+
 
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat
                 .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
-
-    // =========================================================
-    // SYSTEM BAR SHOW
-    // =========================================================
 
     private fun showSystemBars() {
 
@@ -839,11 +939,13 @@ class MainActivity : AppCompatActivity() {
             true
         )
 
+
         val controller =
             WindowCompat.getInsetsController(
                 window,
                 window.decorView
             )
+
 
         controller.show(
             WindowInsetsCompat.Type.systemBars()
@@ -863,6 +965,7 @@ class MainActivity : AppCompatActivity() {
             newConfig
         )
 
+
         window.decorView.post {
 
             if (isFullscreen) {
@@ -876,17 +979,18 @@ class MainActivity : AppCompatActivity() {
                 val density =
                     resources.displayMetrics.density
 
+
                 val params =
                     playerContainer.layoutParams
+
 
                 params.width =
                     ViewGroup.LayoutParams.MATCH_PARENT
 
                 params.height =
-                    (
-                        normalPlayerHeight *
-                        density
-                    ).toInt()
+                    (normalPlayerHeight * density)
+                        .toInt()
+
 
                 playerContainer.layoutParams =
                     params
@@ -896,7 +1000,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // BOTTOM NAVIGATION
+    // BOTTOM MENU
     // =========================================================
 
     private fun setupBottomMenu() {
@@ -914,6 +1018,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         findViewById<View>(
             R.id.menu_notification
         ).setOnClickListener {
@@ -925,6 +1030,7 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
+
         findViewById<View>(
             R.id.menu_update
         ).setOnClickListener {
@@ -935,6 +1041,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+
 
         findViewById<View>(
             R.id.menu_channel
@@ -952,7 +1059,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // SOCIAL MEDIA
+    // SOCIAL LINKS
     // =========================================================
 
     private fun setupSocialLinks() {
@@ -964,6 +1071,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+
         footerYoutube.setOnClickListener {
 
             openUrl(
@@ -971,12 +1079,14 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+
         footerInstagram.setOnClickListener {
 
             openUrl(
                 "https://www.instagram.com/crimeworld06266"
             )
         }
+
 
         footerTiktok.setOnClickListener {
 
@@ -1021,26 +1131,49 @@ class MainActivity : AppCompatActivity() {
 
 
     // =========================================================
-    // RESUME
+    // ACTIVITY RESUME
     // =========================================================
 
     override fun onResume() {
 
         super.onResume()
 
-        player?.play()
+        /*
+         * App আবার foreground-এ এলে
+         * বর্তমান stream resume হবে।
+         */
+        player?.let {
+
+            if (
+                it.playbackState ==
+                Player.STATE_IDLE
+                ||
+                it.playbackState ==
+                Player.STATE_ENDED
+            ) {
+
+                resumePlayback()
+
+            } else {
+
+                it.play()
+            }
+        }
     }
 
 
     // =========================================================
-    // PAUSE
+    // ACTIVITY PAUSE
     // =========================================================
 
     override fun onPause() {
 
-        super.onPause()
-
+        /*
+         * App background-এ গেলে stream pause।
+         */
         player?.pause()
+
+        super.onPause()
     }
 
 
@@ -1054,7 +1187,10 @@ class MainActivity : AppCompatActivity() {
 
         player = null
 
-        if (::channelAdapter.isInitialized) {
+        if (
+            ::channelAdapter.isInitialized
+        ) {
+
             channelAdapter.shutdown()
         }
 
