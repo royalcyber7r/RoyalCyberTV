@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -180,6 +181,83 @@ class MainActivity : AppCompatActivity() {
             name = "Boishakhi TV",
             logo = "https://upload.wikimedia.org/wikipedia/commons/f/f2/Boishakhi_Tv_Logo.png",
             streamUrl = "https://tvsen6.aynaott.com/1d3uG9VCgrR9DRtWZM57/index.m3u8"
+        ),
+
+
+        // =====================================================
+        // NEW CHANNELS
+        // =====================================================
+
+        Channel(
+            name = "A Sports",
+            logo = "https://upload.wikimedia.org/wikipedia/en/0/0c/A_Sports_Logo.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+            streamUrl = "https://tvsen6.aynaott.com/zv68oqPDu7MZZwmHhRxt/index.m3u8"
+        ),
+
+        Channel(
+            name = "Bein Sports Direct",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkuwIi4KCSdEc0i8OLMZSEhUkAzkd6cWArxA&s",
+            streamUrl = "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8"
+        ),
+
+        Channel(
+            name = "Zee 24 Ghanta HD",
+            logo = "https://i.postimg.cc/tTNPLBMs/24-Ghanta.jpg",
+            streamUrl = "https://d2dsoyvkr33m05.cloudfront.net/index_1.m3u8"
+        ),
+
+        Channel(
+            name = "ATN News HD",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_PzLYrDkO7qND7MCx4Tk_awS9J9PwOzcH6Q&s=",
+            streamUrl = "https://tvsen6.aynaott.com/da6WMXAk/index.m3u8"
+        ),
+
+        Channel(
+            name = "DeshBidesh",
+            logo = "https://i.imgur.com/Ek1Ohj6.png",
+            streamUrl = "https://dbcanada.sonarbanglatv.com/deshebideshe/dbtv/index.m3u8"
+        ),
+
+        Channel(
+            name = "Goldmines Movies HD",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUso-0xopQb02-1w2nw5xxHpydkdNNFS5Cqg&s",
+            streamUrl = "https://cdn-2.pishow.tv/live/1461/master.m3u8"
+        ),
+
+        Channel(
+            name = "9XM",
+            logo = "https://yt3.googleusercontent.com/a5SfL3aMu1G_MufbVoDv0wPz4gcyn_pYtsR3BAMH08B368gh-ytxzBWgPpdmKyWemwCGF0Ql=s900-c-k-c0x00ffffff-no-rj",
+            streamUrl = "https://9xjio.wiseplayout.com/9XM/master.m3u8"
+        ),
+
+        Channel(
+            name = "Yrf Music HD",
+            logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/756c50edae8599fb760cbbfb22010a75.png",
+            streamUrl = "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01412-xiaomiasia-yrfmusic-xiaomi/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "Music India HD",
+            logo = "https://static.wikia.nocookie.net/logopedia/images/2/2f/Music_India.jpeg",
+            streamUrl = "https://cdn-2.pishow.tv/live/226/master.m3u8"
+        ),
+
+        Channel(
+            name = "Ekator TV HD",
+            logo = "https://s4.gifyu.com/images/imagea02f4314e761661d.png",
+            streamUrl = "https://tvsen6.aynaott.com/EWDrV5QskgarZEUBb3pU/index.m3u8"
+        ),
+
+        Channel(
+            name = "Channel 24 HD",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Logo_of_Channel_24_%28Bangladesh%29.svg/1280px-Logo_of_Channel_24_%28Bangladesh%29.svg.png",
+            streamUrl = "https://stream.ottplus.live/live/channel_24_abr/index.m3u8"
+        ),
+
+        Channel(
+            name = "Channel 1 4K",
+            logo = "https://www.thedailystar.net/sites/default/files/styles/big_1/public/images/2025/02/24/channel_1.png",
+            streamUrl = "https://stream.ottplus.live/live/channel_1_hd_abr/index.m3u8"
         )
     )
 
@@ -298,7 +376,8 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val itemCount = channelAdapter.itemCount
+        val itemCount =
+            channelAdapter.itemCount
 
         val columns = 3
 
@@ -325,9 +404,11 @@ class MainActivity : AppCompatActivity() {
         val params =
             channelRecycler.layoutParams
 
-        params.height = heightPx.toInt()
+        params.height =
+            heightPx.toInt()
 
-        channelRecycler.layoutParams = params
+        channelRecycler.layoutParams =
+            params
     }
 
 
@@ -340,17 +421,23 @@ class MainActivity : AppCompatActivity() {
         player =
             ExoPlayer.Builder(this).build()
 
-        playerView.player = player
+        playerView.player =
+            player
 
-        playerView.useController = true
+        playerView.useController =
+            true
 
-        playerView.controllerAutoShow = true
+        playerView.controllerAutoShow =
+            true
 
-        playerView.controllerHideOnTouch = true
+        playerView.controllerHideOnTouch =
+            true
 
-        playerView.controllerShowTimeoutMs = 5000
+        playerView.controllerShowTimeoutMs =
+            5000
 
-        playerView.keepScreenOn = true
+        playerView.keepScreenOn =
+            true
 
         playerView.setShowBuffering(
             PlayerView.SHOW_BUFFERING_WHEN_PLAYING
@@ -413,11 +500,14 @@ class MainActivity : AppCompatActivity() {
 
             clearMediaItems()
 
-            setMediaSource(mediaSource)
+            setMediaSource(
+                mediaSource
+            )
 
             prepare()
 
-            playWhenReady = true
+            playWhenReady =
+                true
 
             play()
         }
@@ -446,15 +536,20 @@ class MainActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
 
-            if (searchBox.visibility == View.GONE) {
+            if (
+                searchBox.visibility ==
+                View.GONE
+            ) {
 
-                searchBox.visibility = View.VISIBLE
+                searchBox.visibility =
+                    View.VISIBLE
 
                 searchBox.requestFocus()
 
             } else {
 
-                searchBox.visibility = View.GONE
+                searchBox.visibility =
+                    View.GONE
 
                 searchBox.text.clear()
             }
@@ -499,7 +594,9 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
-                    channelAdapter.updateList(result)
+                    channelAdapter.updateList(
+                        result
+                    )
 
                     channelRecycler.post {
                         updateRecyclerHeight()
@@ -548,24 +645,32 @@ class MainActivity : AppCompatActivity() {
         isFullscreen = true
 
         searchWasVisible =
-            searchBox.visibility == View.VISIBLE
+            searchBox.visibility ==
+                    View.VISIBLE
 
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        headerLayout.visibility = View.GONE
+        headerLayout.visibility =
+            View.GONE
 
-        searchBox.visibility = View.GONE
+        searchBox.visibility =
+            View.GONE
 
-        currentChannelName.visibility = View.GONE
+        currentChannelName.visibility =
+            View.GONE
 
-        channelTitle.visibility = View.GONE
+        channelTitle.visibility =
+            View.GONE
 
-        channelRecycler.visibility = View.GONE
+        channelRecycler.visibility =
+            View.GONE
 
-        footerLayout.visibility = View.GONE
+        footerLayout.visibility =
+            View.GONE
 
-        bottomNavigation.visibility = View.GONE
+        bottomNavigation.visibility =
+            View.GONE
 
         mainScrollView.scrollTo(
             0,
@@ -594,21 +699,17 @@ class MainActivity : AppCompatActivity() {
         val displayMetrics =
             resources.displayMetrics
 
-        val screenWidth =
-            displayMetrics.widthPixels
-
         val screenHeight =
             displayMetrics.heightPixels
 
         val params =
             playerContainer.layoutParams
 
-        // IMPORTANT:
-        // Landscape fullscreen-এ পুরো screen width নেবে
+        // Fullscreen width
         params.width =
             ViewGroup.LayoutParams.MATCH_PARENT
 
-        // Landscape fullscreen-এ পুরো screen height নেবে
+        // Fullscreen height
         params.height =
             screenHeight
 
@@ -649,30 +750,41 @@ class MainActivity : AppCompatActivity() {
 
         // Normal player height
         params.height =
-            (normalPlayerHeight * density).toInt()
+            (
+                normalPlayerHeight *
+                density
+            ).toInt()
 
         playerContainer.layoutParams =
             params
 
-        headerLayout.visibility = View.VISIBLE
+        headerLayout.visibility =
+            View.VISIBLE
 
-        currentChannelName.visibility = View.VISIBLE
+        currentChannelName.visibility =
+            View.VISIBLE
 
-        channelTitle.visibility = View.VISIBLE
+        channelTitle.visibility =
+            View.VISIBLE
 
-        channelRecycler.visibility = View.VISIBLE
+        channelRecycler.visibility =
+            View.VISIBLE
 
-        footerLayout.visibility = View.VISIBLE
+        footerLayout.visibility =
+            View.VISIBLE
 
-        bottomNavigation.visibility = View.VISIBLE
+        bottomNavigation.visibility =
+            View.VISIBLE
 
         if (searchWasVisible) {
 
-            searchBox.visibility = View.VISIBLE
+            searchBox.visibility =
+                View.VISIBLE
 
         } else {
 
-            searchBox.visibility = View.GONE
+            searchBox.visibility =
+                View.GONE
         }
 
         showSystemBars()
@@ -747,7 +859,9 @@ class MainActivity : AppCompatActivity() {
         newConfig: Configuration
     ) {
 
-        super.onConfigurationChanged(newConfig)
+        super.onConfigurationChanged(
+            newConfig
+        )
 
         window.decorView.post {
 
