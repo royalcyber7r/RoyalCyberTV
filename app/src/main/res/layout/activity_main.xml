@@ -8,10 +8,6 @@
     android:orientation="vertical"
     android:background="#000000">
 
-    <!-- ===================================================== -->
-    <!-- MAIN CONTENT -->
-    <!-- ===================================================== -->
-
     <ScrollView
         android:id="@+id/main_scroll_view"
         android:layout_width="match_parent"
@@ -19,12 +15,13 @@
         android:layout_weight="1"
         android:fillViewport="true"
         android:background="#000000"
-        android:clipToPadding="false">
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="#000000">
 
             <!-- ================================================= -->
             <!-- HEADER -->
@@ -33,67 +30,65 @@
             <LinearLayout
                 android:id="@+id/header_layout"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="70dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="10dp"
                 android:background="#111111">
 
                 <ImageView
                     android:id="@+id/app_logo"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:src="@drawable/royalcyber_logo"
-                    android:scaleType="centerInside"
-                    android:contentDescription="RoyalCyber Logo" />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/ic_launcher"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Royal Cyber TV" />
 
                 <TextView
-                    android:id="@+id/app_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:text="ROYALCYBERIPTV"
+                    android:layout_marginStart="12dp"
+                    android:text="ROYALCYBERITV"
                     android:textColor="#FFFFFF"
-                    android:textSize="18sp"
+                    android:textSize="24sp"
                     android:textStyle="bold"
-                    android:maxLines="1" />
+                    android:singleLine="true" />
 
                 <ImageButton
                     android:id="@+id/search_button"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:background="@android:color/transparent"
                     android:src="@android:drawable/ic_menu_search"
                     android:tint="#FFFFFF"
-                    android:contentDescription="Search" />
+                    android:padding="10dp"
+                    android:contentDescription="Search"
+                    android:clickable="true"
+                    android:focusable="true" />
 
             </LinearLayout>
 
-
-            <!-- ================================================= -->
-            <!-- SEARCH -->
-            <!-- ================================================= -->
+            <!-- SEARCH BOX -->
 
             <EditText
                 android:id="@+id/search_box"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginStart="12dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="12dp"
                 android:layout_marginBottom="8dp"
-                android:background="#222222"
-                android:hint="Search channel..."
-                android:textColor="#FFFFFF"
-                android:textColorHint="#888888"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
+                android:hint="Search Channel..."
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:textSize="16sp"
                 android:singleLine="true"
-                android:inputType="text"
+                android:background="#222222"
                 android:visibility="gone" />
-
 
             <!-- ================================================= -->
             <!-- PLAYER -->
@@ -105,52 +100,181 @@
                 android:layout_height="220dp"
                 android:background="#000000">
 
+                <!-- VIDEO -->
+
                 <androidx.media3.ui.PlayerView
                     android:id="@+id/player_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:keepScreenOn="true"
                     android:background="#000000"
-                    app:use_controller="true"
+                    android:keepScreenOn="true"
+                    app:use_controller="false"
                     app:show_buffering="when_playing"
                     app:resize_mode="fit" />
 
-                <!-- FULLSCREEN ONLY -->
-                <!-- Quality button সম্পূর্ণ বাদ দেওয়া হয়েছে -->
+                <!-- ================================================= -->
+                <!-- CUSTOM YOUTUBE STYLE CONTROLS -->
+                <!-- ================================================= -->
 
-                <ImageButton
-    android:id="@+id/fullscreen_button"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:layout_gravity="bottom|end"
-    android:layout_margin="10dp"
-    android:background="@drawable/player_fullscreen_bg"
-    android:padding="12dp"
-    android:src="@android:drawable/ic_menu_crop"
-    android:tint="#FFFFFF"
-    android:contentDescription="Fullscreen" />
+                <FrameLayout
+                    android:id="@+id/player_controls"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:clickable="false">
+
+                    <!-- TOP LEFT -->
+                    <TextView
+                        android:id="@+id/player_back_button"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_gravity="top|start"
+                        android:gravity="center"
+                        android:text="⌄"
+                        android:textColor="#FFFFFF"
+                        android:textSize="38sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <!-- CENTER CONTROLS -->
+
+                    <LinearLayout
+                        android:id="@+id/center_controls"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- REWIND -->
+
+                        <TextView
+                            android:id="@+id/rewind_button"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:gravity="center"
+                            android:text="↶&#10;10"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <!-- PLAY PAUSE -->
+
+                        <TextView
+                            android:id="@+id/play_pause_button"
+                            android:layout_width="82dp"
+                            android:layout_height="82dp"
+                            android:gravity="center"
+                            android:text="▶"
+                            android:textColor="#FFFFFF"
+                            android:textSize="38sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/player_center_button"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:elevation="8dp" />
+
+                        <!-- FORWARD -->
+
+                        <TextView
+                            android:id="@+id/forward_button"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:gravity="center"
+                            android:text="↷&#10;10"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                    </LinearLayout>
+
+                    <!-- LIVE TEXT -->
+
+                    <TextView
+                        android:id="@+id/live_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginBottom="18dp"
+                        android:text="●  LIVE"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- BOTTOM LINE -->
+
+                    <View
+                        android:id="@+id/live_progress_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="80dp"
+                        android:layout_marginBottom="10dp"
+                        android:background="#FFFFFF" />
+
+                    <!-- FULLSCREEN -->
+
+                    <ImageButton
+                        android:id="@+id/fullscreen_button"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="@android:color/transparent"
+                        android:padding="10dp"
+                        android:src="@android:drawable/ic_menu_crop"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Fullscreen"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                </FrameLayout>
 
             </FrameLayout>
-
 
             <!-- ================================================= -->
             <!-- CURRENT CHANNEL -->
             <!-- ================================================= -->
 
-            <TextView
-                android:id="@+id/current_channel_name"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="15dp"
-                android:paddingTop="12dp"
-                android:paddingEnd="15dp"
-                android:paddingBottom="12dp"
-                android:text="Live TV"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:background="#111111" />
+                android:orientation="vertical"
+                android:paddingStart="28dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="15dp"
+                android:background="#111111">
 
+                <TextView
+                    android:id="@+id/current_channel_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="T Sports"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Live"
+                    android:textColor="#FF2020"
+                    android:textSize="18sp"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
 
             <!-- ================================================= -->
             <!-- CHANNEL TITLE -->
@@ -160,35 +284,29 @@
                 android:id="@+id/channel_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="15dp"
-                android:paddingTop="14dp"
-                android:paddingEnd="15dp"
-                android:paddingBottom="10dp"
+                android:paddingStart="28dp"
+                android:paddingTop="25dp"
+                android:paddingBottom="15dp"
                 android:text="Live TV Channels"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:background="#000000" />
 
             <!-- ================================================= -->
-            <!-- CHANNEL LIST -->
-            <!-- গুরুত্বপূর্ণ:
-                 RecyclerView nestedScrolling=false
-                 যাতে ScrollView-এর ভিতরে সব item-এর height নেওয়া যায়
-            ================================================= -->
+            <!-- CHANNEL GRID -->
+            <!-- ================================================= -->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channel_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="100dp"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:paddingBottom="15dp"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                android:clipToPadding="false" />
-
+                android:clipToPadding="false"
+                android:background="#000000"
+                android:overScrollMode="never" />
 
             <!-- ================================================= -->
             <!-- FOOTER -->
@@ -197,236 +315,50 @@
             <LinearLayout
                 android:id="@+id/footer_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="20dp"
-                android:paddingTop="28dp"
-                android:paddingEnd="20dp"
-                android:paddingBottom="30dp"
+                android:layout_height="120dp"
+                android:orientation="horizontal"
+                android:gravity="center"
                 android:background="#111111">
 
-                <!-- LOGO -->
+                <ImageView
+                    android:id="@+id/footer_facebook"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="12dp"
+                    android:src="@android:drawable/ic_menu_share"
+                    android:tint="#FFFFFF"
+                    android:clickable="true"
+                    android:contentDescription="Facebook" />
 
                 <ImageView
-                    android:id="@+id/footer_logo"
-                    android:layout_width="130dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/royalcyber_logo"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="RoyalCyber" />
+                    android:id="@+id/footer_youtube"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="12dp"
+                    android:src="@android:drawable/ic_media_play"
+                    android:tint="#FFFFFF"
+                    android:clickable="true"
+                    android:contentDescription="YouTube" />
 
+                <ImageView
+                    android:id="@+id/footer_instagram"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="12dp"
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:tint="#FFFFFF"
+                    android:clickable="true"
+                    android:contentDescription="Instagram" />
 
-                <!-- ABOUT -->
-
-                <TextView
-                    android:id="@+id/footer_about"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="About Us"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <TextView
-                    android:id="@+id/footer_faq"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FAQ's"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <TextView
-                    android:id="@+id/footer_terms"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Terms of Use"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <TextView
-                    android:id="@+id/footer_privacy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Privacy Policy"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <!-- AVAILABLE ON -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:text="Available on"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-
-                <TextView
-                    android:id="@+id/footer_google_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Google Play Store"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <TextView
-                    android:id="@+id/footer_apple_store"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Apple App Store"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
-
-
-                <!-- CALL US -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:text="Call us"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-
-                <TextView
-                    android:id="@+id/footer_phone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="01611018372"
-                    android:textColor="#BBBBBB"
-                    android:textSize="14sp" />
-
-
-                <!-- ================================================= -->
-                <!-- FOLLOW US -->
-                <!-- ================================================= -->
-
-                <TextView
-                    android:id="@+id/follow_us_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Follow Us"
-                    android:textColor="#FFFFFF"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
-
-
-                <!-- SOCIAL ICONS -->
-
-                <LinearLayout
-                    android:id="@+id/social_links"
-                    android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="start|center_vertical">
-
-                    <!-- FACEBOOK -->
-
-                    <ImageView
-                        android:id="@+id/footer_facebook"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_facebook"
-                        android:scaleType="centerInside"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="Facebook" />
-
-
-                    <!-- YOUTUBE -->
-
-                    <ImageView
-                        android:id="@+id/footer_youtube"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_youtube"
-                        android:scaleType="centerInside"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="YouTube" />
-
-
-                    <!-- INSTAGRAM -->
-
-                    <ImageView
-                        android:id="@+id/footer_instagram"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="12dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_instagram"
-                        android:scaleType="centerInside"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="Instagram" />
-
-
-                    <!-- TIKTOK -->
-
-                    <ImageView
-                        android:id="@+id/footer_tiktok"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_tiktok"
-                        android:scaleType="centerInside"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="TikTok" />
-
-                </LinearLayout>
-
-
-                <!-- FOOTER BRAND -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="ROYALCYBER IPTV"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-
-                <!-- COPYRIGHT -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Copyright © 2026 Royalcyber. All rights reserved."
-                    android:textColor="#777777"
-                    android:textSize="12sp" />
+                <ImageView
+                    android:id="@+id/footer_tiktok"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_margin="12dp"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    android:tint="#FFFFFF"
+                    android:clickable="true"
+                    android:contentDescription="TikTok" />
 
             </LinearLayout>
 
@@ -434,15 +366,14 @@
 
     </ScrollView>
 
-
-    <!-- ===================================================== -->
+    <!-- ========================================================= -->
     <!-- BOTTOM NAVIGATION -->
-    <!-- ===================================================== -->
+    <!-- ========================================================= -->
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="70dp"
         android:orientation="horizontal"
         android:gravity="center"
         android:background="#111111"
@@ -455,28 +386,26 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_view"
-                android:tint="#FFFFFF"
-                android:contentDescription="Home" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⌂"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Home"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:layout_marginTop="3dp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
-
 
         <!-- NOTIFICATION -->
 
@@ -485,28 +414,26 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_popup_reminder"
-                android:tint="#FFFFFF"
-                android:contentDescription="Notification" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="♟"
+                android:textColor="#FFFFFF"
+                android:textSize="25sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Notification"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:layout_marginTop="3dp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
-
 
         <!-- UPDATE -->
 
@@ -515,28 +442,26 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_popup_sync"
-                android:tint="#FFFFFF"
-                android:contentDescription="Update" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⟳"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Update"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:layout_marginTop="3dp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
-
 
         <!-- CHANNEL -->
 
@@ -545,25 +470,24 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:clickable="true"
             android:focusable="true">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_media_play"
-                android:tint="#FF0000"
-                android:contentDescription="Channel" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="▶"
+                android:textColor="#FFFFFF"
+                android:textSize="25sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Channel"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp"
-                android:layout_marginTop="3dp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
 
