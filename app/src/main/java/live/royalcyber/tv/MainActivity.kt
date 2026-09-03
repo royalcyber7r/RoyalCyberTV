@@ -76,13 +76,40 @@ class MainActivity : AppCompatActivity() {
 
     private var searchWasVisible = false
 
+    /*
+     * =========================================================
+     * UPDATE SYSTEM
+     * =========================================================
+     *
+     * GitHub Repository:
+     *
+     * https://github.com/royalcyber7r/RoyalCyberTV
+     *
+     * Latest Release:
+     *
+     * build-8
+     * build-9
+     * build-10
+     * build-11
+     * etc.
+     *
+     * UpdateActivity GitHub-এর latest release check করবে।
+     */
+
+    private var updateCheckStarted = false
+
+
     private val handler =
         Handler(Looper.getMainLooper())
 
+
     private val hideControlsRunnable =
         Runnable {
+
             if (!isFullscreen) {
-                playerControls.visibility = View.GONE
+
+                playerControls.visibility =
+                    View.GONE
             }
         }
 
@@ -405,7 +432,10 @@ class MainActivity : AppCompatActivity() {
         )
 
     ).distinctBy {
-        it.name.trim().lowercase()
+
+        it.name
+            .trim()
+            .lowercase()
     }
 
 
@@ -440,11 +470,113 @@ class MainActivity : AppCompatActivity() {
         setupSocialLinks()
 
         mainScrollView.post {
+
             updateRecyclerHeight()
         }
 
+
         if (channels.isNotEmpty()) {
-            playChannel(channels[0])
+
+            playChannel(
+                channels[0]
+            )
+        }
+
+
+        /*
+         * =====================================================
+         * AUTOMATIC UPDATE CHECK
+         * =====================================================
+         *
+         * App open হওয়ার পর GitHub latest release check হবে।
+         *
+         * যেমন:
+         *
+         * Installed Version = 8
+         * GitHub Latest      = build-9
+         *
+         * তাহলে UpdateActivity খুলবে।
+         *
+         * Installed Version = 9
+         * GitHub Latest      = build-10
+         *
+         * তাহলে UpdateActivity খুলবে।
+         */
+
+        checkForUpdateAutomatically()
+    }
+
+
+    /* =========================================================
+       AUTOMATIC UPDATE
+       ========================================================= */
+
+    private fun checkForUpdateAutomatically() {
+
+        if (updateCheckStarted) {
+            return
+        }
+
+        updateCheckStarted = true
+
+        /*
+         * UpdateActivity নিজেই GitHub latest release check করবে।
+         *
+         * তাই MainActivity শুধু UpdateActivity খুলছে।
+         *
+         * Update না থাকলে UpdateActivity নিজে থেকে finish()
+         * হয়ে MainActivity-তে ফিরে আসবে।
+         */
+
+        try {
+
+            val intent =
+                Intent(
+                    this,
+                    UpdateActivity::class.java
+                )
+
+            startActivity(intent)
+
+        } catch (
+            _: Exception
+        ) {
+
+            /*
+             * UpdateActivity কোনো কারণে না থাকলে
+             * MainActivity বন্ধ হবে না।
+             */
+
+            updateCheckStarted = false
+        }
+    }
+
+
+    /* =========================================================
+       MANUAL UPDATE
+       ========================================================= */
+
+    private fun openUpdateScreen() {
+
+        try {
+
+            val intent =
+                Intent(
+                    this,
+                    UpdateActivity::class.java
+                )
+
+            startActivity(intent)
+
+        } catch (
+            _: Exception
+        ) {
+
+            Toast.makeText(
+                this,
+                "Update System চালু করা যাচ্ছে না",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -456,67 +588,109 @@ class MainActivity : AppCompatActivity() {
     private fun initializeViews() {
 
         playerView =
-            findViewById(R.id.player_view)
+            findViewById(
+                R.id.player_view
+            )
 
         playerContainer =
-            findViewById(R.id.player_container)
+            findViewById(
+                R.id.player_container
+            )
 
         channelRecycler =
-            findViewById(R.id.channel_recycler)
+            findViewById(
+                R.id.channel_recycler
+            )
 
         searchButton =
-            findViewById(R.id.search_button)
+            findViewById(
+                R.id.search_button
+            )
 
         searchBox =
-            findViewById(R.id.search_box)
+            findViewById(
+                R.id.search_box
+            )
 
         fullscreenButton =
-            findViewById(R.id.fullscreen_button)
+            findViewById(
+                R.id.fullscreen_button
+            )
 
         mainScrollView =
-            findViewById(R.id.main_scroll_view)
+            findViewById(
+                R.id.main_scroll_view
+            )
 
         headerLayout =
-            findViewById(R.id.header_layout)
+            findViewById(
+                R.id.header_layout
+            )
 
         currentChannelName =
-            findViewById(R.id.current_channel_name)
+            findViewById(
+                R.id.current_channel_name
+            )
 
         channelTitle =
-            findViewById(R.id.channel_title)
+            findViewById(
+                R.id.channel_title
+            )
 
         footerLayout =
-            findViewById(R.id.footer_layout)
+            findViewById(
+                R.id.footer_layout
+            )
 
         bottomNavigation =
-            findViewById(R.id.bottom_navigation)
+            findViewById(
+                R.id.bottom_navigation
+            )
 
         footerFacebook =
-            findViewById(R.id.footer_facebook)
+            findViewById(
+                R.id.footer_facebook
+            )
 
         footerYoutube =
-            findViewById(R.id.footer_youtube)
+            findViewById(
+                R.id.footer_youtube
+            )
 
         footerInstagram =
-            findViewById(R.id.footer_instagram)
+            findViewById(
+                R.id.footer_instagram
+            )
 
         footerTiktok =
-            findViewById(R.id.footer_tiktok)
+            findViewById(
+                R.id.footer_tiktok
+            )
 
         playerControls =
-            findViewById(R.id.player_controls)
+            findViewById(
+                R.id.player_controls
+            )
 
         playPauseButton =
-            findViewById(R.id.play_pause_button)
+            findViewById(
+                R.id.play_pause_button
+            )
 
         rewindButton =
-            findViewById(R.id.rewind_button)
+            findViewById(
+                R.id.rewind_button
+            )
 
         forwardButton =
-            findViewById(R.id.forward_button)
+            findViewById(
+                R.id.forward_button
+            )
 
         liveText =
-            findViewById(R.id.live_text)
+            findViewById(
+                R.id.live_text
+            )
     }
 
 
@@ -536,7 +710,10 @@ class MainActivity : AppCompatActivity() {
             ChannelAdapter(
                 channels = channels,
                 onChannelClick = { channel ->
-                    playChannel(channel)
+
+                    playChannel(
+                        channel
+                    )
                 }
             )
 
@@ -567,25 +744,38 @@ class MainActivity : AppCompatActivity() {
         val itemCount =
             channelAdapter.itemCount
 
-        val columns = 3
+        val columns =
+            3
 
         val rows =
             if (itemCount == 0) {
+
                 0
+
             } else {
-                (itemCount + columns - 1) / columns
+
+                (
+                    itemCount +
+                        columns -
+                        1
+                    ) / columns
             }
 
         val density =
-            resources.displayMetrics.density
+            resources
+                .displayMetrics
+                .density
 
-        val rowHeightDp = 145
+        val rowHeightDp =
+            145
 
-        val bottomPaddingDp = 15
+        val bottomPaddingDp =
+            15
 
         val heightPx =
             (
-                rows * rowHeightDp +
+                rows *
+                    rowHeightDp +
                     bottomPaddingDp
                 ) * density
 
@@ -607,8 +797,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupPlayer() {
 
         player =
-            ExoPlayer.Builder(this)
-                .build()
+            ExoPlayer.Builder(
+                this
+            ).build()
 
         playerView.player =
             player
@@ -698,19 +889,20 @@ class MainActivity : AppCompatActivity() {
         playPauseButton.setOnClickListener {
 
             val exoPlayer =
-                player ?: return@setOnClickListener
+                player
+                    ?: return@setOnClickListener
 
             when {
 
                 exoPlayer.playbackState ==
-                        Player.STATE_IDLE -> {
+                    Player.STATE_IDLE -> {
 
                     resumePlayback()
                 }
 
 
                 exoPlayer.playbackState ==
-                        Player.STATE_ENDED -> {
+                    Player.STATE_ENDED -> {
 
                     resumePlayback()
                 }
@@ -739,7 +931,8 @@ class MainActivity : AppCompatActivity() {
         rewindButton.setOnClickListener {
 
             val exoPlayer =
-                player ?: return@setOnClickListener
+                player
+                    ?: return@setOnClickListener
 
             exoPlayer.seekBack()
 
@@ -750,7 +943,8 @@ class MainActivity : AppCompatActivity() {
         forwardButton.setOnClickListener {
 
             val exoPlayer =
-                player ?: return@setOnClickListener
+                player
+                    ?: return@setOnClickListener
 
             exoPlayer.seekForward()
 
@@ -762,7 +956,7 @@ class MainActivity : AppCompatActivity() {
 
             if (
                 playerControls.visibility ==
-                View.VISIBLE
+                    View.VISIBLE
             ) {
 
                 playerControls.visibility =
@@ -782,7 +976,9 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        updatePlayPauseButton(false)
+        updatePlayPauseButton(
+            false
+        )
     }
 
 
@@ -800,8 +996,11 @@ class MainActivity : AppCompatActivity() {
 
         playPauseButton.text =
             if (isPlaying) {
+
                 "❚❚"
+
             } else {
+
                 "▶"
             }
     }
@@ -862,7 +1061,9 @@ class MainActivity : AppCompatActivity() {
             HlsMediaSource.Factory(
                 dataSourceFactory
             ).createMediaSource(
-                MediaItem.fromUri(url)
+                MediaItem.fromUri(
+                    url
+                )
             )
 
         player?.apply {
@@ -892,7 +1093,9 @@ class MainActivity : AppCompatActivity() {
         playerControls.visibility =
             View.VISIBLE
 
-        updatePlayPauseButton(true)
+        updatePlayPauseButton(
+            true
+        )
 
         showControlsTemporarily()
 
@@ -916,7 +1119,8 @@ class MainActivity : AppCompatActivity() {
     private fun resumePlayback() {
 
         val exoPlayer =
-            player ?: return
+            player
+                ?: return
 
         if (
             exoPlayer.playbackState ==
@@ -927,7 +1131,9 @@ class MainActivity : AppCompatActivity() {
 
             currentChannel?.let {
 
-                playChannel(it)
+                playChannel(
+                    it
+                )
 
                 return
             }
@@ -938,7 +1144,9 @@ class MainActivity : AppCompatActivity() {
 
         exoPlayer.play()
 
-        updatePlayPauseButton(true)
+        updatePlayPauseButton(
+            true
+        )
     }
 
 
@@ -1017,6 +1225,7 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     channelRecycler.post {
+
                         updateRecyclerHeight()
                     }
                 }
@@ -1062,7 +1271,7 @@ class MainActivity : AppCompatActivity() {
 
         searchWasVisible =
             searchBox.visibility ==
-                    View.VISIBLE
+                View.VISIBLE
 
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -1180,8 +1389,11 @@ class MainActivity : AppCompatActivity() {
 
         searchBox.visibility =
             if (searchWasVisible) {
+
                 View.VISIBLE
+
             } else {
+
                 View.GONE
             }
 
@@ -1273,7 +1485,9 @@ class MainActivity : AppCompatActivity() {
             } else {
 
                 val density =
-                    resources.displayMetrics.density
+                    resources
+                        .displayMetrics
+                        .density
 
                 val params =
                     playerContainer.layoutParams
@@ -1326,15 +1540,25 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        /*
+         * =====================================================
+         * UPDATE BUTTON
+         * =====================================================
+         *
+         * আগে এখানে:
+         *
+         * "আপনার App সর্বশেষ Version-এ আছে"
+         *
+         * Toast ছিল।
+         *
+         * এখন UpdateActivity খুলবে।
+         */
+
         findViewById<View>(
             R.id.menu_update
         ).setOnClickListener {
 
-            Toast.makeText(
-                this,
-                "আপনার App সর্বশেষ Version-এ আছে",
-                Toast.LENGTH_SHORT
-            ).show()
+            openUpdateScreen()
         }
 
 
@@ -1406,7 +1630,9 @@ class MainActivity : AppCompatActivity() {
                     Uri.parse(url)
                 )
 
-            startActivity(intent)
+            startActivity(
+                intent
+            )
 
         } catch (
             _: ActivityNotFoundException
