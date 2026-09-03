@@ -364,7 +364,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Action Hollywood Movies",
-            logo = "https://prod98.togglestatic.com/shain/v1/dataservice/ResizeImage/$value?Format=%27png%27&Quality=85&ImageId=%279268117%27&EntityType=%27Item%27&EntityId=%27556894%27&Width=1920&Height=1080",
+            logo = "logo="https://prod98.togglestatic.com/shain/v1/dataservice/ResizeImage/${'$'}value?Format=%27png%27&Quality=85&ImageId=%279268117%27&EntityType=%27Item%27&EntityId=%27556894%27&Width=1920&Height=1080",
             streamUrl = "https://amg01076-lightningintern-actionhollywood-samsungnz-82rry.amagi.tv/playlist/amg01076-lightningintern-actionhollywood-samsungnz/playlist.m3u8"
         ),
 
