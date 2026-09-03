@@ -11,9 +11,9 @@
     android:background="#000000">
 
 
-    <!-- ===================================================== -->
+    <!-- ========================================================= -->
     <!-- MAIN SCROLL -->
-    <!-- ===================================================== -->
+    <!-- ========================================================= -->
 
     <ScrollView
         android:id="@+id/main_scroll_view"
@@ -24,6 +24,7 @@
 
         android:fillViewport="true"
         android:background="#000000"
+
         android:overScrollMode="never">
 
 
@@ -48,14 +49,15 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
 
-                android:paddingStart="15dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="6dp"
 
                 android:background="#111111">
 
 
-                <!-- APP LOGO -->
-                <!-- এখানে mipmap/ic_launcher ব্যবহার করা হয়নি -->
+                <!-- ================================================= -->
+                <!-- ROYAL CYBER LOGO -->
+                <!-- ================================================= -->
 
                 <TextView
                     android:id="@+id/app_logo"
@@ -73,25 +75,29 @@
                     android:background="#111111" />
 
 
+                <!-- ================================================= -->
                 <!-- APP NAME -->
+                <!-- ================================================= -->
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
 
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="8dp"
 
-                    android:text="ROYALCYBERITV"
+                    android:text="ROYALCYBERIPTV"
 
                     android:textColor="#FFFFFF"
-                    android:textSize="23sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
 
                     android:singleLine="true" />
 
 
-                <!-- SEARCH -->
+                <!-- ================================================= -->
+                <!-- SEARCH BUTTON -->
+                <!-- ================================================= -->
 
                 <ImageButton
                     android:id="@+id/search_button"
@@ -110,6 +116,7 @@
 
                     android:clickable="true"
                     android:focusable="true" />
+
 
             </LinearLayout>
 
@@ -147,7 +154,7 @@
 
 
             <!-- ================================================= -->
-            <!-- PLAYER -->
+            <!-- VIDEO PLAYER -->
             <!-- ================================================= -->
 
             <FrameLayout
@@ -159,7 +166,9 @@
                 android:background="#000000">
 
 
-                <!-- VIDEO -->
+                <!-- ================================================= -->
+                <!-- EXOPLAYER -->
+                <!-- ================================================= -->
 
                 <androidx.media3.ui.PlayerView
                     android:id="@+id/player_view"
@@ -177,7 +186,7 @@
 
 
                 <!-- ================================================= -->
-                <!-- CUSTOM CONTROLS -->
+                <!-- CUSTOM PLAYER CONTROLS -->
                 <!-- ================================================= -->
 
                 <FrameLayout
@@ -193,7 +202,7 @@
 
 
                     <!-- ================================================= -->
-                    <!-- CENTER CONTROLS -->
+                    <!-- CENTER PLAYER CONTROLS -->
                     <!-- ================================================= -->
 
                     <LinearLayout
@@ -206,7 +215,9 @@
                         android:gravity="center_vertical">
 
 
-                        <!-- REWIND -->
+                        <!-- ================================================= -->
+                        <!-- 10 SECOND BACK -->
+                        <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/rewind_button"
@@ -217,8 +228,8 @@
                             android:gravity="center"
 
                             android:text="↶&#10;10"
-
                             android:textColor="#FFFFFF"
+
                             android:textSize="16sp"
                             android:textStyle="bold"
 
@@ -229,7 +240,7 @@
 
 
                         <!-- ================================================= -->
-                        <!-- CENTER PLAY PAUSE -->
+                        <!-- CENTER PLAY / PAUSE -->
                         <!-- ================================================= -->
 
                         <TextView
@@ -241,8 +252,8 @@
                             android:gravity="center"
 
                             android:text="▶"
-
                             android:textColor="#FFFFFF"
+
                             android:textSize="36sp"
                             android:textStyle="bold"
 
@@ -254,7 +265,9 @@
                             android:elevation="8dp" />
 
 
-                        <!-- FORWARD -->
+                        <!-- ================================================= -->
+                        <!-- 10 SECOND FORWARD -->
+                        <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/forward_button"
@@ -265,8 +278,8 @@
                             android:gravity="center"
 
                             android:text="↷&#10;10"
-
                             android:textColor="#FFFFFF"
+
                             android:textSize="16sp"
                             android:textStyle="bold"
 
@@ -274,6 +287,7 @@
 
                             android:clickable="true"
                             android:focusable="true" />
+
 
                     </LinearLayout>
 
@@ -290,8 +304,8 @@
 
                         android:layout_gravity="bottom|start"
 
-                        android:layout_marginStart="20dp"
-                        android:layout_marginBottom="18dp"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginBottom="17dp"
 
                         android:text="●  LIVE"
 
@@ -301,7 +315,7 @@
 
 
                     <!-- ================================================= -->
-                    <!-- PROGRESS LINE -->
+                    <!-- PLAYER PROGRESS LINE -->
                     <!-- ================================================= -->
 
                     <View
@@ -310,41 +324,43 @@
 
                         android:layout_gravity="bottom"
 
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="75dp"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="68dp"
                         android:layout_marginBottom="9dp"
 
                         android:background="#FFFFFF" />
 
 
                     <!-- ================================================= -->
-                    <!-- FULLSCREEN -->
+                    <!-- YOUTUBE STYLE FULLSCREEN BUTTON -->
                     <!-- ================================================= -->
 
                     <ImageButton
                         android:id="@+id/fullscreen_button"
 
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
 
                         android:layout_gravity="bottom|end"
 
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginBottom="3dp"
+                        android:layout_marginEnd="7dp"
+                        android:layout_marginBottom="1dp"
 
                         android:background="@android:color/transparent"
 
                         android:src="@android:drawable/ic_menu_crop"
                         android:tint="#FFFFFF"
 
-                        android:padding="10dp"
+                        android:padding="8dp"
 
                         android:contentDescription="Fullscreen"
 
                         android:clickable="true"
                         android:focusable="true" />
 
+
                 </FrameLayout>
+
 
             </FrameLayout>
 
@@ -392,6 +408,7 @@
 
                     android:layout_marginTop="2dp" />
 
+
             </LinearLayout>
 
 
@@ -419,8 +436,10 @@
 
 
             <!-- ================================================= -->
-            <!-- CHANNEL GRID -->
+            <!-- CHANNEL GUIDE -->
             <!-- ================================================= -->
+            <!-- MainActivity.kt-এ GridLayoutManager(this, 3)
+                 থাকার কারণে এখানে ৩টি করে channel থাকবে -->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channel_recycler"
@@ -440,93 +459,162 @@
 
 
             <!-- ================================================= -->
-            <!-- FOOTER -->
+            <!-- FOLLOW US -->
             <!-- ================================================= -->
 
             <LinearLayout
                 android:id="@+id/footer_layout"
 
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="125dp"
 
-                android:orientation="horizontal"
+                android:orientation="vertical"
+
                 android:gravity="center"
 
                 android:background="#111111">
 
 
-                <ImageView
-                    android:id="@+id/footer_facebook"
+                <!-- ================================================= -->
+                <!-- FOLLOW US TEXT -->
+                <!-- ================================================= -->
 
-                    android:layout_width="50dp"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Follow Us"
+
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+
+                    android:layout_marginBottom="8dp" />
+
+
+                <!-- ================================================= -->
+                <!-- SOCIAL MEDIA ICONS -->
+                <!-- ================================================= -->
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="50dp"
 
-                    android:layout_margin="12dp"
+                    android:orientation="horizontal"
 
-                    android:src="@android:drawable/ic_menu_share"
-                    android:tint="#FFFFFF"
-
-                    android:clickable="true"
-
-                    android:contentDescription="Facebook" />
+                    android:gravity="center">
 
 
-                <ImageView
-                    android:id="@+id/footer_youtube"
+                    <!-- ================================================= -->
+                    <!-- FACEBOOK -->
+                    <!-- ================================================= -->
 
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    <ImageView
+                        android:id="@+id/footer_facebook"
 
-                    android:layout_margin="12dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
 
-                    android:src="@android:drawable/ic_media_play"
-                    android:tint="#FFFFFF"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                    android:clickable="true"
+                        android:padding="4dp"
 
-                    android:contentDescription="YouTube" />
+                        android:src="@android:drawable/ic_menu_share"
+                        android:tint="#FFFFFF"
 
+                        android:contentDescription="Facebook"
 
-                <ImageView
-                    android:id="@+id/footer_instagram"
-
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-
-                    android:layout_margin="12dp"
-
-                    android:src="@android:drawable/ic_menu_camera"
-                    android:tint="#FFFFFF"
-
-                    android:clickable="true"
-
-                    android:contentDescription="Instagram" />
+                        android:clickable="true"
+                        android:focusable="true" />
 
 
-                <ImageView
-                    android:id="@+id/footer_tiktok"
+                    <!-- ================================================= -->
+                    <!-- YOUTUBE -->
+                    <!-- ================================================= -->
 
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    <ImageView
+                        android:id="@+id/footer_youtube"
 
-                    android:layout_margin="12dp"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
 
-                    android:src="@android:drawable/ic_menu_info_details"
-                    android:tint="#FFFFFF"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
 
-                    android:clickable="true"
+                        android:padding="4dp"
 
-                    android:contentDescription="TikTok" />
+                        android:src="@android:drawable/ic_media_play"
+                        android:tint="#FFFFFF"
+
+                        android:contentDescription="YouTube"
+
+                        android:clickable="true"
+                        android:focusable="true" />
+
+
+                    <!-- ================================================= -->
+                    <!-- INSTAGRAM -->
+                    <!-- ================================================= -->
+
+                    <ImageView
+                        android:id="@+id/footer_instagram"
+
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+
+                        android:padding="4dp"
+
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:tint="#FFFFFF"
+
+                        android:contentDescription="Instagram"
+
+                        android:clickable="true"
+                        android:focusable="true" />
+
+
+                    <!-- ================================================= -->
+                    <!-- TIKTOK -->
+                    <!-- ================================================= -->
+
+                    <ImageView
+                        android:id="@+id/footer_tiktok"
+
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+
+                        android:padding="4dp"
+
+                        android:src="@android:drawable/ic_menu_info_details"
+                        android:tint="#FFFFFF"
+
+                        android:contentDescription="TikTok"
+
+                        android:clickable="true"
+                        android:focusable="true" />
+
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
+
         </LinearLayout>
+
 
     </ScrollView>
 
 
     <!-- ========================================================= -->
-    <!-- BOTTOM NAVIGATION -->
+    <!-- FIXED BOTTOM NAVIGATION -->
     <!-- ========================================================= -->
 
     <LinearLayout
@@ -544,7 +632,9 @@
         android:elevation="8dp">
 
 
+        <!-- ================================================= -->
         <!-- HOME -->
+        <!-- ================================================= -->
 
         <LinearLayout
             android:id="@+id/menu_home"
@@ -581,10 +671,13 @@
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
+
         </LinearLayout>
 
 
+        <!-- ================================================= -->
         <!-- NOTIFICATION -->
+        <!-- ================================================= -->
 
         <LinearLayout
             android:id="@+id/menu_notification"
@@ -621,10 +714,13 @@
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
+
         </LinearLayout>
 
 
+        <!-- ================================================= -->
         <!-- UPDATE -->
+        <!-- ================================================= -->
 
         <LinearLayout
             android:id="@+id/menu_update"
@@ -661,10 +757,13 @@
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
+
         </LinearLayout>
 
 
+        <!-- ================================================= -->
         <!-- CHANNEL -->
+        <!-- ================================================= -->
 
         <LinearLayout
             android:id="@+id/menu_channel"
@@ -701,8 +800,11 @@
                 android:textColor="#FFFFFF"
                 android:textSize="13sp" />
 
+
         </LinearLayout>
 
+
     </LinearLayout>
+
 
 </LinearLayout>
