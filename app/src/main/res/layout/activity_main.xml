@@ -49,30 +49,32 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
 
-                android:paddingStart="14dp"
-                android:paddingEnd="6dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp"
 
                 android:background="#111111">
 
 
                 <!-- ================================================= -->
                 <!-- ROYAL CYBER LOGO -->
+                <!-- File:
+                     app/src/main/res/drawable/royalcyber_logo.png
+                -->
                 <!-- ================================================= -->
 
-                <TextView
+                <ImageView
                     android:id="@+id/app_logo"
 
                     android:layout_width="48dp"
                     android:layout_height="48dp"
 
-                    android:gravity="center"
+                    android:layout_marginEnd="8dp"
 
-                    android:text="R"
-                    android:textColor="#FFFFFF"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
+                    android:src="@drawable/royalcyber_logo"
 
-                    android:background="#111111" />
+                    android:scaleType="fitCenter"
+
+                    android:contentDescription="RoyalCyberTV Logo" />
 
 
                 <!-- ================================================= -->
@@ -84,15 +86,16 @@
                     android:layout_height="wrap_content"
 
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
 
                     android:text="ROYALCYBERIPTV"
 
                     android:textColor="#FFFFFF"
-                    android:textSize="22sp"
+                    android:textSize="21sp"
                     android:textStyle="bold"
 
-                    android:singleLine="true" />
+                    android:singleLine="true"
+
+                    android:ellipsize="end" />
 
 
                 <!-- ================================================= -->
@@ -202,7 +205,7 @@
 
 
                     <!-- ================================================= -->
-                    <!-- CENTER PLAYER CONTROLS -->
+                    <!-- CENTER CONTROLS -->
                     <!-- ================================================= -->
 
                     <LinearLayout
@@ -216,21 +219,21 @@
 
 
                         <!-- ================================================= -->
-                        <!-- 10 SECOND BACK -->
+                        <!-- REWIND -->
                         <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/rewind_button"
 
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="65dp"
+                            android:layout_height="65dp"
 
                             android:gravity="center"
 
                             android:text="↶&#10;10"
                             android:textColor="#FFFFFF"
 
-                            android:textSize="16sp"
+                            android:textSize="15sp"
                             android:textStyle="bold"
 
                             android:background="@android:color/transparent"
@@ -240,24 +243,24 @@
 
 
                         <!-- ================================================= -->
-                        <!-- CENTER PLAY / PAUSE -->
+                        <!-- PLAY / PAUSE -->
                         <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/play_pause_button"
 
-                            android:layout_width="78dp"
-                            android:layout_height="78dp"
+                            android:layout_width="76dp"
+                            android:layout_height="76dp"
 
                             android:gravity="center"
 
                             android:text="▶"
                             android:textColor="#FFFFFF"
 
-                            android:textSize="36sp"
+                            android:textSize="34sp"
                             android:textStyle="bold"
 
-                            android:background="@drawable/player_center_button"
+                            android:background="#66000000"
 
                             android:clickable="true"
                             android:focusable="true"
@@ -266,21 +269,21 @@
 
 
                         <!-- ================================================= -->
-                        <!-- 10 SECOND FORWARD -->
+                        <!-- FORWARD -->
                         <!-- ================================================= -->
 
                         <TextView
                             android:id="@+id/forward_button"
 
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="65dp"
+                            android:layout_height="65dp"
 
                             android:gravity="center"
 
                             android:text="↷&#10;10"
                             android:textColor="#FFFFFF"
 
-                            android:textSize="16sp"
+                            android:textSize="15sp"
                             android:textStyle="bold"
 
                             android:background="@android:color/transparent"
@@ -310,7 +313,7 @@
                         android:text="●  LIVE"
 
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
 
@@ -325,14 +328,14 @@
                         android:layout_gravity="bottom"
 
                         android:layout_marginStart="18dp"
-                        android:layout_marginEnd="68dp"
+                        android:layout_marginEnd="62dp"
                         android:layout_marginBottom="9dp"
 
                         android:background="#FFFFFF" />
 
 
                     <!-- ================================================= -->
-                    <!-- YOUTUBE STYLE FULLSCREEN BUTTON -->
+                    <!-- FULLSCREEN -->
                     <!-- ================================================= -->
 
                     <ImageButton
@@ -343,7 +346,7 @@
 
                         android:layout_gravity="bottom|end"
 
-                        android:layout_marginEnd="7dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginBottom="1dp"
 
                         android:background="@android:color/transparent"
@@ -393,7 +396,7 @@
                     android:text="T Sports"
 
                     android:textColor="#FFFFFF"
-                    android:textSize="24sp"
+                    android:textSize="23sp"
                     android:textStyle="bold" />
 
 
@@ -404,7 +407,7 @@
                     android:text="Live"
 
                     android:textColor="#FF2020"
-                    android:textSize="17sp"
+                    android:textSize="16sp"
 
                     android:layout_marginTop="2dp" />
 
@@ -429,7 +432,7 @@
                 android:text="Live TV Channels"
 
                 android:textColor="#FFFFFF"
-                android:textSize="28sp"
+                android:textSize="27sp"
                 android:textStyle="bold"
 
                 android:background="#000000" />
@@ -437,9 +440,8 @@
 
             <!-- ================================================= -->
             <!-- CHANNEL GUIDE -->
+            <!-- 3 COLUMNS -->
             <!-- ================================================= -->
-            <!-- MainActivity.kt-এ GridLayoutManager(this, 3)
-                 থাকার কারণে এখানে ৩টি করে channel থাকবে -->
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channel_recycler"
@@ -493,7 +495,7 @@
 
 
                 <!-- ================================================= -->
-                <!-- SOCIAL MEDIA ICONS -->
+                <!-- SOCIAL ICONS -->
                 <!-- ================================================= -->
 
                 <LinearLayout
@@ -515,10 +517,10 @@
                         android:layout_width="34dp"
                         android:layout_height="34dp"
 
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
 
-                        android:padding="4dp"
+                        android:padding="5dp"
 
                         android:src="@android:drawable/ic_menu_share"
                         android:tint="#FFFFFF"
@@ -539,10 +541,10 @@
                         android:layout_width="34dp"
                         android:layout_height="34dp"
 
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
 
-                        android:padding="4dp"
+                        android:padding="5dp"
 
                         android:src="@android:drawable/ic_media_play"
                         android:tint="#FFFFFF"
@@ -563,10 +565,10 @@
                         android:layout_width="34dp"
                         android:layout_height="34dp"
 
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
 
-                        android:padding="4dp"
+                        android:padding="5dp"
 
                         android:src="@android:drawable/ic_menu_camera"
                         android:tint="#FFFFFF"
@@ -587,10 +589,10 @@
                         android:layout_width="34dp"
                         android:layout_height="34dp"
 
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="12dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
 
-                        android:padding="4dp"
+                        android:padding="5dp"
 
                         android:src="@android:drawable/ic_menu_info_details"
                         android:tint="#FFFFFF"
@@ -659,7 +661,7 @@
                 android:text="⌂"
 
                 android:textColor="#FFFFFF"
-                android:textSize="28sp" />
+                android:textSize="27sp" />
 
 
             <TextView
@@ -702,7 +704,7 @@
                 android:text="♟"
 
                 android:textColor="#FFFFFF"
-                android:textSize="25sp" />
+                android:textSize="24sp" />
 
 
             <TextView
@@ -745,7 +747,7 @@
                 android:text="⟳"
 
                 android:textColor="#FFFFFF"
-                android:textSize="28sp" />
+                android:textSize="27sp" />
 
 
             <TextView
@@ -788,7 +790,7 @@
                 android:text="▶"
 
                 android:textColor="#FFFFFF"
-                android:textSize="25sp" />
+                android:textSize="24sp" />
 
 
             <TextView
