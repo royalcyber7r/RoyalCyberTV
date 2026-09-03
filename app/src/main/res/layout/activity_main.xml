@@ -119,17 +119,16 @@
                 <!-- Quality button সম্পূর্ণ বাদ দেওয়া হয়েছে -->
 
                 <ImageButton
-                    android:id="@+id/fullscreen_button"
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="#99000000"
-                    android:padding="10dp"
-                    android:src="@android:drawable/ic_menu_crop"
-                    android:tint="#FFFFFF"
-                    android:contentDescription="Fullscreen" />
+    android:id="@+id/fullscreen_button"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="10dp"
+    android:background="@drawable/player_fullscreen_bg"
+    android:padding="12dp"
+    android:src="@android:drawable/ic_menu_crop"
+    android:tint="#FFFFFF"
+    android:contentDescription="Fullscreen" />
 
             </FrameLayout>
 
