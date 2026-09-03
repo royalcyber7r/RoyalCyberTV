@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- Rocket -->
         <ImageView
             android:id="@+id/update_image"
             android:layout_width="match_parent"
@@ -22,7 +21,6 @@
             android:scaleType="centerCrop"
             android:contentDescription="Update" />
 
-        <!-- Title -->
         <TextView
             android:id="@+id/update_title"
             android:layout_width="wrap_content"
@@ -34,7 +32,6 @@
             android:textStyle="bold"
             android:gravity="center" />
 
-        <!-- Version -->
         <TextView
             android:id="@+id/update_version"
             android:layout_width="wrap_content"
@@ -45,7 +42,6 @@
             android:textSize="23sp"
             android:gravity="center" />
 
-        <!-- Message -->
         <TextView
             android:id="@+id/update_message"
             android:layout_width="match_parent"
@@ -59,7 +55,6 @@
             android:gravity="center"
             android:lineSpacingExtra="8dp" />
 
-        <!-- Progress -->
         <ProgressBar
             android:id="@+id/update_progress"
             style="?android:attr/progressBarStyleHorizontal"
@@ -73,7 +68,6 @@
             android:progressTint="#8BC34A"
             android:backgroundTint="#EEEEEE" />
 
-        <!-- Percentage -->
         <TextView
             android:id="@+id/update_percent"
             android:layout_width="wrap_content"
@@ -81,10 +75,8 @@
             android:layout_marginTop="-48dp"
             android:text="0 %"
             android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="normal" />
+            android:textSize="24sp" />
 
-        <!-- Update Button -->
         <Button
             android:id="@+id/update_button"
             android:layout_width="match_parent"
@@ -98,7 +90,6 @@
             android:textSize="20sp"
             android:backgroundTint="#FFFFFF" />
 
-        <!-- Later -->
         <TextView
             android:id="@+id/update_later"
             android:layout_width="wrap_content"
