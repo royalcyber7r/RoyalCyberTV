@@ -98,10 +98,8 @@ class MainActivity : AppCompatActivity() {
 
     private var updateCheckStarted = false
 
-
     private val handler =
         Handler(Looper.getMainLooper())
-
 
     private val hideControlsRunnable =
         Runnable {
@@ -129,38 +127,41 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
-            name = "Global Tv",
-            logo = "https://globaltvbd.com/storage/settings/01KVWJD176R6VT9GC3B9KEJBWK.png",
-            streamUrl = "https://stream.ottplus.live/live/global_tv_abr/index.m3u8"
-        ),
+            name = "Global Tv",
+            logo = "https://globaltvbd.com/storage/settings/01KVWJD176R6VT9GC3B9KEJBWK.png",
+            streamUrl = "https://stream.ottplus.live/live/global_tv_abr/index.m3u8"
+        ),
 
         Channel(
-            name = "Joo Music",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbNd6fN0L21ZYgbAtkKGaS-t-cqTGfbk0svw&s",
-            streamUrl = "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
-        ),
-        Channel(
-            name = "Party Music",
-            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1778083145889.png",
-            streamUrl = "https://nomawnoijl.gpcdn.net/akash/partyuniverse/playlist.m3u8"
-        ),
+            name = "Joo Music",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbNd6fN0L21ZYgbAtkKGaS-t-cqTGfbk0svw&s",
+            streamUrl = "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
+        ),
 
         Channel(
-            name = "Akash 8 BN",
-            logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/5e7e35a1e640364eb38c06c67dee7179.png",
-            streamUrl = "https://cdn-4.pishow.tv/live/969/master.m3u8"
-        ),
+            name = "Party Music",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1778083145889.png",
+            streamUrl = "https://nomawnoijl.gpcdn.net/akash/partyuniverse/playlist.m3u8"
+        ),
 
         Channel(
-            name = "Net Tv",
-            logo = "https://i.imgur.com/EWmshtx.png",
-            streamUrl = "https://unlimited1-us.dps.live/nettv/nettv.smil/playlist.m3u8"
-        ),
-       Channel(
-            name = "TNT Sports ARG Premium",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f4/TNT_Sports_Premium_%28Argentina%29.png",
-            streamUrl = "https://1nyaler.streamhostingcdn.top/stream/30/index.m3u8"
-        ),
+            name = "Akash 8 BN",
+            logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/5e7e35a1e640364eb38c06c67dee7179.png",
+            streamUrl = "https://cdn-4.pishow.tv/live/969/master.m3u8"
+        ),
+
+        Channel(
+            name = "Net Tv",
+            logo = "https://i.imgur.com/EWmshtx.png",
+            streamUrl = "https://unlimited1-us.dps.live/nettv/nettv.smil/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "TNT Sports ARG Premium",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/f/f4/TNT_Sports_Premium_%28Argentina%29.png",
+            streamUrl = "https://1nyaler.streamhostingcdn.top/stream/30/index.m3u8"
+        ),
+
         Channel(
             name = "Sony Aath",
             logo = "https://upload.wikimedia.org/wikipedia/en/6/64/Sony_Aath_Logo.png",
@@ -168,22 +169,21 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
-            name = "Deluxe Music",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
-            streamUrl = "https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8"
-        ),
+            name = "Deluxe Music",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8"
+        ),
 
         Channel(
-            name = "Retro Music",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
-            streamUrl = "https://stream.mediawork.cz/retrotv/smil:retrotv2.smil/playlist.m3u8"
-        ),
+            name = "Retro Music",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://stream.mediawork.cz/retrotv/smil:retrotv2.smil/playlist.m3u8"
+        ),
 
         Channel(
-            name = "EBS Kids",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
-            streamUrl = "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"
-      
+            name = "EBS Kids",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            streamUrl = "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"
         ),
 
         Channel(
@@ -417,7 +417,6 @@ class MainActivity : AppCompatActivity() {
             streamUrl = "https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_720p/chunks.m3u8"
         ),
 
-
         Channel(
             name = "DD Sports",
             logo = "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/DD_Sports_logo.svg/1280px-DD_Sports_logo.svg.png",
@@ -486,7 +485,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "TPV Sport",
-            logo = "img/tvp.png",
+            logo = "https://royalcyberiptv.live/img/tvp.png",
             streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         )
 
@@ -533,14 +532,12 @@ class MainActivity : AppCompatActivity() {
             updateRecyclerHeight()
         }
 
-
         if (channels.isNotEmpty()) {
 
             playChannel(
                 channels[0]
             )
         }
-
 
         /*
          * =====================================================
