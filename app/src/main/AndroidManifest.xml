@@ -3,11 +3,11 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Internet -->
+    <!-- Internet Permission -->
     <uses-permission
         android:name="android.permission.INTERNET" />
 
-    <!-- APK update/install -->
+    <!-- Allow APK Update / Install -->
     <uses-permission
         android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
@@ -18,7 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- ========================= -->
         <!-- Splash Screen -->
+        <!-- ========================= -->
+
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -35,13 +38,31 @@
 
         </activity>
 
-        <!-- Main App -->
+
+        <!-- ========================= -->
+        <!-- Main Activity -->
+        <!-- ========================= -->
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
 
-        <!-- APK File Provider -->
+
+        <!-- ========================= -->
+        <!-- App Update Activity -->
+        <!-- ========================= -->
+
+        <activity
+            android:name=".UpdateActivity"
+            android:exported="false" />
+
+
+        <!-- ========================= -->
+        <!-- FileProvider -->
+        <!-- Used for APK installation -->
+        <!-- ========================= -->
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
