@@ -93,6 +93,8 @@ class MainActivity : AppCompatActivity() {
 
     private val channels = listOf(
 
+        /* ================= ORIGINAL CHANNELS ================= */
+
         Channel(
             name = "T Sports",
             logo = "https://yt3.googleusercontent.com/IFgAG_o_AdtX4IauErKIzuFGCj0m4QyH81Q1Uq8H-2Si9ul3vmXkLihDUnn6-QI3xiMZech0AQ=s900-c-k-c0x00ffffff-no-rj",
@@ -116,6 +118,7 @@ class MainActivity : AppCompatActivity() {
             logo = "https://yt3.googleusercontent.com/fl29COpVoSRu4iXG505zsyWag0d9kdB-I-C2mm8h7ePDiT2SSTqGWyt93ObOHWcLdh0wa7yd=s900-c-k-c0x00ffffff-no-rj",
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI/atnmusic.stream/playlist.m3u8"
         ),
+
         Channel(
             name = "Channel S",
             logo = "https://upload.wikimedia.org/wikipedia/en/a/aa/Channel_S_Bangladesh_Logo.png",
@@ -276,8 +279,134 @@ class MainActivity : AppCompatActivity() {
             name = "Channel 1 4K",
             logo = "https://www.thedailystar.net/sites/default/files/styles/big_1/public/images/2025/02/24/channel_1.png",
             streamUrl = "https://stream.ottplus.live/live/channel_1_hd_abr/index.m3u8"
+        ),
+
+
+        /* ================= NEW CHANNELS ================= */
+
+        Channel(
+            name = "Eros Now",
+            logo = "https://upload.wikimedia.org/wikipedia/commons/f/fe/ErosNow_Stag_New_18_White.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+            streamUrl = "https://live20.bozztv.com/giatvplayout7/giatv-209612/tracks-v1a1/mono.ts.m3u8"
+        ),
+
+        Channel(
+            name = "WAM",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvrI0UZWtzXNzpIdpiJmKFbgVDUnMr0DkQyvrnjTbt5DQDwsxPGjvASR8&s=10",
+            streamUrl = "https://live20.bozztv.com/giatvplayout7/giatv-209593/tracks-v1a1/mono.ts.m3u8"
+        ),
+
+        Channel(
+            name = "DBC News",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1770186306600.png",
+            streamUrl = "https://owrcovcrpy.gpcdn.net/bpk-tv/1728/output/index.m3u8"
+        ),
+
+        Channel(
+            name = "News 24 HD",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1770186895850.png",
+            streamUrl = "https://owrcovcrpy.gpcdn.net/bpk-tv/1708/output/index.m3u8"
+        ),
+
+        Channel(
+            name = "BTV HD",
+            logo = "https://i.pinimg.com/736x/c3/8c/b7/c38cb7aa28d273128b42f70a428e611e.jpg",
+            streamUrl = "https://tvsen6.aynaott.com/TjGR1GcxKetHNVcMVxbq/index.m3u8"
+        ),
+
+        Channel(
+            name = "BTV Sangsad",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/a/a6/Sangsad_Television_Emblem.svg/250px-Sangsad_Television_Emblem.svg.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+            streamUrl = "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/index.m3u8"
+        ),
+
+        Channel(
+            name = "SA TV HD",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1770187361105.png",
+            streamUrl = "https://tvsen6.aynaott.com/rELXiuUXqbgzPb06Npom/index.m3u8"
+        ),
+
+        Channel(
+            name = "Red Bull TV",
+            logo = "https://upload.wikimedia.org/wikipedia/vi/thumb/6/6d/Red_Bull_Logo.svg/3840px-Red_Bull_Logo.svg.png",
+            streamUrl = "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"
+        ),
+
+        Channel(
+            name = "DD Sports",
+            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/DD_Sports_logo.svg/1280px-DD_Sports_logo.svg.png",
+            streamUrl = "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8"
+        ),
+
+        Channel(
+            name = "SRK TV",
+            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1746005940155.png",
+            streamUrl = "https://srknowapp.ncare.live/srktvhlswodrm/srktv.stream/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "Green TV",
+            logo = "https://upload.wikimedia.org/wikipedia/en/2/20/Green_TV_Logo.png",
+            streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/greentv.stream/live-orgin/greentv.stream/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "DD Bangla HD",
+            logo = "https://i.postimg.cc/WzhwJYDJ/DD-Bangla.jpg",
+            streamUrl = "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/7ff57cc9046b4c188b51a0d506f36e7f/index_3.m3u8"
+        ),
+
+        Channel(
+            name = "Hindi Movie Classic 24",
+            logo = "https://s3.aynaott.com/storage/3132515182ec50091b496fe515564084",
+            streamUrl = "https://vods2.aynaott.com/hindimovies/index.m3u8"
+        ),
+
+        Channel(
+            name = "Action Hollywood Movies",
+            logo = "https://prod98.togglestatic.com/shain/v1/dataservice/ResizeImage/$value?Format=%27png%27&Quality=85&ImageId=%279268117%27&EntityType=%27Item%27&EntityId=%27556894%27&Width=1920&Height=1080",
+            streamUrl = "https://amg01076-lightningintern-actionhollywood-samsungnz-82rry.amagi.tv/playlist/amg01076-lightningintern-actionhollywood-samsungnz/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "CNN USA",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk5qbYrWblEWdFFAOZa3KaAlnPTvlGayE_mA&s",
+            streamUrl = "https://turnerlive.warnermediacdn.com/hls/live/586495/cnngo/cnn_slate/VIDEO_0_3564000.m3u8"
+        ),
+
+        Channel(
+            name = "India Today",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZw3lZN_0pLcMA5ZUhuDEc6oDRgPbaEZGtRA&s",
+            streamUrl = "https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8"
+        ),
+
+        Channel(
+            name = "Global News",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9hVBEVr65a4nsYDIOuY9tvDL4NWe9Bfaz7g&s",
+            streamUrl = "https://live.corusdigitaldev.com/groupd/live/49a91e7f-1023-430f-8d66-561055f3d0f7/live.isml/.m3u8"
+        ),
+
+        Channel(
+            name = "Modina Live",
+            logo = "https://images-na.ssl-images-amazon.com/images/I/71CywdrFaZL.png",
+            streamUrl = "https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8"
+        ),
+
+        Channel(
+            name = "R Plus Gold",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEqtnqPJ3ELtDpyyNJCWYyOz--NgOs7kQADM5g7XW44v7N9oyXPGQXraY&s=10",
+            streamUrl = "https://cdn-4.pishow.tv/live/1231/1231_1.m3u8"
+        ),
+
+        Channel(
+            name = "TPV Sport",
+            logo = "img/tvp.png",
+            streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         )
-    )
+
+    ).distinctBy {
+        it.name.trim().lowercase()
+    }
 
 
     /* =========================================================
@@ -484,10 +613,6 @@ class MainActivity : AppCompatActivity() {
         playerView.player =
             player
 
-        /*
-         * Default Media3 controller বন্ধ।
-         * আমাদের Custom YouTube-style controller ব্যবহার হবে।
-         */
         playerView.useController =
             false
 
@@ -570,10 +695,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupPlayerControls() {
 
-        /*
-         * CENTER PLAY / PAUSE
-         */
-
         playPauseButton.setOnClickListener {
 
             val exoPlayer =
@@ -615,10 +736,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        /*
-         * 10 SECOND BACK
-         */
-
         rewindButton.setOnClickListener {
 
             val exoPlayer =
@@ -630,10 +747,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        /*
-         * 10 SECOND FORWARD
-         */
-
         forwardButton.setOnClickListener {
 
             val exoPlayer =
@@ -644,10 +757,6 @@ class MainActivity : AppCompatActivity() {
             showControlsTemporarily()
         }
 
-
-        /*
-         * VIDEO TAP
-         */
 
         playerView.setOnClickListener {
 
@@ -1257,6 +1366,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+
         footerYoutube.setOnClickListener {
 
             openUrl(
@@ -1264,12 +1374,14 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+
         footerInstagram.setOnClickListener {
 
             openUrl(
                 "https://www.instagram.com/crimeworld06266"
             )
         }
+
 
         footerTiktok.setOnClickListener {
 
