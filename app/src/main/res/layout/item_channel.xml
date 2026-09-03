@@ -3,10 +3,10 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="125dp"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="6dp"
+    android:padding="5dp"
     android:background="#000000"
     android:clickable="true"
     android:focusable="true">
@@ -16,14 +16,14 @@
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:background="#151515"
-        android:padding="8dp"
+        android:padding="7dp"
         android:scaleType="fitCenter"
         android:contentDescription="Channel Logo" />
 
     <TextView
         android:id="@+id/channel_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
         android:text="Channel"
