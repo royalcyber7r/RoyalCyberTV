@@ -371,6 +371,10 @@ class MainActivity : AppCompatActivity() {
         playerView.player =
             player
 
+        playerView.useController = true
+playerView.controllerAutoShow = true
+playerView.controllerHideOnTouch = true
+
         /*
          * Media3-এর নিজস্ব controller ব্যবহার হচ্ছে।
          *
@@ -378,7 +382,7 @@ class MainActivity : AppCompatActivity() {
          * মাঝখানে YouTube-এর মতো দেখাবে।
          */
 
-        playerView.useController = true
+        
 
         playerView.controllerShowTimeoutMs =
             5000
