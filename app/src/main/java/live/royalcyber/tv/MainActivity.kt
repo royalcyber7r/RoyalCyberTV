@@ -133,6 +133,12 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Thikana Tv",
+            logo = "https://web.aynaott.com/storage/019dd92f-107c-7056-9e79-e5233f6e51d9/uploads/images/2026-07-02/images_b9a8bdbfcea2fb4656204d06f615682a_playmist_thikana400x400.jpg",
+            streamUrl = "https://5dd3981940faa.streamlock.net:443/thikanatv/thikanatv/playlist.m3u8"
+        ),
+
+        Channel(
             name = "Joo Music",
             logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbNd6fN0L21ZYgbAtkKGaS-t-cqTGfbk0svw&s",
             streamUrl = "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
