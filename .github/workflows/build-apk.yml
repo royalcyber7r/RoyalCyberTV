@@ -45,7 +45,34 @@ jobs:
 
 
       # ==========================================
-      # 4. Generate Automatic Version
+      # 4. Setup Android SDK / Build Tools
+      # ==========================================
+
+      - name: Setup Android SDK
+        shell: bash
+        run: |
+
+          echo "=========================================="
+          echo "Checking Android SDK"
+          echo "=========================================="
+
+          echo "ANDROID_HOME:"
+          echo "${ANDROID_HOME:-not set}"
+
+          echo ""
+
+          if [ -d "${ANDROID_HOME:-}" ]; then
+            echo "Android SDK found."
+          else
+            echo "ERROR: Android SDK was not found!"
+            exit 1
+          fi
+
+          echo "=========================================="
+
+
+      # ==========================================
+      # 5. Generate Automatic Version
       # ==========================================
 
       - name: Generate Version
@@ -72,21 +99,27 @@ jobs:
 
 
       # ==========================================
-      # 5. Check Gradle
+      # 6. Check Gradle
       # ==========================================
 
       - name: Check Gradle
         shell: bash
         run: |
 
+          echo "=========================================="
+          echo "Gradle Information"
+          echo "=========================================="
+
           gradle --version
 
+          echo "=========================================="
+
 
       # ==========================================
-      # 6. Verify Release Keystore
+      # 7. Verify Release Keystore
       # ==========================================
       #
-      # Keystore is already in Repository Root:
+      # Keystore is in Repository Root:
       #
       # RoyalCyberTV/
       # ├── royalcyber-release.jks
@@ -129,7 +162,7 @@ jobs:
 
 
       # ==========================================
-      # 7. Verify Keystore Credentials
+      # 8. Verify Keystore Credentials
       # ==========================================
 
       - name: Verify Keystore Credentials
@@ -168,13 +201,14 @@ jobs:
             exit 1
           fi
 
+          echo ""
           echo "Keystore credentials verified successfully."
 
           echo "=========================================="
 
 
       # ==========================================
-      # 8. Build Signed Release APK
+      # 9. Build Signed Release APK
       # ==========================================
 
       - name: Build Signed Release APK
@@ -190,6 +224,11 @@ jobs:
           echo "=========================================="
           echo "Building Signed Release APK"
           echo "=========================================="
+
+          if [ -z "$KEY_PASSWORD" ]; then
+            echo "ERROR: KEY_PASSWORD secret is missing!"
+            exit 1
+          fi
 
           echo "Keystore:"
           echo "$KEYSTORE_PATH"
@@ -210,7 +249,7 @@ jobs:
 
 
       # ==========================================
-      # 9. Check Release APK
+      # 10. Check Release APK
       # ==========================================
 
       - name: Check Release APK
@@ -219,20 +258,30 @@ jobs:
 
           APK_PATH="app/build/outputs/apk/release/app-release.apk"
 
+          echo "=========================================="
+          echo "Checking Release APK"
+          echo "=========================================="
+
           if [ ! -f "$APK_PATH" ]; then
             echo "ERROR: Release APK was not generated!"
             exit 1
           fi
 
-          echo "=========================================="
+          if [ ! -s "$APK_PATH" ]; then
+            echo "ERROR: Release APK is empty!"
+            exit 1
+          fi
+
+          echo ""
           echo "Release APK successfully generated!"
-          echo "=========================================="
 
           ls -lh "$APK_PATH"
 
+          echo "=========================================="
+
 
       # ==========================================
-      # 10. Rename APK
+      # 11. Rename APK
       # ==========================================
 
       - name: Rename APK
@@ -251,9 +300,58 @@ jobs:
 
           ls -lh release/
 
+          echo "=========================================="
+
 
       # ==========================================
-      # 11. Verify APK Signing
+      # 12. Locate apksigner
+      # ==========================================
+
+      - name: Locate APK Signer
+        id: apksigner
+        shell: bash
+        run: |
+
+          echo "=========================================="
+          echo "Locating apksigner"
+          echo "=========================================="
+
+          APKSIGNER=""
+
+          if [ -n "${ANDROID_HOME:-}" ] && [ -d "$ANDROID_HOME/build-tools" ]; then
+
+            APKSIGNER="$(find "$ANDROID_HOME/build-tools" \
+              -type f \
+              -name "apksigner" \
+              2>/dev/null \
+              | sort -V \
+              | tail -n 1)"
+
+          fi
+
+          if [ -z "$APKSIGNER" ]; then
+            echo "ERROR: apksigner was not found in Android SDK!"
+            echo ""
+            echo "Android SDK:"
+            echo "${ANDROID_HOME:-not set}"
+            echo ""
+            echo "Available build-tools:"
+            if [ -d "${ANDROID_HOME:-}/build-tools" ]; then
+              ls -la "$ANDROID_HOME/build-tools"
+            fi
+            exit 1
+          fi
+
+          echo "apksigner found:"
+          echo "$APKSIGNER"
+
+          echo "apksigner_path=$APKSIGNER" >> "$GITHUB_OUTPUT"
+
+          echo "=========================================="
+
+
+      # ==========================================
+      # 13. Verify APK Signing
       # ==========================================
 
       - name: Verify APK Signing
@@ -262,30 +360,50 @@ jobs:
 
           APK_PATH="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
 
+          APKSIGNER="${{ steps.apksigner.outputs.apksigner_path }}"
+
           echo "=========================================="
           echo "Checking APK Signature"
           echo "=========================================="
 
-          if ! command -v apksigner >/dev/null 2>&1; then
-            echo "ERROR: apksigner was not found!"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "ERROR: APK file was not found!"
             exit 1
           fi
 
-          apksigner verify --verbose "$APK_PATH"
-
-          if [ $? -ne 0 ]; then
-            echo "ERROR: APK signature verification failed!"
+          if [ -z "$APKSIGNER" ]; then
+            echo "ERROR: apksigner path is empty!"
             exit 1
           fi
+
+          if [ ! -f "$APKSIGNER" ]; then
+            echo "ERROR: apksigner executable was not found!"
+            echo "$APKSIGNER"
+            exit 1
+          fi
+
+          echo "APK:"
+          echo "$APK_PATH"
 
           echo ""
-          echo "APK signature verified successfully."
+          echo "apksigner:"
+          echo "$APKSIGNER"
 
+          echo ""
+          echo "Verifying APK signature..."
+
+          "$APKSIGNER" verify \
+            --verbose \
+            "$APK_PATH"
+
+          echo ""
+          echo "=========================================="
+          echo "APK signature verified successfully."
           echo "=========================================="
 
 
       # ==========================================
-      # 12. Upload GitHub Actions Artifact
+      # 14. Upload GitHub Actions Artifact
       # ==========================================
 
       - name: Upload APK Artifact
@@ -302,7 +420,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Create GitHub Release
+      # 15. Create GitHub Release
       # ==========================================
 
       - name: Create GitHub Release
@@ -344,12 +462,7 @@ jobs:
 
 
       # ==========================================
-      # 14. Cleanup
-      # ==========================================
-      #
-      # Keystore is tracked in the repository, so
-      # we do NOT delete it from the workspace here.
-      #
+      # 16. Build Completed
       # ==========================================
 
       - name: Build Completed
@@ -361,10 +474,19 @@ jobs:
           echo "ROYALCYBERTV APK BUILD SUCCESSFUL"
           echo "=========================================="
 
+          echo ""
           echo "Version:"
           echo "${{ steps.version.outputs.version_name }}"
 
+          echo ""
           echo "APK:"
           ls -lh release/
 
+          echo ""
+          echo "GitHub Release:"
+          echo "v${{ steps.version.outputs.version_name }}"
+
+          echo ""
+          echo "=========================================="
+          echo "BUILD COMPLETED SUCCESSFULLY"
           echo "=========================================="
