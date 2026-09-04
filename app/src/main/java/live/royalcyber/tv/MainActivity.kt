@@ -151,9 +151,9 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
-            name = "Party Music",
-            logo = "https://tstatic.akash-go.com/cms-ui/images/custom-content/1778083145889.png",
-            streamUrl = "https://nomawnoijl.gpcdn.net/akash/partyuniverse/playlist.m3u8"
+            name = "TV9 Bangla",
+            logo = "https://static.wikia.nocookie.net/logopedia/images/2/2b/Tv9bangla.png/revision/latest/scale-to-width-down/280?cb=20210509173815",
+            streamUrl = "https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9banaen8yq/liveabr/playlist.m3u8"
         ),
 
         Channel(
