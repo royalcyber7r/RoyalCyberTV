@@ -139,6 +139,12 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Drama 24",
+            logo = "https://yt3.googleusercontent.com/ytc/AIdro_mRNcwLGFRiDadXg634lWGLZRX94k4kFVCQne23qV2b-G0=w544-c-h544-k-c0x00ffffff-no-l90-rj",
+            streamUrl = "https://vods2.aynaott.com/gseriesDrama/index.m3u8"
+        ),
+
+        Channel(
             name = "Joo Music",
             logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbNd6fN0L21ZYgbAtkKGaS-t-cqTGfbk0svw&s",
             streamUrl = "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
