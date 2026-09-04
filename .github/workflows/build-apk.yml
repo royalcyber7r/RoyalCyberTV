@@ -118,15 +118,6 @@ jobs:
       # ==========================================
       # 7. Verify Release Keystore
       # ==========================================
-      #
-      # Keystore is in Repository Root:
-      #
-      # RoyalCyberTV/
-      # ├── royalcyber-release.jks
-      # ├── app/
-      # └── .github/
-      #
-      # ==========================================
 
       - name: Verify Release Keystore
         shell: bash
@@ -283,6 +274,21 @@ jobs:
       # ==========================================
       # 11. Rename APK
       # ==========================================
+      #
+      # দুটি নাম তৈরি হবে:
+      #
+      # 1. RoyalCyberTV-1.0.X.apk
+      # 2. RoyalCyberTV.apk
+      #
+      # দুটোই একই signed APK
+      #
+      # পুরোনো UpdateActivity:
+      # RoyalCyberTV.apk
+      #
+      # নতুন UpdateActivity:
+      # RoyalCyberTV-1.0.X.apk
+      #
+      # ==========================================
 
       - name: Rename APK
         shell: bash
@@ -290,21 +296,75 @@ jobs:
 
           mkdir -p release
 
+          VERSIONED_APK="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
+
+          GENERIC_APK="release/RoyalCyberTV.apk"
+
+          SOURCE_APK="app/build/outputs/apk/release/app-release.apk"
+
           cp \
-            app/build/outputs/apk/release/app-release.apk \
-            "release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
+            "$SOURCE_APK" \
+            "$VERSIONED_APK"
+
+          cp \
+            "$SOURCE_APK" \
+            "$GENERIC_APK"
 
           echo "=========================================="
-          echo "Final APK"
+          echo "Final APK Files"
           echo "=========================================="
 
+          echo ""
+          echo "Versioned APK:"
+          ls -lh "$VERSIONED_APK"
+
+          echo ""
+          echo "Generic APK:"
+          ls -lh "$GENERIC_APK"
+
+          echo ""
+          echo "Both APK files are copies of the SAME signed APK."
+
+          echo "=========================================="
+
+
+      # ==========================================
+      # 12. Verify APK Version Information
+      # ==========================================
+
+      - name: Verify APK Version Information
+        shell: bash
+        run: |
+
+          echo "=========================================="
+          echo "Verifying APK Version"
+          echo "=========================================="
+
+          VERSION_CODE="${{ steps.version.outputs.version_code }}"
+
+          VERSION_NAME="${{ steps.version.outputs.version_name }}"
+
+          echo ""
+          echo "Expected Version Code:"
+          echo "$VERSION_CODE"
+
+          echo ""
+          echo "Expected Version Name:"
+          echo "$VERSION_NAME"
+
+          echo ""
+          echo "Application ID:"
+          echo "live.royalcyber.tv"
+
+          echo ""
+          echo "APK files:"
           ls -lh release/
 
           echo "=========================================="
 
 
       # ==========================================
-      # 12. Locate apksigner
+      # 13. Locate apksigner
       # ==========================================
 
       - name: Locate APK Signer
@@ -336,9 +396,11 @@ jobs:
             echo "${ANDROID_HOME:-not set}"
             echo ""
             echo "Available build-tools:"
+
             if [ -d "${ANDROID_HOME:-}/build-tools" ]; then
               ls -la "$ANDROID_HOME/build-tools"
             fi
+
             exit 1
           fi
 
@@ -351,23 +413,30 @@ jobs:
 
 
       # ==========================================
-      # 13. Verify APK Signing
+      # 14. Verify APK Signing
       # ==========================================
 
       - name: Verify APK Signing
         shell: bash
         run: |
 
-          APK_PATH="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
+          VERSIONED_APK="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
+
+          GENERIC_APK="release/RoyalCyberTV.apk"
 
           APKSIGNER="${{ steps.apksigner.outputs.apksigner_path }}"
 
           echo "=========================================="
-          echo "Checking APK Signature"
+          echo "Checking APK Signatures"
           echo "=========================================="
 
-          if [ ! -f "$APK_PATH" ]; then
-            echo "ERROR: APK file was not found!"
+          if [ ! -f "$VERSIONED_APK" ]; then
+            echo "ERROR: Versioned APK was not found!"
+            exit 1
+          fi
+
+          if [ ! -f "$GENERIC_APK" ]; then
+            echo "ERROR: Generic APK was not found!"
             exit 1
           fi
 
@@ -382,28 +451,34 @@ jobs:
             exit 1
           fi
 
-          echo "APK:"
-          echo "$APK_PATH"
-
           echo ""
-          echo "apksigner:"
-          echo "$APKSIGNER"
-
-          echo ""
-          echo "Verifying APK signature..."
+          echo "Verifying Versioned APK..."
 
           "$APKSIGNER" verify \
             --verbose \
-            "$APK_PATH"
+            "$VERSIONED_APK"
+
+          echo ""
+          echo "Versioned APK signature verified."
+
+          echo ""
+          echo "Verifying Generic APK..."
+
+          "$APKSIGNER" verify \
+            --verbose \
+            "$GENERIC_APK"
+
+          echo ""
+          echo "Generic APK signature verified."
 
           echo ""
           echo "=========================================="
-          echo "APK signature verified successfully."
+          echo "Both APK signatures verified successfully."
           echo "=========================================="
 
 
       # ==========================================
-      # 14. Upload GitHub Actions Artifact
+      # 15. Upload GitHub Actions Artifact
       # ==========================================
 
       - name: Upload APK Artifact
@@ -412,7 +487,9 @@ jobs:
 
           name: RoyalCyberTV-Release-${{ steps.version.outputs.version_code }}
 
-          path: release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+          path: |
+            release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+            release/RoyalCyberTV.apk
 
           if-no-files-found: error
 
@@ -420,7 +497,7 @@ jobs:
 
 
       # ==========================================
-      # 15. Create GitHub Release
+      # 16. Create GitHub Release
       # ==========================================
 
       - name: Create GitHub Release
@@ -447,13 +524,31 @@ jobs:
 
             ==========================================
 
+            Application ID:
+            live.royalcyber.tv
+
+            ==========================================
+
             Signed Release APK
 
             This APK is digitally signed with the
             RoyalCyberTV release signing key.
 
+            ==========================================
+
+            Update Support
+
+            RoyalCyberTV.apk
+            is included for compatibility with
+            older versions of the automatic updater.
+
+            The versioned APK is also included:
+
+            RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+
           files: |
             release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+            release/RoyalCyberTV.apk
 
           generate_release_notes: false
 
@@ -462,7 +557,7 @@ jobs:
 
 
       # ==========================================
-      # 16. Build Completed
+      # 17. Build Completed
       # ==========================================
 
       - name: Build Completed
@@ -475,16 +570,28 @@ jobs:
           echo "=========================================="
 
           echo ""
-          echo "Version:"
+          echo "Version Code:"
+          echo "${{ steps.version.outputs.version_code }}"
+
+          echo ""
+          echo "Version Name:"
           echo "${{ steps.version.outputs.version_name }}"
 
           echo ""
-          echo "APK:"
+          echo "Application ID:"
+          echo "live.royalcyber.tv"
+
+          echo ""
+          echo "APK Files:"
           ls -lh release/
 
           echo ""
           echo "GitHub Release:"
           echo "v${{ steps.version.outputs.version_name }}"
+
+          echo ""
+          echo "Automatic Update:"
+          echo "RoyalCyberTV.apk = ENABLED"
 
           echo ""
           echo "=========================================="
