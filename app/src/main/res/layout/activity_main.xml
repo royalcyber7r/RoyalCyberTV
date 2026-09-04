@@ -4,11 +4,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
+    android:id="@+id/root_layout"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
     android:orientation="vertical"
-    android:background="#000000">
+    android:background="#000000"
+
+    android:fitsSystemWindows="true">
 
 
     <!-- ========================================================= -->
@@ -243,7 +247,6 @@
 
                         <!-- ================================================= -->
                         <!-- PLAY / PAUSE -->
-                        <!-- NO BLACK BACKGROUND -->
                         <!-- ================================================= -->
 
                         <TextView
@@ -624,7 +627,7 @@
         android:id="@+id/bottom_navigation"
 
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="76dp"
 
         android:orientation="horizontal"
 
@@ -632,7 +635,9 @@
 
         android:background="#111111"
 
-        android:elevation="8dp">
+        android:elevation="12dp"
+
+        android:fitsSystemWindows="true">
 
 
         <!-- ================================================= -->
@@ -651,6 +656,9 @@
 
             android:orientation="vertical"
 
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+
             android:clickable="true"
             android:focusable="true">
 
@@ -662,7 +670,9 @@
                 android:text="⌂"
 
                 android:textColor="#FFFFFF"
-                android:textSize="27sp" />
+                android:textSize="27sp"
+
+                android:includeFontPadding="false" />
 
 
             <TextView
@@ -672,7 +682,9 @@
                 android:text="Home"
 
                 android:textColor="#FFFFFF"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+
+                android:includeFontPadding="false" />
 
 
         </LinearLayout>
@@ -694,6 +706,9 @@
 
             android:orientation="vertical"
 
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+
             android:clickable="true"
             android:focusable="true">
 
@@ -705,7 +720,9 @@
                 android:text="♟"
 
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+
+                android:includeFontPadding="false" />
 
 
             <TextView
@@ -715,7 +732,9 @@
                 android:text="Notification"
 
                 android:textColor="#FFFFFF"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+
+                android:includeFontPadding="false" />
 
 
         </LinearLayout>
@@ -737,6 +756,9 @@
 
             android:orientation="vertical"
 
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+
             android:clickable="true"
             android:focusable="true">
 
@@ -748,7 +770,9 @@
                 android:text="⟳"
 
                 android:textColor="#FFFFFF"
-                android:textSize="27sp" />
+                android:textSize="27sp"
+
+                android:includeFontPadding="false" />
 
 
             <TextView
@@ -758,7 +782,9 @@
                 android:text="Update"
 
                 android:textColor="#FFFFFF"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+
+                android:includeFontPadding="false" />
 
 
         </LinearLayout>
@@ -780,6 +806,9 @@
 
             android:orientation="vertical"
 
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+
             android:clickable="true"
             android:focusable="true">
 
@@ -791,7 +820,9 @@
                 android:text="▶"
 
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+
+                android:includeFontPadding="false" />
 
 
             <TextView
@@ -801,7 +832,9 @@
                 android:text="Channel"
 
                 android:textColor="#FFFFFF"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+
+                android:includeFontPadding="false" />
 
 
         </LinearLayout>
