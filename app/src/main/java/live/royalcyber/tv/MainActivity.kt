@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -76,25 +77,16 @@ class MainActivity : AppCompatActivity() {
 
     private var searchWasVisible = false
 
-    /*
-     * =========================================================
-     * UPDATE SYSTEM
-     * =========================================================
-     *
-     * GitHub Repository:
-     *
-     * https://github.com/royalcyber7r/RoyalCyberTV
-     *
-     * Latest Release:
-     *
-     * build-8
-     * build-9
-     * build-10
-     * build-11
-     * etc.
-     *
-     * UpdateActivity GitHub-এর latest release check করবে।
-     */
+    /* =========================================================
+       BOTTOM NAVIGATION BASE HEIGHT
+       ========================================================= */
+
+    private var bottomNavigationBaseHeight = 70
+
+
+    /* =========================================================
+       UPDATE SYSTEM
+       ========================================================= */
 
     private var updateCheckStarted = false
 
@@ -196,7 +188,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "My TV",
-            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTwzEuhaRG7YKVDoXfF2ycdlvNkShrJje8Em3lzCPghg&s",
+            logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTwzEuhaRG7YKVDoXfXDYcdlvNkShrJje8Em3lzCPghg&s",
             streamUrl = "https://tvsen6.aynaott.com/XMpHaEf0ANBhv8w6NWR7/index.m3u8"
         ),
 
@@ -539,6 +531,8 @@ class MainActivity : AppCompatActivity() {
 
         initializeViews()
 
+        setupBottomNavigationInsets()
+
         setupChannelList()
 
         setupSearch()
@@ -565,27 +559,77 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        /*
-         * =====================================================
-         * AUTOMATIC UPDATE CHECK
-         * =====================================================
-         *
-         * App open হওয়ার পর GitHub latest release check হবে।
-         *
-         * যেমন:
-         *
-         * Installed Version = 8
-         * GitHub Latest      = build-9
-         *
-         * তাহলে UpdateActivity খুলবে।
-         *
-         * Installed Version = 9
-         * GitHub Latest      = build-10
-         *
-         * তাহলে UpdateActivity খুলবে।
-         */
-
         checkForUpdateAutomatically()
+    }
+
+
+    /* =========================================================
+       BOTTOM NAVIGATION SYSTEM INSETS
+       =========================================================
+       
+       Android-এর Navigation Bar / Gesture Bar যেন
+       Home / Notification / Update / Channel-এর উপর
+       চলে না আসে, তার জন্য এই system inset ব্যবহার করা হচ্ছে।
+       ========================================================= */
+
+    private fun setupBottomNavigationInsets() {
+
+        if (!::bottomNavigation.isInitialized) {
+            return
+        }
+
+        val density =
+            resources
+                .displayMetrics
+                .density
+
+        bottomNavigationBaseHeight =
+            (
+                70f * density
+            ).toInt()
+
+        ViewCompat.setOnApplyWindowInsetsListener(
+            bottomNavigation
+        ) { view, insets ->
+
+            val navigationInsets =
+                insets.getInsets(
+                    WindowInsetsCompat.Type.navigationBars()
+                )
+
+            val bottomInset =
+                navigationInsets.bottom
+
+            val params =
+                view.layoutParams
+
+            params.height =
+                bottomNavigationBaseHeight +
+                    bottomInset
+
+            view.layoutParams =
+                params
+
+            /*
+             * Navigation bar-এর জায়গা আলাদা রাখা হচ্ছে।
+             *
+             * ফলে menu-এর actual content
+             * system navigation bar-এর নিচে যাবে না।
+             */
+
+            view.setPadding(
+                view.paddingLeft,
+                0,
+                view.paddingRight,
+                bottomInset
+            )
+
+            insets
+        }
+
+        ViewCompat.requestApplyInsets(
+            bottomNavigation
+        )
     }
 
 
@@ -601,15 +645,6 @@ class MainActivity : AppCompatActivity() {
 
         updateCheckStarted = true
 
-        /*
-         * UpdateActivity নিজেই GitHub latest release check করবে।
-         *
-         * তাই MainActivity শুধু UpdateActivity খুলছে।
-         *
-         * Update না থাকলে UpdateActivity নিজে থেকে finish()
-         * হয়ে MainActivity-তে ফিরে আসবে।
-         */
-
         try {
 
             val intent =
@@ -623,11 +658,6 @@ class MainActivity : AppCompatActivity() {
         } catch (
             _: Exception
         ) {
-
-            /*
-             * UpdateActivity কোনো কারণে না থাকলে
-             * MainActivity বন্ধ হবে না।
-             */
 
             updateCheckStarted = false
         }
@@ -1481,6 +1511,10 @@ class MainActivity : AppCompatActivity() {
 
         showSystemBars()
 
+        ViewCompat.requestApplyInsets(
+            bottomNavigation
+        )
+
         mainScrollView.post {
 
             mainScrollView.scrollTo(
@@ -1541,6 +1575,10 @@ class MainActivity : AppCompatActivity() {
         controller.show(
             WindowInsetsCompat.Type.systemBars()
         )
+
+        ViewCompat.requestApplyInsets(
+            bottomNavigation
+        )
     }
 
 
@@ -1585,6 +1623,10 @@ class MainActivity : AppCompatActivity() {
 
                 playerContainer.layoutParams =
                     params
+
+                ViewCompat.requestApplyInsets(
+                    bottomNavigation
+                )
             }
         }
     }
@@ -1621,20 +1663,6 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-
-        /*
-         * =====================================================
-         * UPDATE BUTTON
-         * =====================================================
-         *
-         * আগে এখানে:
-         *
-         * "আপনার App সর্বশেষ Version-এ আছে"
-         *
-         * Toast ছিল।
-         *
-         * এখন UpdateActivity খুলবে।
-         */
 
         findViewById<View>(
             R.id.menu_update
@@ -1736,6 +1764,10 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
 
         super.onResume()
+
+        ViewCompat.requestApplyInsets(
+            bottomNavigation
+        )
 
         player?.let {
 
