@@ -157,9 +157,9 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
-            name = "Akash 8 BN",
+            name = "Z Cenema",
             logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/5e7e35a1e640364eb38c06c67dee7179.png",
-            streamUrl = "https://cdn-4.pishow.tv/live/969/master.m3u8"
+            streamUrl = "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/NGCHD/default/NGCHD.m3u8"
         ),
 
         Channel(
