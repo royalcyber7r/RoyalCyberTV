@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Z Cenema",
-            logo = "https://jiotvimages.cdn.jio.com/dare_images/images/channel/5e7e35a1e640364eb38c06c67dee7179.png",
+            logo = "https://royalcyberiptv.live/img/z-cenema.jpg",
             streamUrl = "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/NGCHD/default/NGCHD.m3u8"
         ),
 
