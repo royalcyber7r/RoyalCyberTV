@@ -1,1 +1,71 @@
+name: Export RoyalCyberTV Signing Key
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  export-signing-key:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check Keystore
+        shell: bash
+        run: |
+
+          if [ ! -f "royalcyber-release.jks" ]; then
+
+            echo "ERROR: royalcyber-release.jks not found!"
+
+            exit 1
+
+          fi
+
+          echo "Keystore found successfully."
+
+      - name: Convert Keystore To Base64
+        shell: bash
+        run: |
+
+          base64 -w 0 royalcyber-release.jks > keystore_base64.txt
+
+          echo "Base64 keystore created."
+
+      - name: Upload Signing Key Artifact
+        uses: actions/upload-artifact@v4
+        with:
+
+          name: RoyalCyberTV-Signing-Key-Base64
+
+          path: keystore_base64.txt
+
+          if-no-files-found: error
+
+          retention-days: 1
+
+      - name: Export Information
+        shell: bash
+        run: |
+
+          echo "=========================================="
+          echo "RoyalCyberTV signing key export completed."
+          echo "=========================================="
+
+          echo "Artifact:"
+          echo "RoyalCyberTV-Signing-Key-Base64"
+
+          echo "File:"
+          echo "keystore_base64.txt"
+
+          echo "Retention:"
+          echo "1 day"
+
+          echo "=========================================="
