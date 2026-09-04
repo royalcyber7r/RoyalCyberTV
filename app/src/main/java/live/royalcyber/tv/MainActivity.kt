@@ -306,7 +306,6 @@ class MainActivity : AppCompatActivity() {
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/greentv.stream/live-orgin/greentv.stream/playlist.m3u8"
         ),
 
-
         /* =====================================================
            ⚽ SPORTS CHANNELS
            ===================================================== */
@@ -352,7 +351,6 @@ class MainActivity : AppCompatActivity() {
             logo = "https://royalcyberiptv.live/img/tpv.png",
             streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         ),
-
 
         /* =====================================================
            🇮🇳 INDIAN CHANNELS
@@ -447,7 +445,6 @@ class MainActivity : AppCompatActivity() {
             logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEqtnqPJ3ELtDpyyNJCWYyOz--NgOs7kQADM5g7XW44v7N9oyXPGQXraY&s=10",
             streamUrl = "https://cdn-4.pishow.tv/live/1231/1231_1.m3u8"
         ),
-
 
         /* =====================================================
            🌍 INTERNATIONAL CHANNELS
@@ -559,17 +556,26 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        checkForUpdateAutomatically()
+        /*
+         * App-এর মূল UI আগে সম্পূর্ণ layout হতে দেওয়া হচ্ছে।
+         * তারপর UpdateActivity চালু হবে।
+         */
+        handler.postDelayed({
+
+            if (
+                !isFinishing &&
+                !isDestroyed
+            ) {
+
+                checkForUpdateAutomatically()
+            }
+
+        }, 1500)
     }
 
 
     /* =========================================================
        BOTTOM NAVIGATION SYSTEM INSETS
-       =========================================================
-       
-       Android-এর Navigation Bar / Gesture Bar যেন
-       Home / Notification / Update / Channel-এর উপর
-       চলে না আসে, তার জন্য এই system inset ব্যবহার করা হচ্ছে।
        ========================================================= */
 
     private fun setupBottomNavigationInsets() {
@@ -609,13 +615,6 @@ class MainActivity : AppCompatActivity() {
 
             view.layoutParams =
                 params
-
-            /*
-             * Navigation bar-এর জায়গা আলাদা রাখা হচ্ছে।
-             *
-             * ফলে menu-এর actual content
-             * system navigation bar-এর নিচে যাবে না।
-             */
 
             view.setPadding(
                 view.paddingLeft,
@@ -1353,7 +1352,7 @@ class MainActivity : AppCompatActivity() {
 
 
     /* =========================================================
-       FULLSCREEN
+       FULLSCREEN BUTTON
        ========================================================= */
 
     private fun setupFullscreenButton() {
@@ -1372,6 +1371,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    /* =========================================================
+       ENTER FULLSCREEN
+       ========================================================= */
+
     private fun enterFullscreen() {
 
         if (isFullscreen) {
@@ -1385,9 +1388,33 @@ class MainActivity : AppCompatActivity() {
             searchBox.visibility ==
                 View.VISIBLE
 
+        /*
+         * Fullscreen শুরু করার আগে ScrollView একদম উপরে।
+         */
+        mainScrollView.scrollTo(
+            0,
+            0
+        )
+
+        /*
+         * Fullscreen অবস্থায় ScrollView-এর scrollbar
+         * দেখানো হবে না।
+         */
+        mainScrollView.isVerticalScrollBarEnabled =
+            false
+
+        mainScrollView.overScrollMode =
+            View.OVER_SCROLL_NEVER
+
+        /*
+         * Landscape করা হচ্ছে।
+         */
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
+        /*
+         * Player ছাড়া বাকি UI hide।
+         */
         headerLayout.visibility =
             View.GONE
 
@@ -1409,12 +1436,10 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.visibility =
             View.GONE
 
+        /*
+         * System bars hide।
+         */
         hideSystemBars()
-
-        window.decorView.post {
-
-            applyFullscreenPlayerSize()
-        }
 
         playerControls.visibility =
             View.VISIBLE
@@ -1422,8 +1447,33 @@ class MainActivity : AppCompatActivity() {
         handler.removeCallbacks(
             hideControlsRunnable
         )
+
+        /*
+         * Orientation পরিবর্তনের পর actual viewport পাওয়া গেলে
+         * player-এর height সেট হবে।
+         */
+        window.decorView.post {
+
+            if (isFullscreen) {
+
+                applyFullscreenPlayerSize()
+            }
+        }
+
+        window.decorView.postDelayed({
+
+            if (isFullscreen) {
+
+                applyFullscreenPlayerSize()
+            }
+
+        }, 250)
     }
 
+
+    /* =========================================================
+       APPLY FULLSCREEN PLAYER SIZE
+       ========================================================= */
 
     private fun applyFullscreenPlayerSize() {
 
@@ -1431,25 +1481,68 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val displayMetrics =
-            resources.displayMetrics
+        /*
+         * displayMetrics.heightPixels ব্যবহার করা হচ্ছে না।
+         *
+         * ScrollView-এর actual visible height ব্যবহার করা হচ্ছে।
+         * এতে player নিজের viewport-এর বাইরে বড় হয়ে ScrollView
+         * তৈরি করবে না।
+         */
+        val viewportWidth =
+            mainScrollView.width
 
-        val screenHeight =
-            displayMetrics.heightPixels
+        val viewportHeight =
+            mainScrollView.height
+
+        /*
+         * Layout এখনো measure না হলে আবার চেষ্টা।
+         */
+        if (
+            viewportWidth <= 0 ||
+            viewportHeight <= 0
+        ) {
+
+            window.decorView.post {
+
+                if (isFullscreen) {
+
+                    applyFullscreenPlayerSize()
+                }
+            }
+
+            return
+        }
 
         val params =
             playerContainer.layoutParams
 
         params.width =
-            ViewGroup.LayoutParams.MATCH_PARENT
+            viewportWidth
 
         params.height =
-            screenHeight
+            viewportHeight
 
         playerContainer.layoutParams =
             params
+
+        /*
+         * Fullscreen-এ ScrollView সবসময় top position-এ।
+         */
+        mainScrollView.scrollTo(
+            0,
+            0
+        )
+
+        /*
+         * Layout update করানো।
+         */
+        playerContainer.requestLayout()
     }
 
+
+    /* =========================================================
+       EXIT FULLSCREEN
+       ========================================================= */
 
     private fun exitFullscreen() {
 
@@ -1457,15 +1550,65 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        /*
+         * আগে fullscreen state বন্ধ।
+         */
         isFullscreen =
             false
 
+        handler.removeCallbacks(
+            hideControlsRunnable
+        )
+
+        /*
+         * Portrait-এ ফেরত যাওয়া।
+         */
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        val density =
-            resources.displayMetrics.density
+        /*
+         * System bars দেখানো।
+         */
+        showSystemBars()
 
+        /*
+         * এখনই player-এর height পরিবর্তন করছি না।
+         *
+         * কারণ orientation পরিবর্তনের মাঝখানে layout resize করলে
+         * app ছোট/স্ক্রল হওয়ার সমস্যা হতে পারে।
+         *
+         * Portrait configuration আসার পর restoreNormalLayout()
+         * সবকিছু একসাথে restore করবে।
+         */
+        window.decorView.postDelayed({
+
+            if (!isFullscreen) {
+
+                restoreNormalLayout()
+            }
+
+        }, 250)
+    }
+
+
+    /* =========================================================
+       RESTORE NORMAL LAYOUT
+       ========================================================= */
+
+    private fun restoreNormalLayout() {
+
+        if (isFullscreen) {
+            return
+        }
+
+        val density =
+            resources
+                .displayMetrics
+                .density
+
+        /*
+         * Player আবার 220dp।
+         */
         val params =
             playerContainer.layoutParams
 
@@ -1481,6 +1624,9 @@ class MainActivity : AppCompatActivity() {
         playerContainer.layoutParams =
             params
 
+        /*
+         * সব UI আবার visible।
+         */
         headerLayout.visibility =
             View.VISIBLE
 
@@ -1509,26 +1655,46 @@ class MainActivity : AppCompatActivity() {
                 View.GONE
             }
 
-        showSystemBars()
+        /*
+         * Normal mode-এ ScrollView আবার স্বাভাবিক।
+         */
+        mainScrollView.isVerticalScrollBarEnabled =
+            true
 
-        ViewCompat.requestApplyInsets(
-            bottomNavigation
+        mainScrollView.overScrollMode =
+            View.OVER_SCROLL_NEVER
+
+        mainScrollView.scrollTo(
+            0,
+            0
         )
 
+        /*
+         * Channel grid-এর height পুনরায় ঠিক করা।
+         */
         mainScrollView.post {
+
+            updateRecyclerHeight()
 
             mainScrollView.scrollTo(
                 0,
                 0
             )
-
-            updateRecyclerHeight()
         }
+
+        /*
+         * Bottom navigation-এর system inset আবার apply।
+         */
+        ViewCompat.requestApplyInsets(
+            bottomNavigation
+        )
 
         playerControls.visibility =
             View.VISIBLE
 
         showControlsTemporarily()
+
+        playerContainer.requestLayout()
     }
 
 
@@ -1538,11 +1704,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideSystemBars() {
 
-        WindowCompat.setDecorFitsSystemWindows(
-            window,
-            false
-        )
-
+        /*
+         * গুরুত্বপূর্ণ:
+         *
+         * এখানে setDecorFitsSystemWindows(false) ব্যবহার করা হয়নি।
+         *
+         * এতে Root / ScrollView-এর layout mode বদলে যায় না।
+         * শুধু system bars hide হবে।
+         */
         val controller =
             WindowCompat.getInsetsController(
                 window,
@@ -1561,11 +1730,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSystemBars() {
 
-        WindowCompat.setDecorFitsSystemWindows(
-            window,
-            true
-        )
-
+        /*
+         * এখানে setDecorFitsSystemWindows(true) ব্যবহার করা হয়নি।
+         *
+         * কারণ আমরা Activity-এর edge-to-edge layout mode
+         * fullscreen-এর সময় পরিবর্তন করছি না।
+         */
         val controller =
             WindowCompat.getInsetsController(
                 window,
@@ -1596,37 +1766,42 @@ class MainActivity : AppCompatActivity() {
 
         window.decorView.post {
 
-            if (isFullscreen) {
+            if (
+                isFullscreen &&
+                newConfig.orientation ==
+                    Configuration.ORIENTATION_LANDSCAPE
+            ) {
 
+                /*
+                 * Landscape fullscreen।
+                 */
                 hideSystemBars()
+
+                mainScrollView.isVerticalScrollBarEnabled =
+                    false
+
+                mainScrollView.overScrollMode =
+                    View.OVER_SCROLL_NEVER
+
+                mainScrollView.scrollTo(
+                    0,
+                    0
+                )
 
                 applyFullscreenPlayerSize()
 
-            } else {
+            } else if (
+                !isFullscreen &&
+                newConfig.orientation ==
+                    Configuration.ORIENTATION_PORTRAIT
+            ) {
 
-                val density =
-                    resources
-                        .displayMetrics
-                        .density
+                /*
+                 * Portrait normal mode।
+                 */
+                showSystemBars()
 
-                val params =
-                    playerContainer.layoutParams
-
-                params.width =
-                    ViewGroup.LayoutParams.MATCH_PARENT
-
-                params.height =
-                    (
-                        normalPlayerHeight *
-                            density
-                        ).toInt()
-
-                playerContainer.layoutParams =
-                    params
-
-                ViewCompat.requestApplyInsets(
-                    bottomNavigation
-                )
+                restoreNormalLayout()
             }
         }
     }
@@ -1641,6 +1816,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(
             R.id.menu_home
         ).setOnClickListener {
+
+            if (isFullscreen) {
+                exitFullscreen()
+                return@setOnClickListener
+            }
 
             mainScrollView.post {
 
@@ -1675,6 +1855,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(
             R.id.menu_channel
         ).setOnClickListener {
+
+            if (isFullscreen) {
+                exitFullscreen()
+                return@setOnClickListener
+            }
 
             channelRecycler.post {
 
@@ -1765,9 +1950,24 @@ class MainActivity : AppCompatActivity() {
 
         super.onResume()
 
-        ViewCompat.requestApplyInsets(
-            bottomNavigation
-        )
+        if (isFullscreen) {
+
+            hideSystemBars()
+
+            window.decorView.post {
+
+                if (isFullscreen) {
+
+                    applyFullscreenPlayerSize()
+                }
+            }
+
+        } else {
+
+            ViewCompat.requestApplyInsets(
+                bottomNavigation
+            )
+        }
 
         player?.let {
 
