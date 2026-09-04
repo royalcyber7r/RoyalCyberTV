@@ -182,19 +182,19 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Deluxe Music",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            logo = "https://royalcyberiptv.live/img/Deluxe-music.png",
             streamUrl = "https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8"
         ),
 
         Channel(
             name = "Retro Music",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            logo = "https://royalcyberiptv.live/img/retro-music.jpg",
             streamUrl = "https://stream.mediawork.cz/retrotv/smil:retrotv2.smil/playlist.m3u8"
         ),
 
         Channel(
             name = "EBS Kids",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/EBS_KIDS.svg/1280px-EBS_KIDS.svg.png",
+            logo = "https://royalcyberiptv.live/img/ebs-kids.jpg",
             streamUrl = "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"
         ),
 
@@ -212,13 +212,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Channel S",
-            logo = "https://upload.wikimedia.org/wikipedia/en/a/aa/Channel_S_Bangladesh_Logo.png",
+            logo = "https://royalcyberiptv.live/img/Channel_S.png",
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/channels.stream/live-orgin/channels.stream/playlist.m3u8"
         ),
 
         Channel(
             name = "Ekhon TV",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/Ekhon_Logo.svg/1280px-Ekhon_Logo.svg.png",
+            logo = "https://royalcyberiptv.live/img/ekhon.jpg",
             streamUrl = "https://tvsen6.aynaott.com/fbgZV3X17hwWcyfZ4pdb/index.m3u8"
         ),
 
@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Deepto TV",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/0/00/Logo_of_Deepto_TV.svg/250px-Logo_of_Deepto_TV.svg.png",
+            logo = "https://royalcyberiptv.live/img/Deepto_TV.webp",
             streamUrl = "https://byphdgllyk.gpcdn.net/hls/deeptotv/0_1/index.m3u8"
         ),
 
@@ -260,7 +260,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Maasranga TV HD",
-            logo = "https://upload.wikimedia.org/wikipedia/en/3/39/Maasranga_Television_Logo.jpg",
+            logo = "https://royalcyberiptv.live/img/Maasranga_Television.jpg",
             streamUrl = "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"
         ),
 
@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Desh TV",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/2/25/Desh_tv_logo.jpg",
+            logo = "https://royalcyberiptv.live/img/deshtv.jpg",
             streamUrl = "https://tvsen6.aynaott.com/ryFkXfd1a4CQ7mMdc820/index.m3u8"
         ),
 
@@ -302,7 +302,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "A Sports",
-            logo = "https://upload.wikimedia.org/wikipedia/en/0/0c/A_Sports_Logo.png",
+            logo = "https://royalcyberiptv.live/img/A_Sports.png",
             streamUrl = "https://tvsen6.aynaott.com/zv68oqPDu7MZZwmHhRxt/index.m3u8"
         ),
 
@@ -425,13 +425,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Al Arabiya Al Hadath HD",
-            logo = "https://upload.wikimedia.org/wikipedia/commons/b/b9/Al-arabiya-al-hadath.jpg",
+            logo = "https://royalcyberiptv.live/img/al_arabiya.png",
             streamUrl = "https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_720p/chunks.m3u8"
         ),
 
         Channel(
             name = "DD Sports",
-            logo = "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/DD_Sports_logo.svg/1280px-DD_Sports_logo.svg.png",
+            logo = "https://royalcyberiptv.live/img/ddsport.jpg",
             streamUrl = "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8"
         ),
 
@@ -497,7 +497,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "TPV Sport",
-            logo = "https://royalcyberiptv.live/img/tvp.png",
+            logo = "https://royalcyberiptv.live/img/tpv.png",
             streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         )
 
