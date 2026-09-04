@@ -152,13 +152,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Channel S",
-            logo = "https://royalcyberiptv.live/img/Channel_S.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Channel_S.png",
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/channels.stream/live-orgin/channels.stream/playlist.m3u8"
         ),
 
         Channel(
             name = "Ekhon TV",
-            logo = "https://royalcyberiptv.live/img/ekhon.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ekhon.jpg",
             streamUrl = "https://tvsen6.aynaott.com/fbgZV3X17hwWcyfZ4pdb/index.m3u8"
         ),
 
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Deepto TV",
-            logo = "https://royalcyberiptv.live/img/Deepto_TV.webp",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Deepto_TV.webp",
             streamUrl = "https://byphdgllyk.gpcdn.net/hls/deeptotv/0_1/index.m3u8"
         ),
 
@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Maasranga TV HD",
-            logo = "https://royalcyberiptv.live/img/Maasranga_Television.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Maasranga_Television.jpg",
             streamUrl = "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"
         ),
 
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Desh TV",
-            logo = "https://royalcyberiptv.live/img/deshtv.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/deshtv.jpg",
             streamUrl = "https://tvsen6.aynaott.com/ryFkXfd1a4CQ7mMdc820/index.m3u8"
         ),
 
@@ -318,7 +318,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "A Sports",
-            logo = "https://royalcyberiptv.live/img/A_Sports.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/A_Sports.png",
             streamUrl = "https://tvsen6.aynaott.com/zv68oqPDu7MZZwmHhRxt/index.m3u8"
         ),
 
@@ -342,13 +342,13 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "DD Sports",
-            logo = "https://royalcyberiptv.live/img/ddsport.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ddsport.jpg",
             streamUrl = "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8"
         ),
 
         Channel(
             name = "TPV Sport",
-            logo = "https://royalcyberiptv.live/img/tpv.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/tvp.png",
             streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         ),
 
@@ -364,7 +364,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Z Cenema",
-            logo = "https://royalcyberiptv.live/img/z-cenema.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/z-cenema.jpg",
             streamUrl = "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/NGCHD/default/NGCHD.m3u8"
         ),
 
@@ -458,25 +458,31 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "Deluxe Music",
-            logo = "https://royalcyberiptv.live/img/Deluxe-music.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Deluxe-music.png",
             streamUrl = "https://sdn-global-live-streaming-packager-cache.3qsdn.com/13456/13456_264_live.m3u8"
         ),
 
         Channel(
             name = "Retro Music",
-            logo = "https://royalcyberiptv.live/img/retro-music.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/retro-music.jpg",
             streamUrl = "https://stream.mediawork.cz/retrotv/smil:retrotv2.smil/playlist.m3u8"
         ),
 
         Channel(
             name = "EBS Kids",
-            logo = "https://royalcyberiptv.live/img/ebs-kids.jpg",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ebs-kids.jpg",
             streamUrl = "https://ebsonair.ebs.co.kr/ebsufamilypc/familypc1m/playlist.m3u8"
         ),
 
         Channel(
+            name = "Nickjr",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Nick Jr.jpg",
+            streamUrl = "https://tvsen5.aynaott.com/nickjr/index.m3u8"
+        ),
+
+        Channel(
             name = "Al Arabiya Al Hadath HD",
-            logo = "https://royalcyberiptv.live/img/al_arabiya.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/al_arabiya.png",
             streamUrl = "https://live.alarabiya.net/alarabiapublish/alhadath.smil/alarabiapublish/alhadath_720p/chunks.m3u8"
         ),
 
