@@ -9,6 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "live.royalcyber.tv"
+
         minSdk = 23
         targetSdk = 35
 
@@ -18,9 +19,9 @@ android {
          * -PversionCode=132
          * -PversionName=1.0.132
          *
-         * দেওয়া হবে।
+         * দেওয়া হলে সেগুলো ব্যবহার হবে।
          *
-         * Local build হলে default:
+         * Local build হলে:
          * versionCode = 1
          * versionName = 1.0
          */
@@ -35,31 +36,60 @@ android {
                 ?: "1.0"
     }
 
+    /*
+     * Java 17
+     */
     compileOptions {
-        sourceCompatibility =
-            JavaVersion.VERSION_17
-
-        targetCompatibility =
-            JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
+    /*
+     * Kotlin JVM 17
+     */
     kotlinOptions {
         jvmTarget = "17"
     }
 
     /*
-     * Release APK signing
+     * ==========================================
+     * RELEASE SIGNING
+     * ==========================================
      *
-     * GitHub Actions থেকে signing properties
-     * দেওয়া হলে Release APK signed হবে।
+     * Keystore:
+     *
+     * RoyalCyberTV/
+     * ├── royalcyber-release.jks
+     * └── app/
+     *     └── build.gradle.kts
+     *
+     * তাই app/build.gradle.kts থেকে
+     * Root-এর keystore-এ যেতে ../ ব্যবহার করা হয়েছে।
+     *
+     * GitHub Actions চাইলে নিচের Gradle
+     * properties দিয়েও signing তথ্য দিতে পারবে।
      */
+
     signingConfigs {
+
         create("release") {
+
+            /*
+             * GitHub Actions থেকে RELEASE_STORE_FILE
+             * দেওয়া হলে সেটি ব্যবহার করবে।
+             *
+             * না দিলে Root-এর:
+             *
+             * ../royalcyber-release.jks
+             *
+             * ব্যবহার হবে।
+             */
 
             val storeFilePath =
                 project.findProperty(
                     "RELEASE_STORE_FILE"
                 ) as String?
+                    ?: "../royalcyber-release.jks"
 
             val storePasswordValue =
                 project.findProperty(
@@ -76,61 +106,92 @@ android {
                     "RELEASE_KEY_PASSWORD"
                 ) as String?
 
-            if (
-                storeFilePath != null &&
-                storePasswordValue != null &&
-                keyAliasValue != null &&
-                keyPasswordValue != null
-            ) {
+            /*
+             * Keystore file
+             */
+            storeFile = file(storeFilePath)
 
-                storeFile =
-                    file(storeFilePath)
+            /*
+             * Password / Alias
+             *
+             * এগুলো GitHub Actions Secrets থেকে
+             * দেওয়া হবে।
+             */
+            if (storePasswordValue != null) {
+                storePassword = storePasswordValue
+            }
 
-                storePassword =
-                    storePasswordValue
+            if (keyAliasValue != null) {
+                keyAlias = keyAliasValue
+            }
 
-                keyAlias =
-                    keyAliasValue
-
-                keyPassword =
-                    keyPasswordValue
+            if (keyPasswordValue != null) {
+                keyPassword = keyPasswordValue
             }
         }
     }
 
+    /*
+     * ==========================================
+     * BUILD TYPES
+     * ==========================================
+     */
+
     buildTypes {
 
+        /*
+         * RELEASE
+         */
         getByName("release") {
 
-            isMinifyEnabled =
-                false
+            isMinifyEnabled = false
 
+            /*
+             * Release APK অবশ্যই release signing config
+             * ব্যবহার করবে।
+             */
             signingConfig =
-                signingConfigs.getByName(
-                    "release"
-                )
+                signingConfigs.getByName("release")
         }
 
+        /*
+         * DEBUG
+         */
         getByName("debug") {
 
-            isMinifyEnabled =
-                false
+            isMinifyEnabled = false
         }
     }
 }
 
+/*
+ * ==========================================
+ * DEPENDENCIES
+ * ==========================================
+ */
+
 dependencies {
 
-    // AndroidX
+    /*
+     * AndroidX Core
+     */
     implementation(
         "androidx.core:core-ktx:1.15.0"
     )
 
+    /*
+     * AndroidX AppCompat
+     */
     implementation(
         "androidx.appcompat:appcompat:1.7.0"
     )
 
-    // Media3 / ExoPlayer
+    /*
+     * ==========================================
+     * Media3 / ExoPlayer
+     * ==========================================
+     */
+
     implementation(
         "androidx.media3:media3-exoplayer:1.5.1"
     )
@@ -143,7 +204,9 @@ dependencies {
         "androidx.media3:media3-ui:1.5.1"
     )
 
-    // RecyclerView
+    /*
+     * RecyclerView
+     */
     implementation(
         "androidx.recyclerview:recyclerview:1.3.2"
     )
