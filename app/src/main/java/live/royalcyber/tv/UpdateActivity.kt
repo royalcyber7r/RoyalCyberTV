@@ -47,16 +47,39 @@ class UpdateActivity : AppCompatActivity() {
     companion object {
 
         /*
-         * GitHub Releases List API
-         *
-         * Private repository নয়,
-         * তাই Public repository থেকে কাজ করবে।
+         * =========================================================
+         * GITHUB RELEASES API
+         * =========================================================
          */
+
         private const val GITHUB_API =
             "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=100"
 
+
+        /*
+         * পুরোনো APK নাম
+         *
+         * RoyalCyberTV.apk
+         */
+
         private const val APK_NAME =
             "RoyalCyberTV.apk"
+
+
+        /*
+         * বর্তমান GitHub Actions Release APK
+         *
+         * যেমন:
+         *
+         * RoyalCyberTV-1.0.145.apk
+         */
+
+        private const val APK_PREFIX =
+            "RoyalCyberTV-"
+
+
+        private const val APK_EXTENSION =
+            ".apk"
     }
 
 
@@ -102,11 +125,18 @@ class UpdateActivity : AppCompatActivity() {
             )
 
 
+        /*
+         * =========================================================
+         * UPDATE BUTTON
+         * =========================================================
+         */
+
         updateButton.setOnClickListener {
 
             if (isDownloading) {
                 return@setOnClickListener
             }
+
 
             if (apkUrl.isNotEmpty()) {
 
@@ -119,11 +149,23 @@ class UpdateActivity : AppCompatActivity() {
         }
 
 
+        /*
+         * =========================================================
+         * LATER BUTTON
+         * =========================================================
+         */
+
         laterText.setOnClickListener {
 
             finish()
         }
 
+
+        /*
+         * =========================================================
+         * START UPDATE CHECK
+         * =========================================================
+         */
 
         checkLatestRelease()
     }
@@ -137,7 +179,13 @@ class UpdateActivity : AppCompatActivity() {
 
     private fun checkLatestRelease() {
 
-        updateButton.isEnabled = false
+        if (isFinishing || isDestroyed) {
+            return
+        }
+
+
+        updateButton.isEnabled =
+            false
 
         updateButton.text =
             "Checking Update..."
@@ -145,12 +193,21 @@ class UpdateActivity : AppCompatActivity() {
 
         executor.execute {
 
-            var connection: HttpURLConnection? = null
+            var connection: HttpURLConnection? =
+                null
+
 
             try {
 
+                /*
+                 * =================================================
+                 * CONNECT GITHUB
+                 * =================================================
+                 */
+
                 val apiUrl =
                     URL(GITHUB_API)
+
 
                 connection =
                     apiUrl.openConnection()
@@ -160,21 +217,27 @@ class UpdateActivity : AppCompatActivity() {
                 connection.requestMethod =
                     "GET"
 
+
                 connection.connectTimeout =
                     20000
+
 
                 connection.readTimeout =
                     20000
 
+
                 connection.useCaches =
                     false
+
 
                 connection.instanceFollowRedirects =
                     true
 
 
                 /*
-                 * GitHub API Headers
+                 * =================================================
+                 * GITHUB API HEADERS
+                 * =================================================
                  */
 
                 connection.setRequestProperty(
@@ -182,10 +245,12 @@ class UpdateActivity : AppCompatActivity() {
                     "application/vnd.github+json"
                 )
 
+
                 connection.setRequestProperty(
                     "User-Agent",
                     "RoyalCyberTV Android App"
                 )
+
 
                 connection.setRequestProperty(
                     "X-GitHub-Api-Version",
@@ -195,6 +260,12 @@ class UpdateActivity : AppCompatActivity() {
 
                 connection.connect()
 
+
+                /*
+                 * =================================================
+                 * RESPONSE CODE
+                 * =================================================
+                 */
 
                 val responseCode =
                     connection.responseCode
@@ -210,6 +281,12 @@ class UpdateActivity : AppCompatActivity() {
                     )
                 }
 
+
+                /*
+                 * =================================================
+                 * READ RESPONSE
+                 * =================================================
+                 */
 
                 val response =
                     connection.inputStream
@@ -228,7 +305,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * JSON Array
+                 * =================================================
+                 * JSON ARRAY
+                 * =================================================
                  */
 
                 val releases =
@@ -245,35 +324,38 @@ class UpdateActivity : AppCompatActivity() {
 
                 /*
                  * =================================================
-                 * সবচেয়ে বড় BUILD NUMBER-এর RELEASE নির্বাচন করা হবে
+                 * SELECT LATEST RELEASE
                  * =================================================
                  */
 
                 var selectedRelease: JSONObject? =
                     null
 
+
                 var selectedTag =
                     ""
+
 
                 var selectedName =
                     ""
 
+
                 var selectedBody =
                     ""
 
+
                 var selectedDownloadUrl =
                     ""
+
 
                 var selectedVersionCode =
                     0
 
 
                 /*
-                 * সব Release পরীক্ষা করা হবে
-                 *
-                 * কারণ API-এর প্রথম Release-ই
-                 * সবসময় আমাদের APK-এর সবচেয়ে বড় build
-                 * নাও হতে পারে।
+                 * =================================================
+                 * CHECK ALL RELEASES
+                 * =================================================
                  */
 
                 for (
@@ -285,7 +367,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * Draft Release বাদ
+                     * =================================================
+                     * DRAFT RELEASE SKIP
+                     * =================================================
                      */
 
                     val draft =
@@ -301,7 +385,29 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * Tag
+                     * =================================================
+                     * PRERELEASE SKIP
+                     *
+                     * Beta / Alpha Release বাদ
+                     * =================================================
+                     */
+
+                    val prerelease =
+                        release.optBoolean(
+                            "prerelease",
+                            false
+                        )
+
+
+                    if (prerelease) {
+                        continue
+                    }
+
+
+                    /*
+                     * =================================================
+                     * TAG NAME
+                     * =================================================
                      */
 
                     val tagName =
@@ -317,7 +423,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * APK Assets
+                     * =================================================
+                     * RELEASE ASSETS
+                     * =================================================
                      */
 
                     val assets =
@@ -335,8 +443,23 @@ class UpdateActivity : AppCompatActivity() {
                         ""
 
 
+                    var foundApkName =
+                        ""
+
+
                     /*
-                     * RoyalCyberTV.apk খোঁজা
+                     * =================================================
+                     * SEARCH APK
+                     *
+                     * Support:
+                     *
+                     * RoyalCyberTV.apk
+                     *
+                     * RoyalCyberTV-1.0.145.apk
+                     *
+                     * RoyalCyberTV-145.apk
+                     *
+                     * =================================================
                      */
 
                     for (
@@ -354,6 +477,25 @@ class UpdateActivity : AppCompatActivity() {
                             ).trim()
 
 
+                        val browserDownloadUrl =
+                            asset.optString(
+                                "browser_download_url",
+                                ""
+                            ).trim()
+
+
+                        if (
+                            assetName.isEmpty() ||
+                            browserDownloadUrl.isEmpty()
+                        ) {
+                            continue
+                        }
+
+
+                        /*
+                         * Exact old APK name
+                         */
+
                         if (
                             assetName.equals(
                                 APK_NAME,
@@ -361,19 +503,51 @@ class UpdateActivity : AppCompatActivity() {
                             )
                         ) {
 
+                            foundApkName =
+                                assetName
+
+
                             foundApkUrl =
-                                asset.optString(
-                                    "browser_download_url",
-                                    ""
-                                ).trim()
+                                browserDownloadUrl
+
 
                             break
+                        }
+
+
+                        /*
+                         * New GitHub Actions APK name
+                         *
+                         * RoyalCyberTV-1.0.145.apk
+                         */
+
+                        val lowerName =
+                            assetName.lowercase()
+
+
+                        if (
+                            lowerName.startsWith(
+                                APK_PREFIX.lowercase()
+                            ) &&
+                            lowerName.endsWith(
+                                APK_EXTENSION.lowercase()
+                            )
+                        ) {
+
+                            foundApkName =
+                                assetName
+
+
+                            foundApkUrl =
+                                browserDownloadUrl
                         }
                     }
 
 
                     /*
-                     * APK না থাকলে এই Release বাদ
+                     * =================================================
+                     * APK না থাকলে Release বাদ
+                     * =================================================
                      */
 
                     if (
@@ -385,7 +559,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * Release Build Number
+                     * =================================================
+                     * EXTRACT VERSION CODE
+                     * =================================================
                      */
 
                     val releaseVersionCode =
@@ -395,7 +571,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     /*
-                     * Version বুঝতে না পারলে বাদ
+                     * =================================================
+                     * VERSION INVALID হলে বাদ
+                     * =================================================
                      */
 
                     if (
@@ -408,16 +586,18 @@ class UpdateActivity : AppCompatActivity() {
 
                     /*
                      * =================================================
-                     * সবচেয়ে বড় VERSION CODE নির্বাচন
+                     * SELECT HIGHEST VERSION
                      * =================================================
                      *
-                     * যেমন:
+                     * Example:
                      *
-                     * build-99
-                     * build-125
-                     * build-127
+                     * v1.0.140
+                     * v1.0.141
+                     * v1.0.144
+                     * v1.0.145
                      *
-                     * তাহলে build-127 নেওয়া হবে।
+                     * তাহলে 145 নির্বাচন হবে।
+                     * =================================================
                      */
 
                     if (
@@ -429,8 +609,10 @@ class UpdateActivity : AppCompatActivity() {
                         selectedRelease =
                             release
 
+
                         selectedTag =
                             tagName
+
 
                         selectedName =
                             release.optString(
@@ -438,14 +620,17 @@ class UpdateActivity : AppCompatActivity() {
                                 ""
                             ).trim()
 
+
                         selectedBody =
                             release.optString(
                                 "body",
                                 ""
                             ).trim()
 
+
                         selectedDownloadUrl =
                             foundApkUrl
+
 
                         selectedVersionCode =
                             releaseVersionCode
@@ -454,7 +639,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * কোনো valid Release পাওয়া যায়নি
+                 * =================================================
+                 * NO VALID RELEASE
+                 * =================================================
                  */
 
                 if (
@@ -462,7 +649,7 @@ class UpdateActivity : AppCompatActivity() {
                 ) {
 
                     throw Exception(
-                        "GitHub Release-এ $APK_NAME পাওয়া যায়নি"
+                        "GitHub Release-এ RoyalCyberTV APK পাওয়া যায়নি"
                     )
                 }
 
@@ -472,13 +659,15 @@ class UpdateActivity : AppCompatActivity() {
                 ) {
 
                     throw Exception(
-                        "$APK_NAME-এর download URL পাওয়া যায়নি"
+                        "APK-এর download URL পাওয়া যায়নি"
                     )
                 }
 
 
                 /*
-                 * Installed App Version
+                 * =================================================
+                 * CURRENT INSTALLED VERSION
+                 * =================================================
                  */
 
                 val currentVersionCode =
@@ -486,10 +675,26 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * UI Update
+                 * =================================================
+                 * UPDATE UI
+                 * =================================================
                  */
 
                 handler.post {
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@post
+                    }
+
+
+                    /*
+                     * =================================================
+                     * NEW VERSION AVAILABLE
+                     * =================================================
+                     */
 
                     if (
                         selectedVersionCode >
@@ -501,7 +706,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                         /*
-                         * Version display
+                         * Version
                          */
 
                         versionText.text =
@@ -526,8 +731,13 @@ class UpdateActivity : AppCompatActivity() {
                             }
 
 
+                        /*
+                         * Update button
+                         */
+
                         updateButton.text =
                             "Update Now"
+
 
                         updateButton.isEnabled =
                             true
@@ -535,15 +745,19 @@ class UpdateActivity : AppCompatActivity() {
 
                     } else {
 
-    /*
-     * App already latest
-     *
-     * কোনো Toast দেখানো হবে না।
-     * সরাসরি UpdateActivity বন্ধ হয়ে MainActivity-তে যাবে।
-     */
+                        /*
+                         * =================================================
+                         * ALREADY LATEST
+                         * =================================================
+                         *
+                         * কোনো Toast নয়।
+                         *
+                         * UpdateActivity বন্ধ হবে।
+                         * =================================================
+                         */
 
-    finish()
-}
+                        finish()
+                    }
                 }
 
 
@@ -553,11 +767,21 @@ class UpdateActivity : AppCompatActivity() {
 
                 handler.post {
 
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@post
+                    }
+
+
                     apkUrl =
                         ""
 
+
                     updateButton.text =
                         "Try Again"
+
 
                     updateButton.isEnabled =
                         true
@@ -574,6 +798,7 @@ class UpdateActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+
 
             } finally {
 
@@ -605,7 +830,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * Android 8+ Unknown Sources Permission
+         * =========================================================
+         * ANDROID 8+ UNKNOWN SOURCES PERMISSION
+         * =========================================================
          */
 
         if (
@@ -656,6 +883,12 @@ class UpdateActivity : AppCompatActivity() {
         }
 
 
+        /*
+         * =========================================================
+         * START DOWNLOAD
+         * =========================================================
+         */
+
         isDownloading =
             true
 
@@ -663,12 +896,14 @@ class UpdateActivity : AppCompatActivity() {
         updateButton.isEnabled =
             false
 
+
         updateButton.text =
             "Downloading..."
 
 
         progressBar.progress =
             0
+
 
         progressText.text =
             "0 %"
@@ -682,6 +917,12 @@ class UpdateActivity : AppCompatActivity() {
 
             try {
 
+                /*
+                 * =================================================
+                 * CONNECT APK URL
+                 * =================================================
+                 */
+
                 connection =
                     URL(apkUrl)
                         .openConnection()
@@ -691,23 +932,34 @@ class UpdateActivity : AppCompatActivity() {
                 connection.requestMethod =
                     "GET"
 
+
                 connection.connectTimeout =
                     20000
+
 
                 connection.readTimeout =
                     60000
 
+
                 connection.useCaches =
                     false
+
 
                 connection.instanceFollowRedirects =
                     true
 
 
+                /*
+                 * =================================================
+                 * HEADERS
+                 * =================================================
+                 */
+
                 connection.setRequestProperty(
                     "User-Agent",
                     "RoyalCyberTV Android App"
                 )
+
 
                 connection.setRequestProperty(
                     "Accept",
@@ -717,6 +969,12 @@ class UpdateActivity : AppCompatActivity() {
 
                 connection.connect()
 
+
+                /*
+                 * =================================================
+                 * RESPONSE
+                 * =================================================
+                 */
 
                 val responseCode =
                     connection.responseCode
@@ -733,12 +991,20 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
+                /*
+                 * =================================================
+                 * TOTAL SIZE
+                 * =================================================
+                 */
+
                 val totalBytes =
                     connection.contentLengthLong
 
 
                 /*
-                 * App-specific Download folder
+                 * =================================================
+                 * APP-SPECIFIC DOWNLOAD DIRECTORY
+                 * =================================================
                  */
 
                 val downloadDirectory =
@@ -773,7 +1039,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * APK File
+                 * =================================================
+                 * APK FILE
+                 * =================================================
                  */
 
                 val apkFile =
@@ -783,6 +1051,10 @@ class UpdateActivity : AppCompatActivity() {
                     )
 
 
+                /*
+                 * পুরোনো APK delete
+                 */
+
                 if (apkFile.exists()) {
 
                     apkFile.delete()
@@ -790,7 +1062,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * Download
+                 * =================================================
+                 * DOWNLOAD
+                 * =================================================
                  */
 
                 connection.inputStream.use { input ->
@@ -799,6 +1073,7 @@ class UpdateActivity : AppCompatActivity() {
 
                         val buffer =
                             ByteArray(8192)
+
 
                         var downloaded =
                             0L
@@ -828,6 +1103,12 @@ class UpdateActivity : AppCompatActivity() {
                                 read.toLong()
 
 
+                            /*
+                             * =================================================
+                             * UPDATE PROGRESS
+                             * =================================================
+                             */
+
                             if (
                                 totalBytes > 0
                             ) {
@@ -837,16 +1118,28 @@ class UpdateActivity : AppCompatActivity() {
                                         downloaded *
                                             100L /
                                             totalBytes
-                                    ).toInt()
+                                    )
+                                        .toInt()
+                                        .coerceIn(
+                                            0,
+                                            100
+                                        )
 
 
                                 handler.post {
 
-                                    progressBar.progress =
-                                        percent
+                                    if (
+                                        !isFinishing &&
+                                        !isDestroyed
+                                    ) {
 
-                                    progressText.text =
-                                        "$percent %"
+                                        progressBar.progress =
+                                            percent
+
+
+                                        progressText.text =
+                                            "$percent %"
+                                    }
                                 }
                             }
                         }
@@ -858,7 +1151,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 /*
-                 * File validation
+                 * =================================================
+                 * FILE VALIDATION
+                 * =================================================
                  */
 
                 if (
@@ -872,10 +1167,25 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
+                /*
+                 * =================================================
+                 * INSTALL
+                 * =================================================
+                 */
+
                 handler.post {
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@post
+                    }
+
 
                     progressBar.progress =
                         100
+
 
                     progressText.text =
                         "100 %"
@@ -897,12 +1207,21 @@ class UpdateActivity : AppCompatActivity() {
 
                 handler.post {
 
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@post
+                    }
+
+
                     isDownloading =
                         false
 
 
                     updateButton.isEnabled =
                         true
+
 
                     updateButton.text =
                         "Try Again"
@@ -941,6 +1260,12 @@ class UpdateActivity : AppCompatActivity() {
 
         try {
 
+            /*
+             * =================================================
+             * FILE PROVIDER URI
+             * =================================================
+             */
+
             val apkUri =
                 FileProvider.getUriForFile(
                     this,
@@ -948,6 +1273,12 @@ class UpdateActivity : AppCompatActivity() {
                     apkFile
                 )
 
+
+            /*
+             * =================================================
+             * INSTALL INTENT
+             * =================================================
+             */
 
             val intent =
                 Intent(
@@ -971,7 +1302,9 @@ class UpdateActivity : AppCompatActivity() {
             )
 
 
-            startActivity(intent)
+            startActivity(
+                intent
+            )
 
 
         } catch (
@@ -984,6 +1317,7 @@ class UpdateActivity : AppCompatActivity() {
 
             updateButton.isEnabled =
                 true
+
 
             updateButton.text =
                 "Try Again"
@@ -1000,7 +1334,7 @@ class UpdateActivity : AppCompatActivity() {
 
     /*
      * =========================================================
-     * CURRENT APP VERSION CODE
+     * GET CURRENT APP VERSION CODE
      * =========================================================
      */
 
@@ -1047,12 +1381,17 @@ class UpdateActivity : AppCompatActivity() {
      * EXTRACT VERSION CODE
      * =========================================================
      *
+     * Supported:
+     *
      * build-127 -> 127
      * build_127 -> 127
      * build 127 -> 127
      *
      * v1.0.2 -> 2
-     * 1.0.2  -> 2
+     * 1.0.2 -> 2
+     *
+     * v1.0.145 -> 145
+     * =========================================================
      */
 
     private fun extractVersionCode(
@@ -1064,9 +1403,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * build-127
-         * build_127
-         * build 127
+         * =========================================================
+         * BUILD NUMBER
+         * =========================================================
          */
 
         val buildRegex =
@@ -1081,7 +1420,9 @@ class UpdateActivity : AppCompatActivity() {
             )
 
 
-        if (buildMatch != null) {
+        if (
+            buildMatch != null
+        ) {
 
             return buildMatch
                 .groupValues[1]
@@ -1091,8 +1432,12 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * v1.0.2
-         * 1.0.2
+         * =========================================================
+         * SEMANTIC VERSION
+         *
+         * v1.0.145
+         * 1.0.145
+         * =========================================================
          */
 
         val versionRegex =
@@ -1107,7 +1452,9 @@ class UpdateActivity : AppCompatActivity() {
             )
 
 
-        if (versionMatch != null) {
+        if (
+            versionMatch != null
+        ) {
 
             return versionMatch
                 .groupValues[3]
@@ -1117,7 +1464,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * অন্য Tag হলে শেষের সংখ্যা
+         * =========================================================
+         * FALLBACK LAST NUMBER
+         * =========================================================
          */
 
         val numberRegex =
@@ -1164,6 +1513,10 @@ class UpdateActivity : AppCompatActivity() {
             tag.trim()
 
 
+        /*
+         * build-145
+         */
+
         if (
             cleanTag.startsWith(
                 "build-",
@@ -1175,6 +1528,10 @@ class UpdateActivity : AppCompatActivity() {
         }
 
 
+        /*
+         * build_145
+         */
+
         if (
             cleanTag.startsWith(
                 "build_",
@@ -1185,6 +1542,29 @@ class UpdateActivity : AppCompatActivity() {
             return cleanTag
         }
 
+
+        /*
+         * build 145
+         */
+
+        if (
+            cleanTag.startsWith(
+                "build ",
+                ignoreCase = true
+            )
+        ) {
+
+            return cleanTag
+        }
+
+
+        /*
+         * v1.0.145
+         *
+         * Display:
+         *
+         * 1.0.145
+         */
 
         return cleanTag
             .removePrefix("v")
