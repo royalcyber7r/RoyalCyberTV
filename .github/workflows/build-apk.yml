@@ -76,43 +76,123 @@ jobs:
       # ==========================================
 
       - name: Check Gradle
+        shell: bash
         run: |
 
           gradle --version
 
 
       # ==========================================
-      # 6. Build Debug APK
+      # 6. Create Signing Keystore
       # ==========================================
 
-      - name: Build APK
-        run: |
-
-          gradle assembleDebug \
-            -PversionCode=${{ steps.version.outputs.version_code }} \
-            -PversionName=${{ steps.version.outputs.version_name }} \
-            --stacktrace
-
-
-      # ==========================================
-      # 7. Check APK
-      # ==========================================
-
-      - name: Check APK
+      - name: Create Release Keystore
         shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
 
-          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "ERROR: APK file was not generated!"
+          echo "Creating RoyalCyberTV release keystore..."
+
+          echo "$KEYSTORE_BASE64" | base64 --decode > royalcyber-release.jks
+
+          if [ ! -f "royalcyber-release.jks" ]; then
+            echo "ERROR: Keystore file was not created!"
             exit 1
           fi
 
-          echo "APK successfully generated:"
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          if [ ! -s "royalcyber-release.jks" ]; then
+            echo "ERROR: Keystore file is empty!"
+            exit 1
+          fi
+
+          echo "Release keystore created successfully."
+
+          ls -lh royalcyber-release.jks
 
 
       # ==========================================
-      # 8. Rename APK
+      # 7. Verify Signing Keystore
+      # ==========================================
+
+      - name: Verify Release Keystore
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+
+          echo "Verifying signing keystore..."
+
+          keytool \
+            -list \
+            -keystore royalcyber-release.jks \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias "$KEY_ALIAS" \
+            > /dev/null
+
+          if [ $? -ne 0 ]; then
+            echo "ERROR: Keystore verification failed!"
+            exit 1
+          fi
+
+          echo "Signing keystore verified successfully."
+
+
+      # ==========================================
+      # 8. Build Signed Release APK
+      # ==========================================
+
+      - name: Build Signed Release APK
+        shell: bash
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+
+          echo "=========================================="
+          echo "Building Signed Release APK"
+          echo "=========================================="
+
+          gradle assembleRelease \
+            -PversionCode=${{ steps.version.outputs.version_code }} \
+            -PversionName=${{ steps.version.outputs.version_name }} \
+            -PRELEASE_STORE_FILE=royalcyber-release.jks \
+            -PRELEASE_STORE_PASSWORD="$KEYSTORE_PASSWORD" \
+            -PRELEASE_KEY_ALIAS="$KEY_ALIAS" \
+            -PRELEASE_KEY_PASSWORD="$KEY_PASSWORD" \
+            --stacktrace
+
+          echo "=========================================="
+          echo "Release build completed."
+          echo "=========================================="
+
+
+      # ==========================================
+      # 9. Check Release APK
+      # ==========================================
+
+      - name: Check Release APK
+        shell: bash
+        run: |
+
+          APK_PATH="app/build/outputs/apk/release/app-release.apk"
+
+          if [ ! -f "$APK_PATH" ]; then
+            echo "ERROR: Release APK was not generated!"
+            exit 1
+          fi
+
+          echo "=========================================="
+          echo "Release APK successfully generated!"
+          echo "=========================================="
+
+          ls -lh "$APK_PATH"
+
+
+      # ==========================================
+      # 10. Rename APK
       # ==========================================
 
       - name: Rename APK
@@ -122,53 +202,108 @@ jobs:
           mkdir -p release
 
           cp \
-            app/build/outputs/apk/debug/app-debug.apk \
-            release/RoyalCyberTV.apk
+            app/build/outputs/apk/release/app-release.apk \
+            "release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
 
-          echo "Final APK:"
-          ls -lh release/RoyalCyberTV.apk
+          echo "=========================================="
+          echo "Final APK"
+          echo "=========================================="
+
+          ls -lh release/
 
 
       # ==========================================
-      # 9. Upload GitHub Actions Artifact
+      # 11. Verify APK Signing
+      # ==========================================
+
+      - name: Verify APK Signing
+        shell: bash
+        run: |
+
+          APK_PATH="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
+
+          echo "Checking APK signature..."
+
+          apksigner verify --verbose "$APK_PATH"
+
+          if [ $? -ne 0 ]; then
+            echo "ERROR: APK signature verification failed!"
+            exit 1
+          fi
+
+          echo "=========================================="
+          echo "APK signature verified successfully."
+          echo "=========================================="
+
+
+      # ==========================================
+      # 12. Upload GitHub Actions Artifact
       # ==========================================
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
 
-          name: RoyalCyberTV-Build-${{ steps.version.outputs.version_code }}
+          name: RoyalCyberTV-Release-${{ steps.version.outputs.version_code }}
 
-          path: release/RoyalCyberTV.apk
+          path: release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
 
           if-no-files-found: error
 
+          retention-days: 30
+
 
       # ==========================================
-      # 10. Create GitHub Release
+      # 13. Create GitHub Release
       # ==========================================
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
 
-          tag_name: build-${{ steps.version.outputs.version_code }}
+          tag_name: v${{ steps.version.outputs.version_name }}
 
-          name: RoyalCyberTV APK #${{ steps.version.outputs.version_code }}
+          name: RoyalCyberTV v${{ steps.version.outputs.version_name }}
 
           body: |
-            Automatic build from GitHub Actions
+            RoyalCyberTV Android Application
 
-            Version Code: ${{ steps.version.outputs.version_code }}
+            ==========================================
 
-            Version Name: ${{ steps.version.outputs.version_name }}
+            Version Code:
+            ${{ steps.version.outputs.version_code }}
 
-            Build Number: ${{ github.run_number }}
+            Version Name:
+            ${{ steps.version.outputs.version_name }}
+
+            Build Number:
+            ${{ github.run_number }}
+
+            ==========================================
+
+            Signed Release APK
+
+            This APK is digitally signed with the
+            RoyalCyberTV release signing key.
 
           files: |
-            release/RoyalCyberTV.apk
+            release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
 
           generate_release_notes: false
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # ==========================================
+      # 14. Remove Temporary Keystore
+      # ==========================================
+
+      - name: Remove Temporary Keystore
+        if: always()
+        shell: bash
+        run: |
+
+          rm -f royalcyber-release.jks
+
+          echo "Temporary signing keystore removed."
