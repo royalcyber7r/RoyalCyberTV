@@ -232,7 +232,7 @@ Channel( name = "Zee Bangla",
        ), 
 
 Channel( name = "Zoom",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/logo/app/src/main/logos/zoom.webp",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/logo/app/src/main/logos/zoom-tv.png",
         streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8" 
        ), 
 
