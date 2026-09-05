@@ -169,6 +169,48 @@ Channel(
             streamUrl = "https://stream.ottplus.bd/live/sony_max_sd_abr/live/sony_max_sd_720/chunks.m3u8"
         ),
 
+
+        Channel( name = "Gazi Tv",
+                logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/GAZIPUR-BD.png",
+                streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8yNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/gazibdz.stream/live-orgin/gazibdz.stream/playlist.m3u8" 
+               ), 
+
+Channel( name = "ATN Bangla",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ATN-BANGLA.png",
+        streamUrl = "https://tvsen5.aynaott.com/atnbangla/index.m3u8" 
+       ), 
+
+Channel( name = "BanglaVision", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLAVISION.png", streamUrl = "https://tvsen5.aynaott.com/banglavision/index.m3u8" ), 
+
+Channel( name = "Deshi TV", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DESHI-TV.png", streamUrl = "https://deshitv.deshitv24.net/live/myStream/playlist.m3u8" ), 
+
+Channel( name = "Bangla Movie TV", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLA-MOVIE-TV.png", streamUrl = "http://alvetv.com/moviebanglatv/8080/index.m3u8" ), 
+
+Channel( name = "Rajdhani Cable", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/RAJDHANI-CABLE.png", streamUrl = "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8" ), 
+
+Channel( name = "Channel 6", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/CHANNEL-6.png", streamUrl = "https://tvsen6.aynaott.com/6xyZ3N4oHv2KBJdB6W4p/index.m3u8" ), 
+
+Channel( name = "Akash Aath", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/AKASH-AATH.png", streamUrl = "https://mumt03.tangotv.in/Dsly5z3HAAKASHAATH/index.m3u8" ), 
+
+Channel( name = "Colors", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS.png", streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsme.smil/playlist.m3u8" ), 
+
+Channel( name = "MTV India", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTV-INDIA.png", streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8" ), 
+
+Channel( name = "SSport 2 HD", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SSPORT-2-HD.png", streamUrl = "http://tvsen7.aynascope.net/ssport2hd/index.m3u8" ), 
+
+Channel( name = "Wion", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/CHANNEL-7.png", streamUrl = "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8" ), 
+
+Channel( name = "Zee Bangla", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ZEE-BANGLA.png", streamUrl = "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8" ), 
+
+Channel( name = "Live Channel", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/LIVE-CHANNEL.png", streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8" ), 
+
+
+Channel( name = "B4U Movies", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/B4U-MOVIES.png", streamUrl = "https://streams.tangotv.in/B4UMOVIES/ORIGIN/index.m3u8" ), 
+
+
+Channel( name = "Dhoom Music", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DHOOM-MUSIC.png", 
+streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8" ),
+
         Channel(
             name = "Thikana Tv",
             logo = "https://web.aynaott.com/storage/019dd92f-107c-7056-9e79-e5233f6e51d9/uploads/images/2026-07-02/images_b9a8bdbfcea2fb4656204d06f615682a_playmist_thikana400x400.jpg",
