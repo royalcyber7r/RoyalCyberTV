@@ -115,9 +115,9 @@ class MainActivity : AppCompatActivity() {
            ===================================================== */
 
         Channel(
-            name = "Global Tv",
-            logo = "https://globaltvbd.com/storage/settings/01KVWJD176R6VT9GC3B9KEJBWK.png",
-            streamUrl = "https://stream.ottplus.live/live/global_tv_abr/index.m3u8"
+            name = "Bijoy Tv",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/bijoy.png",
+            streamUrl = "https://stream.ottplus.live/live/bijoy_tv_abr/live/bijoy_tv_720/chunks.m3u8"
         ),
 
         Channel(
