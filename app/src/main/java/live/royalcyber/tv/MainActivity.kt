@@ -127,6 +127,43 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Sony Sports 5",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/sonyten5.png",
+            streamUrl = "https://stream.ottplus.live/live/ten_5_hd_abr/live/ten_5_hd_720/chunks.m3u8"
+        ),
+
+Channel(
+            name = "Euro Sports",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Eurosport.png",
+            streamUrl = "https://stream.ottplus.bd/live/euro_sports_hd_abr/live/euro_sports_hd/chunks.m3u8"
+        ),
+
+Channel(
+            name = "Sony Aath",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Sony_Aath.png",
+            streamUrl = "https://stream.ottplus.live/live/sony_aath_abr/index.m3u8"
+        ),
+
+Channel(
+            name = "Mohona Tv",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/mohonatv.png",
+            streamUrl = "https://stream.ottplus.live/live/mohona_tv_abr/index.m3u8"
+        ),
+
+Channel(
+            name = "Colours Cineplex",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS-CINEPLEX.png",
+            streamUrl = "https://vods2.aynaott.com/hindimovies/index.m3u8"
+        ),
+
+Channel(
+            name = "Ronggen Tv",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Rongeen_TV.webp",
+            streamUrl = "https://server.thelegitpro.in/rongeentv/rongeentv/tracks-v1a1/mono.m3u8"
+        ),
+
+
+        Channel(
             name = "Sony Max HD",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
             streamUrl = "https://stream.ottplus.bd/live/sony_max_sd_abr/live/sony_max_sd_720/chunks.m3u8"
@@ -381,8 +418,8 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
-            name = "Sony Aath",
-            logo = "https://upload.wikimedia.org/wikipedia/en/6/64/Sony_Aath_Logo.png",
+            name = "Gopal Bar",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Gopal_Bhar.webp",
             streamUrl = "https://live20.bozztv.com/giatvplayout7/giatv-209611/index.m3u8"
         ),
 
