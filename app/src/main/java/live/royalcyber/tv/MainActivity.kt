@@ -180,36 +180,73 @@ Channel( name = "ATN Bangla",
         streamUrl = "https://tvsen5.aynaott.com/atnbangla/index.m3u8" 
        ), 
 
-Channel( name = "BanglaVision", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLAVISION.png", streamUrl = "https://tvsen5.aynaott.com/banglavision/index.m3u8" ), 
+Channel( name = "BanglaVision",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLAVISION.png",
+        streamUrl = "https://tvsen5.aynaott.com/banglavision/index.m3u8" 
+       ), 
 
-Channel( name = "Deshi TV", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DESHI-TV.png", streamUrl = "https://deshitv.deshitv24.net/live/myStream/playlist.m3u8" ), 
+Channel( name = "Deshi TV",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DESHI-TV.png",
+        streamUrl = "https://deshitv.deshitv24.net/live/myStream/playlist.m3u8" 
+       ), 
 
-Channel( name = "Bangla Movie TV", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLA-MOVIE-TV.png", streamUrl = "http://alvetv.com/moviebanglatv/8080/index.m3u8" ), 
+Channel( name = "Movie Bangla TV",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLA-MOVIE-TV.png",
+        streamUrl = "http://alvetv.com/moviebanglatv/8080/index.m3u8" 
+       ), 
 
-Channel( name = "Rajdhani Cable", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/RAJDHANI-CABLE.png", streamUrl = "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8" ), 
+Channel( name = "Rajdhani Cable",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/RAJDHANI-CABLE.webp",
+        streamUrl = "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8" 
+       ), 
+ 
 
-Channel( name = "Channel 6", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/CHANNEL-6.png", streamUrl = "https://tvsen6.aynaott.com/6xyZ3N4oHv2KBJdB6W4p/index.m3u8" ), 
+Channel( name = "Akash Aath",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/AKASH-AATH.png",
+        streamUrl = "https://mumt03.tangotv.in/Dsly5z3HAAKASHAATH/index.m3u8" 
+       ), 
 
-Channel( name = "Akash Aath", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/AKASH-AATH.png", streamUrl = "https://mumt03.tangotv.in/Dsly5z3HAAKASHAATH/index.m3u8" ), 
+Channel( name = "Colors",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS.png",
+        streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsme.smil/playlist.m3u8" 
+       ), 
 
-Channel( name = "Colors", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS.png", streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsme.smil/playlist.m3u8" ), 
+Channel( name = "MTV India",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTV-INDIA.png",
+        streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8"
+       ), 
 
-Channel( name = "MTV India", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTV-INDIA.png", streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8" ), 
+Channel( name = "SSport 2 HD",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SSPORT-2-HD.webp",
+        streamUrl = "http://tvsen7.aynascope.net/ssport2hd/index.m3u8" 
+       ), 
 
-Channel( name = "SSport 2 HD", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SSPORT-2-HD.png", streamUrl = "http://tvsen7.aynascope.net/ssport2hd/index.m3u8" ), 
+Channel( name = "Wion",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/wion.png", 
+        streamUrl = "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8" 
+       ), 
 
-Channel( name = "Wion", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/wion.png", streamUrl = "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8" ), 
+Channel( name = "Zee Bangla",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zee-bangla.png",
+        streamUrl = "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8" 
+       ), 
 
-Channel( name = "Zee Bangla", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zee-bangla.png", streamUrl = "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8" ), 
-
-Channel( name = "Zoom", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zoom.png", streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8" ), 
-
-
-Channel( name = "B4U Movies", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umovie.png", streamUrl = "https://streams.tangotv.in/B4UMOVIES/ORIGIN/index.m3u8" ), 
+Channel( name = "Zoom",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/logo/app/src/main/logos/zoom.webp",
+        streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8" 
+       ), 
 
 
-Channel( name = "Dhoom Music", logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/dhoom.png", 
-streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8" ),
+Channel( name = "B4U Movies",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umovie.webp",
+        streamUrl = "https://streams.tangotv.in/B4UMOVIES/ORIGIN/index.m3u8" 
+       ), 
+
+
+Channel( name = "Dhoom Music",
+        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/dhoom.png", 
+        streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8" 
+       ),
 
         Channel(
             name = "Thikana Tv",
