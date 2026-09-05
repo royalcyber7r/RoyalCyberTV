@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         Channel(
             name = "Sony Max HD",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
-            streamUrl = "https://stream.ottplus.live/live/ten_2_hd_abr/live/ten_2_hd_720/chunks.m3u8"
+            streamUrl = "https://stream.ottplus.bd/live/sony_max_sd_abr/live/sony_max_sd_720/chunks.m3u8"
         ),
 
         Channel(
