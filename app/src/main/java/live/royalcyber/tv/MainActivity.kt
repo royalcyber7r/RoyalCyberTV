@@ -121,6 +121,12 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Sony Sports 2",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/bijoy",
+            streamUrl = "https://stream.ottplus.live/live/ten_2_hd_abr/live/ten_2_hd_720/chunks.m3u8"
+        ),
+
+        Channel(
             name = "Thikana Tv",
             logo = "https://web.aynaott.com/storage/019dd92f-107c-7056-9e79-e5233f6e51d9/uploads/images/2026-07-02/images_b9a8bdbfcea2fb4656204d06f615682a_playmist_thikana400x400.jpg",
             streamUrl = "https://5dd3981940faa.streamlock.net:443/thikanatv/thikanatv/playlist.m3u8"
