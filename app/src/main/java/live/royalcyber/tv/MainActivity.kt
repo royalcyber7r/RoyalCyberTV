@@ -286,7 +286,7 @@ Channel(
         Channel(
             name = "Sangeet Bangla HD",
             logo = "https://yt3.googleusercontent.com/FGx9xqm5eU1DZXDk4ZDRQDK9fyhvZ2LR6gKXhZcJeFunvG9SwT8SB01SxbiD3GDL8MqMKxWXHQ=s900-c-k-c0x00ffffff-no-rj",
-            streamUrl = "https://cdn-4.pishow.tv/live/1143/master.m3u8"
+            streamUrl = "https://mumt05.tangotv.in/87NeALx2SANGEETBANGLA/index.m3u8"
         ),
 
         Channel(
@@ -432,7 +432,7 @@ Channel(
         Channel(
             name = "Goldmines Movies HD",
             logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUso-0xopQb02-1w2nw5xxHpydkdNNFS5Cqg&s",
-            streamUrl = "https://cdn-2.pishow.tv/live/1461/master.m3u8"
+            streamUrl = "https://streams.tangotv.in/GOLDMINEMOVIES/ORIGIN/index.m3u8"
         ),
 
         Channel(
@@ -450,7 +450,7 @@ Channel(
         Channel(
             name = "Music India HD",
             logo = "https://static.wikia.nocookie.net/logopedia/images/2/2f/Music_India.jpeg",
-            streamUrl = "https://cdn-2.pishow.tv/live/226/master.m3u8"
+            streamUrl = "https://streams.tangotv.in/MUSICINDIA/ORIGIN/index.m3u8"
         ),
 
         Channel(
