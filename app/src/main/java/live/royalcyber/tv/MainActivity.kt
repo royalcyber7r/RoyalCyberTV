@@ -636,31 +636,31 @@ Channel( name = "Dhoom Music",
             name = "Modina Live",
             logo = "https://images-na.ssl-images-amazon.com/images/I/71CywdrFaZL.png",
             streamUrl = "https://cdn-globecast.akamaized.net/live/eds/saudi_sunnah/hls_roku/index.m3u8"
-        )
+        ),
 
         Channel(
             name = "Fifa + HD",
             logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuFj7DFAu7-4kCPDhmlHJyWNGYSKardNBQBASmnnou5Q&s",
             streamUrl = "https://a62dad94.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0ZJRkFQbHVzRW5nbGlzaF9ITFM/playlist.m3u8"
-        )
+        ),
 
         Channel(
             name = "Sony Pix HD",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/sonypix.png",
             streamUrl = "https://stream.ottplus.bd/live/pix_hd_abr/live/sony_pix_hd_720/chunks.m3u8"
-        )
+        ),
 
         Channel(
             name = "Cartoon Network",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Cartoon.webp",
             streamUrl = "https://stream.ottplus.bd/live/cn_hd_abr/live/cn_hd/chunks.m3u8"
-        )
+        ),
 
         Channel(
             name = "Sony Yay",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/sonyyah.jpg",
             streamUrl = "https://stream.ottplus.bd/live/sony_yay_abr/live/sony_yay_720/chunks.m3u8"
-        )
+        ),
 
     ).distinctBy {
 
