@@ -10,6 +10,16 @@
     <uses-permission
         android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- Android TV support -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+
+    <!-- Touchscreen is not required because Android TV uses remote -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/royalcyber_logo"
@@ -20,6 +30,7 @@
         <!-- Splash -->
         <activity
             android:name=".SplashActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true">
 
             <intent-filter>
@@ -27,8 +38,13 @@
                 <action
                     android:name="android.intent.action.MAIN" />
 
+                <!-- Mobile launcher -->
                 <category
                     android:name="android.intent.category.LAUNCHER" />
+
+                <!-- Android TV launcher -->
+                <category
+                    android:name="android.intent.category.LEANBACK_LAUNCHER" />
 
             </intent-filter>
 
@@ -37,7 +53,7 @@
         <!-- Main -->
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false" />
 
         <!-- Update -->
