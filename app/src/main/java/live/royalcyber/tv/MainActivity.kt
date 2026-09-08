@@ -736,7 +736,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-           /*
+        /*
          * Main UI আগে সম্পূর্ণভাবে দেখানো হবে।
          *
          * Android TV-তে automatic UpdateActivity চালু করা হবে না।
@@ -762,6 +762,12 @@ class MainActivity : AppCompatActivity() {
 
             }, 1500)
         }
+
+        // =====================================================
+        // FIX:
+        // এই } টি onCreate() function বন্ধ করছে।
+        // =====================================================
+    }
 
 
     /* =========================================================
@@ -1042,13 +1048,6 @@ class MainActivity : AppCompatActivity() {
             false
         )
 
-        /*
-         * RecyclerView নিজে focus নেবে না।
-         *
-         * ChannelAdapter-এর প্রতিটি card focusable,
-         * তাই Android TV remote-এর D-pad সরাসরি
-         * channel card-এর মধ্যে কাজ করবে।
-         */
         channelRecycler.isFocusable =
             false
 
@@ -1072,10 +1071,6 @@ class MainActivity : AppCompatActivity() {
         val itemCount =
             channelAdapter.itemCount
 
-        /*
-         * Android TV = 5 columns
-         * Mobile = 3 columns
-         */
         val columns =
             if (isAndroidTV) {
                 5
@@ -1613,33 +1608,20 @@ class MainActivity : AppCompatActivity() {
             searchBox.visibility ==
                 View.VISIBLE
 
-        /*
-         * Fullscreen শুরু করার আগে ScrollView একদম উপরে।
-         */
         mainScrollView.scrollTo(
             0,
             0
         )
 
-        /*
-         * Fullscreen অবস্থায় ScrollView-এর scrollbar
-         * দেখানো হবে না।
-         */
         mainScrollView.isVerticalScrollBarEnabled =
             false
 
         mainScrollView.overScrollMode =
             View.OVER_SCROLL_NEVER
 
-        /*
-         * Landscape করা হচ্ছে।
-         */
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        /*
-         * Player ছাড়া বাকি UI hide।
-         */
         headerLayout.visibility =
             View.GONE
 
@@ -1661,9 +1643,6 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.visibility =
             View.GONE
 
-        /*
-         * System bars hide।
-         */
         hideSystemBars()
 
         playerControls.visibility =
@@ -1673,10 +1652,6 @@ class MainActivity : AppCompatActivity() {
             hideControlsRunnable
         )
 
-        /*
-         * Orientation পরিবর্তনের পর actual viewport পাওয়া গেলে
-         * player-এর height সেট হবে।
-         */
         window.decorView.post {
 
             if (isFullscreen) {
@@ -1706,22 +1681,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * displayMetrics.heightPixels ব্যবহার করা হচ্ছে না।
-         *
-         * ScrollView-এর actual visible height ব্যবহার করা হচ্ছে।
-         * এতে player নিজের viewport-এর বাইরে বড় হয়ে ScrollView
-         * তৈরি করবে না।
-         */
         val viewportWidth =
             mainScrollView.width
 
         val viewportHeight =
             mainScrollView.height
 
-        /*
-         * Layout এখনো measure না হলে আবার চেষ্টা।
-         */
         if (
             viewportWidth <= 0 ||
             viewportHeight <= 0
@@ -1750,17 +1715,11 @@ class MainActivity : AppCompatActivity() {
         playerContainer.layoutParams =
             params
 
-        /*
-         * Fullscreen-এ ScrollView সবসময় top position-এ।
-         */
         mainScrollView.scrollTo(
             0,
             0
         )
 
-        /*
-         * Layout update করানো।
-         */
         playerContainer.requestLayout()
     }
 
@@ -1775,9 +1734,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * আগে fullscreen state বন্ধ।
-         */
         isFullscreen =
             false
 
@@ -1785,26 +1741,11 @@ class MainActivity : AppCompatActivity() {
             hideControlsRunnable
         )
 
-        /*
-         * Portrait-এ ফেরত যাওয়া।
-         */
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        /*
-         * System bars দেখানো।
-         */
         showSystemBars()
 
-        /*
-         * এখনই player-এর height পরিবর্তন করছি না।
-         *
-         * কারণ orientation পরিবর্তনের মাঝখানে layout resize করলে
-         * app ছোট/স্ক্রল হওয়ার সমস্যা হতে পারে।
-         *
-         * Portrait configuration আসার পর restoreNormalLayout()
-         * সবকিছু একসাথে restore করবে।
-         */
         window.decorView.postDelayed({
 
             if (!isFullscreen) {
@@ -1831,9 +1772,6 @@ class MainActivity : AppCompatActivity() {
                 .displayMetrics
                 .density
 
-        /*
-         * Player আবার 220dp।
-         */
         val params =
             playerContainer.layoutParams
 
@@ -1849,9 +1787,6 @@ class MainActivity : AppCompatActivity() {
         playerContainer.layoutParams =
             params
 
-        /*
-         * সব UI আবার visible।
-         */
         headerLayout.visibility =
             View.VISIBLE
 
@@ -1880,9 +1815,6 @@ class MainActivity : AppCompatActivity() {
                 View.GONE
             }
 
-        /*
-         * Normal mode-এ ScrollView আবার স্বাভাবিক।
-         */
         mainScrollView.isVerticalScrollBarEnabled =
             true
 
@@ -1894,9 +1826,6 @@ class MainActivity : AppCompatActivity() {
             0
         )
 
-        /*
-         * Channel grid-এর height পুনরায় ঠিক করা।
-         */
         mainScrollView.post {
 
             updateRecyclerHeight()
@@ -1907,9 +1836,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        /*
-         * Bottom navigation-এর system inset আবার apply।
-         */
         ViewCompat.requestApplyInsets(
             bottomNavigation
         )
@@ -1929,14 +1855,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideSystemBars() {
 
-        /*
-         * গুরুত্বপূর্ণ:
-         *
-         * এখানে setDecorFitsSystemWindows(false) ব্যবহার করা হয়নি।
-         *
-         * এতে Root / ScrollView-এর layout mode বদলে যায় না।
-         * শুধু system bars hide হবে।
-         */
         val controller =
             WindowCompat.getInsetsController(
                 window,
@@ -1955,12 +1873,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSystemBars() {
 
-        /*
-         * এখানে setDecorFitsSystemWindows(true) ব্যবহার করা হয়নি।
-         *
-         * কারণ আমরা Activity-এর edge-to-edge layout mode
-         * fullscreen-এর সময় পরিবর্তন করছি না।
-         */
         val controller =
             WindowCompat.getInsetsController(
                 window,
@@ -1997,9 +1909,6 @@ class MainActivity : AppCompatActivity() {
                     Configuration.ORIENTATION_LANDSCAPE
             ) {
 
-                /*
-                 * Landscape fullscreen।
-                 */
                 hideSystemBars()
 
                 mainScrollView.isVerticalScrollBarEnabled =
@@ -2021,9 +1930,6 @@ class MainActivity : AppCompatActivity() {
                     Configuration.ORIENTATION_PORTRAIT
             ) {
 
-                /*
-                 * Portrait normal mode।
-                 */
                 showSystemBars()
 
                 restoreNormalLayout()
