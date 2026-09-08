@@ -10,22 +10,53 @@ class SplashActivity : AppCompatActivity() {
 
     private val splashTime = 2500L
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val handler =
+        Handler(Looper.getMainLooper())
 
-        setContentView(R.layout.activity_splash)
+    private val splashRunnable =
+        Runnable {
 
-        Handler(Looper.getMainLooper()).postDelayed({
+            if (
+                !isFinishing &&
+                !isDestroyed
+            ) {
 
-            val intent = Intent(
-                this,
-                MainActivity::class.java
-            )
+                val intent =
+                    Intent(
+                        this,
+                        MainActivity::class.java
+                    )
 
-            startActivity(intent)
+                startActivity(intent)
 
-            finish()
+                finish()
+            }
+        }
 
-        }, splashTime)
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+
+        super.onCreate(
+            savedInstanceState
+        )
+
+        setContentView(
+            R.layout.activity_splash
+        )
+
+        handler.postDelayed(
+            splashRunnable,
+            splashTime
+        )
+    }
+
+    override fun onDestroy() {
+
+        handler.removeCallbacks(
+            splashRunnable
+        )
+
+        super.onDestroy()
     }
 }
