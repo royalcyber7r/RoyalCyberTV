@@ -3,6 +3,7 @@ package live.royalcyber.tv
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -85,6 +86,17 @@ class MainActivity : AppCompatActivity() {
 
 
     /* =========================================================
+       ANDROID TV DETECTION
+       ========================================================= */
+
+    private val isAndroidTV: Boolean
+        get() =
+            packageManager.hasSystemFeature(
+                PackageManager.FEATURE_LEANBACK
+            )
+
+
+    /* =========================================================
        UPDATE SYSTEM
        ========================================================= */
 
@@ -132,36 +144,35 @@ class MainActivity : AppCompatActivity() {
             streamUrl = "https://stream.ottplus.live/live/ten_5_hd_abr/live/ten_5_hd_720/chunks.m3u8"
         ),
 
-Channel(
+        Channel(
             name = "Euro Sports",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Eurosport.png",
             streamUrl = "https://stream.ottplus.bd/live/euro_sports_hd_abr/live/euro_sports_hd/chunks.m3u8"
         ),
 
-Channel(
+        Channel(
             name = "Sony Aath",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Sony_Aath.png",
             streamUrl = "https://stream.ottplus.live/live/sony_aath_abr/index.m3u8"
         ),
 
-Channel(
+        Channel(
             name = "Mohona Tv",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/mohonatv.png",
             streamUrl = "https://stream.ottplus.live/live/mohona_tv_abr/index.m3u8"
         ),
 
-Channel(
+        Channel(
             name = "Colours Cineplex",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS-CINEPLEX.png",
             streamUrl = "https://vods2.aynaott.com/hindimovies/index.m3u8"
         ),
 
-Channel(
+        Channel(
             name = "Ronggen Tv",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Rongeen_TV.webp",
             streamUrl = "https://server.thelegitpro.in/rongeentv/rongeentv/tracks-v1a1/mono.m3u8"
         ),
-
 
         Channel(
             name = "Sony Max HD",
@@ -169,84 +180,95 @@ Channel(
             streamUrl = "https://stream.ottplus.bd/live/sony_max_sd_abr/live/sony_max_sd_720/chunks.m3u8"
         ),
 
+        Channel(
+            name = "Gazi Tv",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/GAZIPUR-BD.png",
+            streamUrl = "http://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/gazibdz.stream/live-orgin/gazibdz.stream/playlist.m3u8"
+        ),
 
-        Channel( name = "Gazi Tv",
-                logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/GAZIPUR-BD.png",
-                streamUrl = "http://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/gazibdz.stream/live-orgin/gazibdz.stream/playlist.m3u8" 
-               ), 
+        Channel(
+            name = "ATN Bangla",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ATN-BANGLA.png",
+            streamUrl = "https://tvsen5.aynaott.com/atnbangla/index.m3u8"
+        ),
 
-Channel( name = "ATN Bangla",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ATN-BANGLA.png",
-        streamUrl = "https://tvsen5.aynaott.com/atnbangla/index.m3u8" 
-       ), 
+        Channel(
+            name = "BanglaVision",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLAVISION.png",
+            streamUrl = "https://tvsen5.aynaott.com/banglavision/index.m3u8"
+        ),
 
-Channel( name = "BanglaVision",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLAVISION.png",
-        streamUrl = "https://tvsen5.aynaott.com/banglavision/index.m3u8" 
-       ), 
+        Channel(
+            name = "Deshi TV",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DESHI-TV.png",
+            streamUrl = "https://deshitv.deshitv24.net/live/myStream/playlist.m3u8"
+        ),
 
-Channel( name = "Deshi TV",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/DESHI-TV.png",
-        streamUrl = "https://deshitv.deshitv24.net/live/myStream/playlist.m3u8" 
-       ), 
+        Channel(
+            name = "Movie Bangla TV",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLA-MOVIE-TV.png",
+            streamUrl = "http://alvetv.com/moviebanglatv/8080/index.m3u8"
+        ),
 
-Channel( name = "Movie Bangla TV",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/BANGLA-MOVIE-TV.png",
-        streamUrl = "http://alvetv.com/moviebanglatv/8080/index.m3u8" 
-       ), 
+        Channel(
+            name = "Rajdhani Cable",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/RAJDHANI-CABLE.webp",
+            streamUrl = "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8"
+        ),
 
-Channel( name = "Rajdhani Cable",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/RAJDHANI-CABLE.webp",
-        streamUrl = "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8" 
-       ), 
- 
+        Channel(
+            name = "Akash Aath",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/AKASH-AATH.png",
+            streamUrl = "https://mumt03.tangotv.in/Dsly5z3HAAKASHAATH/index.m3u8"
+        ),
 
-Channel( name = "Akash Aath",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/AKASH-AATH.png",
-        streamUrl = "https://mumt03.tangotv.in/Dsly5z3HAAKASHAATH/index.m3u8" 
-       ), 
+        Channel(
+            name = "Colors",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS.png",
+            streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsme.smil/playlist.m3u8"
+        ),
 
-Channel( name = "Colors",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/COLORS.png",
-        streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsme.smil/playlist.m3u8" 
-       ), 
+        Channel(
+            name = "MTV India",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTV-INDIA.png",
+            streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8"
+        ),
 
-Channel( name = "MTV India",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTV-INDIA.png",
-        streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8"
-       ), 
+        Channel(
+            name = "SSport 2 HD",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SSPORT-2-HD.webp",
+            streamUrl = "http://tvsen7.aynascope.net/ssport2hd/index.m3u8"
+        ),
 
-Channel( name = "SSport 2 HD",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SSPORT-2-HD.webp",
-        streamUrl = "http://tvsen7.aynascope.net/ssport2hd/index.m3u8" 
-       ), 
+        Channel(
+            name = "Wion",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/wion.png",
+            streamUrl = "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8"
+        ),
 
-Channel( name = "Wion",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/wion.png", 
-        streamUrl = "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8" 
-       ), 
+        Channel(
+            name = "Zee Bangla",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zee-bangla.png",
+            streamUrl = "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8"
+        ),
 
-Channel( name = "Zee Bangla",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zee-bangla.png",
-        streamUrl = "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8" 
-       ), 
+        Channel(
+            name = "Zoom",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/logo/app/src/main/logos/zoom.webp",
+            streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8"
+        ),
 
-Channel( name = "Zoom",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/logo/app/src/main/logos/zoom.webp",
-        streamUrl = "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8" 
-       ), 
+        Channel(
+            name = "B4U Movies",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umovie.webp",
+            streamUrl = "https://streams.tangotv.in/B4UMOVIES/ORIGIN/index.m3u8"
+        ),
 
-
-Channel( name = "B4U Movies",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umovie.webp",
-        streamUrl = "https://streams.tangotv.in/B4UMOVIES/ORIGIN/index.m3u8" 
-       ), 
-
-
-Channel( name = "Dhoom Music",
-        logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/dhoom.png", 
-        streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8" 
-       ),
+        Channel(
+            name = "Dhoom Music",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/dhoom.png",
+            streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8"
+        ),
 
         Channel(
             name = "Thikana Tv",
@@ -660,7 +682,7 @@ Channel( name = "Dhoom Music",
             name = "Sony Yay",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/sonyyah.jpg",
             streamUrl = "https://stream.ottplus.bd/live/sony_yay_abr/live/sony_yay_720/chunks.m3u8"
-        ),
+        )
 
     ).distinctBy {
 
@@ -969,10 +991,24 @@ Channel( name = "Dhoom Music",
 
     private fun setupChannelList() {
 
+        /*
+         * Android TV = 5 columns
+         * Mobile = 3 columns
+         *
+         * Channel data / URL / adapter logic
+         * কোনো কিছু পরিবর্তন করা হয়নি।
+         */
+        val columns =
+            if (isAndroidTV) {
+                5
+            } else {
+                3
+            }
+
         channelRecycler.layoutManager =
             GridLayoutManager(
                 this,
-                3
+                columns
             )
 
         channelAdapter =
@@ -996,6 +1032,19 @@ Channel( name = "Dhoom Music",
             false
         )
 
+        /*
+         * RecyclerView নিজে focus নেবে না।
+         *
+         * ChannelAdapter-এর প্রতিটি card focusable,
+         * তাই Android TV remote-এর D-pad সরাসরি
+         * channel card-এর মধ্যে কাজ করবে।
+         */
+        channelRecycler.isFocusable =
+            false
+
+        channelRecycler.isFocusableInTouchMode =
+            false
+
         updateRecyclerHeight()
     }
 
@@ -1013,8 +1062,16 @@ Channel( name = "Dhoom Music",
         val itemCount =
             channelAdapter.itemCount
 
+        /*
+         * Android TV = 5 columns
+         * Mobile = 3 columns
+         */
         val columns =
-            3
+            if (isAndroidTV) {
+                5
+            } else {
+                3
+            }
 
         val rows =
             if (itemCount == 0) {
