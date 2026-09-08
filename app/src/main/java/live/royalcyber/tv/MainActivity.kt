@@ -736,22 +736,32 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        /*
-         * App-এর মূল UI আগে সম্পূর্ণ layout হতে দেওয়া হচ্ছে।
-         * তারপর UpdateActivity চালু হবে।
+           /*
+         * Main UI আগে সম্পূর্ণভাবে দেখানো হবে।
+         *
+         * Android TV-তে automatic UpdateActivity চালু করা হবে না।
+         * কারণ TV remote দিয়ে update screen এ যাওয়ার আগে
+         * সরাসরি Main Channel Page দেখা প্রয়োজন।
+         *
+         * Mobile-এ automatic update আগের মতো থাকবে।
+         *
+         * Manual Update menu থেকে UpdateActivity
+         * সব device-এই চালু করা যাবে।
          */
-        handler.postDelayed({
+        if (!isAndroidTV) {
 
-            if (
-                !isFinishing &&
-                !isDestroyed
-            ) {
+            handler.postDelayed({
 
-                checkForUpdateAutomatically()
-            }
+                if (
+                    !isFinishing &&
+                    !isDestroyed
+                ) {
 
-        }, 1500)
-    }
+                    checkForUpdateAutomatically()
+                }
+
+            }, 1500)
+        }
 
 
     /* =========================================================
