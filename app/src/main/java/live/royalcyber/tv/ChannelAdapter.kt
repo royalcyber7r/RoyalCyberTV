@@ -53,6 +53,15 @@ class ChannelAdapter(
                     false
                 )
 
+        /*
+         * Android TV / Remote support
+         *
+         * The whole channel card can receive
+         * focus from the TV remote.
+         */
+        view.isFocusable = true
+        view.isFocusableInTouchMode = true
+
         return ChannelViewHolder(view)
     }
 
@@ -70,20 +79,75 @@ class ChannelAdapter(
          */
         holder.name.text = "🔴 LIVE"
 
+        /*
+         * Default image while logo is loading.
+         */
         holder.logo.setImageResource(
             android.R.drawable.sym_def_app_icon
         )
 
         holder.logo.tag = channel.logo
 
+        /*
+         * Load channel logo.
+         */
         loadImage(
             channel.logo,
             holder.logo
         )
 
+        /*
+         * Normal touch/click support.
+         */
         holder.itemView.setOnClickListener {
 
             onChannelClick(channel)
+        }
+
+        /*
+         * Android TV remote focus support.
+         *
+         * When a channel gets focus:
+         * - card becomes slightly larger
+         * - elevation increases
+         *
+         * When focus is lost:
+         * - card returns to normal size
+         */
+        holder.itemView.setOnFocusChangeListener { view, hasFocus ->
+
+            if (hasFocus) {
+
+                view.animate()
+                    .scaleX(1.06f)
+                    .scaleY(1.06f)
+                    .setDuration(120)
+                    .start()
+
+                view.elevation =
+                    12f * view.resources.displayMetrics.density
+
+            } else {
+
+                view.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(120)
+                    .start()
+
+                view.elevation = 0f
+            }
+        }
+
+        /*
+         * Make sure recycled TV cards keep
+         * the correct normal state.
+         */
+        if (!holder.itemView.hasFocus()) {
+
+            holder.itemView.scaleX = 1.0f
+            holder.itemView.scaleY = 1.0f
+            holder.itemView.elevation = 0f
         }
     }
 
@@ -120,6 +184,10 @@ class ChannelAdapter(
 
                     mainHandler.post {
 
+                        /*
+                         * Prevent wrong logo from being
+                         * placed on a recycled ImageView.
+                         */
                         if (imageView.tag == imageUrl) {
 
                             imageView.setImageBitmap(
