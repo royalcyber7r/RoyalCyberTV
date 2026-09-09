@@ -79,14 +79,13 @@ class MainActivity : AppCompatActivity() {
     private var searchWasVisible = false
 
     /* =========================================================
-       BOTTOM NAVIGATION BASE HEIGHT
+       BOTTOM NAVIGATION
        ========================================================= */
 
     private var bottomNavigationBaseHeight = 70
 
-
     /* =========================================================
-       ANDROID TV DETECTION
+       ANDROID TV
        ========================================================= */
 
     private val isAndroidTV: Boolean
@@ -95,9 +94,8 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.FEATURE_LEANBACK
             )
 
-
     /* =========================================================
-       UPDATE SYSTEM
+       UPDATE
        ========================================================= */
 
     private var updateCheckStarted = false
@@ -107,24 +105,21 @@ class MainActivity : AppCompatActivity() {
 
     private val hideControlsRunnable =
         Runnable {
-
-            if (!isFullscreen) {
-
-                playerControls.visibility =
-                    View.GONE
+            if (
+                ::playerControls.isInitialized &&
+                !isFullscreen &&
+                !isFinishing &&
+                !isDestroyed
+            ) {
+                playerControls.visibility = View.GONE
             }
         }
-
 
     /* =========================================================
        CHANNEL LIST
        ========================================================= */
 
     private val channels = listOf(
-
-        /* =====================================================
-           🇧🇩 BANGLADESHI CHANNELS
-           ===================================================== */
 
         Channel(
             name = "Bijoy Tv",
@@ -456,10 +451,6 @@ class MainActivity : AppCompatActivity() {
             streamUrl = "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/greentv.stream/live-orgin/greentv.stream/playlist.m3u8"
         ),
 
-        /* =====================================================
-           ⚽ SPORTS CHANNELS
-           ===================================================== */
-
         Channel(
             name = "T Sports",
             logo = "https://yt3.googleusercontent.com/IFgAG_o_AdtX4IauErKIzuFGCj0m4QyH81Q1Uq8H-2Si9ul3vmXkLihDUnn6-QI3xiMZech0AQ=s900-c-k-c0x00ffffff-no-rj",
@@ -501,10 +492,6 @@ class MainActivity : AppCompatActivity() {
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/tvp.png",
             streamUrl = "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8"
         ),
-
-        /* =====================================================
-           🇮🇳 INDIAN CHANNELS
-           ===================================================== */
 
         Channel(
             name = "TV9 Bangla",
@@ -596,10 +583,6 @@ class MainActivity : AppCompatActivity() {
             streamUrl = "https://cdn-4.pishow.tv/live/1231/1231_1.m3u8"
         ),
 
-        /* =====================================================
-           🌍 INTERNATIONAL CHANNELS
-           ===================================================== */
-
         Channel(
             name = "Net Tv",
             logo = "https://i.imgur.com/EWmshtx.png",
@@ -685,10 +668,7 @@ class MainActivity : AppCompatActivity() {
         )
 
     ).distinctBy {
-
-        it.name
-            .trim()
-            .lowercase()
+        it.name.trim().lowercase()
     }
 
 
@@ -699,54 +679,34 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-
         super.onCreate(savedInstanceState)
 
-        setContentView(
-            R.layout.activity_main
-        )
+        setContentView(R.layout.activity_main)
 
         initializeViews()
 
         setupBottomNavigationInsets()
-
         setupChannelList()
-
         setupSearch()
-
         setupPlayer()
-
         setupPlayerControls()
-
         setupFullscreenButton()
-
         setupBottomMenu()
-
         setupSocialLinks()
 
         mainScrollView.post {
-
             updateRecyclerHeight()
         }
 
+        /*
+         * প্রথম Channel চালু হবে।
+         */
         if (channels.isNotEmpty()) {
-
-            playChannel(
-                channels[0]
-            )
+            playChannel(channels[0])
         }
 
         /*
-         * Main UI আগে সম্পূর্ণভাবে দেখানো হবে।
-         *
-         * Android TV-তে automatic UpdateActivity চালু করা হবে না।
-         * কারণ TV remote দিয়ে update screen এ যাওয়ার আগে
-         * সরাসরি Main Channel Page দেখা প্রয়োজন।
-         *
-         * Mobile-এ automatic update আগের মতো থাকবে।
-         *
-         * Manual Update menu থেকে UpdateActivity
-         * সব device-এই চালু করা যাবে।
+         * Android TV-তে automatic update screen খুলবে না।
          */
         if (!isAndroidTV) {
 
@@ -756,22 +716,16 @@ class MainActivity : AppCompatActivity() {
                     !isFinishing &&
                     !isDestroyed
                 ) {
-
                     checkForUpdateAutomatically()
                 }
 
             }, 1500)
         }
-
-        // =====================================================
-        // FIX:
-        // এই } টি onCreate() function বন্ধ করছে।
-        // =====================================================
     }
 
 
     /* =========================================================
-       BOTTOM NAVIGATION SYSTEM INSETS
+       BOTTOM NAVIGATION INSETS
        ========================================================= */
 
     private fun setupBottomNavigationInsets() {
@@ -781,14 +735,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         val density =
-            resources
-                .displayMetrics
-                .density
+            resources.displayMetrics.density
 
         bottomNavigationBaseHeight =
-            (
-                70f * density
-            ).toInt()
+            (70f * density).toInt()
 
         ViewCompat.setOnApplyWindowInsetsListener(
             bottomNavigation
@@ -842,13 +792,12 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
-            val intent =
+            startActivity(
                 Intent(
                     this,
                     UpdateActivity::class.java
                 )
-
-            startActivity(intent)
+            )
 
         } catch (
             _: Exception
@@ -867,13 +816,12 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
-            val intent =
+            startActivity(
                 Intent(
                     this,
                     UpdateActivity::class.java
                 )
-
-            startActivity(intent)
+            )
 
         } catch (
             _: Exception
@@ -895,109 +843,67 @@ class MainActivity : AppCompatActivity() {
     private fun initializeViews() {
 
         playerView =
-            findViewById(
-                R.id.player_view
-            )
+            findViewById(R.id.player_view)
 
         playerContainer =
-            findViewById(
-                R.id.player_container
-            )
+            findViewById(R.id.player_container)
 
         channelRecycler =
-            findViewById(
-                R.id.channel_recycler
-            )
+            findViewById(R.id.channel_recycler)
 
         searchButton =
-            findViewById(
-                R.id.search_button
-            )
+            findViewById(R.id.search_button)
 
         searchBox =
-            findViewById(
-                R.id.search_box
-            )
+            findViewById(R.id.search_box)
 
         fullscreenButton =
-            findViewById(
-                R.id.fullscreen_button
-            )
+            findViewById(R.id.fullscreen_button)
 
         mainScrollView =
-            findViewById(
-                R.id.main_scroll_view
-            )
+            findViewById(R.id.main_scroll_view)
 
         headerLayout =
-            findViewById(
-                R.id.header_layout
-            )
+            findViewById(R.id.header_layout)
 
         currentChannelName =
-            findViewById(
-                R.id.current_channel_name
-            )
+            findViewById(R.id.current_channel_name)
 
         channelTitle =
-            findViewById(
-                R.id.channel_title
-            )
+            findViewById(R.id.channel_title)
 
         footerLayout =
-            findViewById(
-                R.id.footer_layout
-            )
+            findViewById(R.id.footer_layout)
 
         bottomNavigation =
-            findViewById(
-                R.id.bottom_navigation
-            )
+            findViewById(R.id.bottom_navigation)
 
         footerFacebook =
-            findViewById(
-                R.id.footer_facebook
-            )
+            findViewById(R.id.footer_facebook)
 
         footerYoutube =
-            findViewById(
-                R.id.footer_youtube
-            )
+            findViewById(R.id.footer_youtube)
 
         footerInstagram =
-            findViewById(
-                R.id.footer_instagram
-            )
+            findViewById(R.id.footer_instagram)
 
         footerTiktok =
-            findViewById(
-                R.id.footer_tiktok
-            )
+            findViewById(R.id.footer_tiktok)
 
         playerControls =
-            findViewById(
-                R.id.player_controls
-            )
+            findViewById(R.id.player_controls)
 
         playPauseButton =
-            findViewById(
-                R.id.play_pause_button
-            )
+            findViewById(R.id.play_pause_button)
 
         rewindButton =
-            findViewById(
-                R.id.rewind_button
-            )
+            findViewById(R.id.rewind_button)
 
         forwardButton =
-            findViewById(
-                R.id.forward_button
-            )
+            findViewById(R.id.forward_button)
 
         liveText =
-            findViewById(
-                R.id.live_text
-            )
+            findViewById(R.id.live_text)
     }
 
 
@@ -1007,19 +913,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupChannelList() {
 
-        /*
-         * Android TV = 5 columns
-         * Mobile = 3 columns
-         *
-         * Channel data / URL / adapter logic
-         * কোনো কিছু পরিবর্তন করা হয়নি।
-         */
         val columns =
-            if (isAndroidTV) {
-                5
-            } else {
-                3
-            }
+            if (isAndroidTV) 5 else 3
 
         channelRecycler.layoutManager =
             GridLayoutManager(
@@ -1031,10 +926,7 @@ class MainActivity : AppCompatActivity() {
             ChannelAdapter(
                 channels = channels,
                 onChannelClick = { channel ->
-
-                    playChannel(
-                        channel
-                    )
+                    playChannel(channel)
                 }
             )
 
@@ -1044,15 +936,31 @@ class MainActivity : AppCompatActivity() {
         channelRecycler.isNestedScrollingEnabled =
             false
 
-        channelRecycler.setHasFixedSize(
-            false
-        )
+        channelRecycler.setHasFixedSize(false)
 
-        channelRecycler.isFocusable =
-            false
+        /*
+         * IMPORTANT TV FIX
+         *
+         * আগে এখানে false ছিল।
+         * Android TV remote/D-pad navigation-এর জন্য
+         * RecyclerView focusable থাকা দরকার।
+         */
+        if (isAndroidTV) {
 
-        channelRecycler.isFocusableInTouchMode =
-            false
+            channelRecycler.isFocusable =
+                true
+
+            channelRecycler.isFocusableInTouchMode =
+                true
+
+        } else {
+
+            channelRecycler.isFocusable =
+                false
+
+            channelRecycler.isFocusableInTouchMode =
+                false
+        }
 
         updateRecyclerHeight()
     }
@@ -1072,19 +980,12 @@ class MainActivity : AppCompatActivity() {
             channelAdapter.itemCount
 
         val columns =
-            if (isAndroidTV) {
-                5
-            } else {
-                3
-            }
+            if (isAndroidTV) 5 else 3
 
         val rows =
             if (itemCount == 0) {
-
                 0
-
             } else {
-
                 (
                     itemCount +
                         columns -
@@ -1093,12 +994,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         val density =
-            resources
-                .displayMetrics
-                .density
+            resources.displayMetrics.density
 
+        /*
+         * Existing card size অনুযায়ী।
+         */
         val rowHeightDp =
-            145
+            if (isAndroidTV) 145 else 145
 
         val bottomPaddingDp =
             15
@@ -1122,92 +1024,135 @@ class MainActivity : AppCompatActivity() {
 
 
     /* =========================================================
-       PLAYER SETUP
+       PLAYER
        ========================================================= */
 
     private fun setupPlayer() {
 
-        player =
-            ExoPlayer.Builder(
-                this
-            ).build()
+        try {
 
-        playerView.player =
-            player
+            player =
+                ExoPlayer.Builder(this)
+                    .build()
 
-        playerView.useController =
-            false
+            playerView.player =
+                player
 
-        playerView.keepScreenOn =
-            true
+            playerView.useController =
+                false
 
-        playerView.setShowBuffering(
-            PlayerView.SHOW_BUFFERING_WHEN_PLAYING
-        )
+            playerView.keepScreenOn =
+                true
 
-        player?.repeatMode =
-            Player.REPEAT_MODE_ONE
+            playerView.setShowBuffering(
+                PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+            )
 
-        player?.addListener(
-            object : Player.Listener {
+            player?.repeatMode =
+                Player.REPEAT_MODE_ONE
 
-                override fun onIsPlayingChanged(
-                    isPlaying: Boolean
-                ) {
+            player?.addListener(
+                object : Player.Listener {
 
-                    updatePlayPauseButton(
-                        isPlaying
-                    )
-                }
+                    override fun onIsPlayingChanged(
+                        isPlaying: Boolean
+                    ) {
 
-
-                override fun onPlaybackStateChanged(
-                    playbackState: Int
-                ) {
-
-                    when (playbackState) {
-
-                        Player.STATE_BUFFERING -> {
-
-                            liveText.text =
-                                "●  BUFFERING..."
-                        }
-
-
-                        Player.STATE_READY -> {
-
-                            liveText.text =
-                                "●  LIVE"
-                        }
-
-
-                        Player.STATE_ENDED -> {
-
-                            liveText.text =
-                                "●  LIVE"
-
-                            resumePlayback()
-                        }
-
-
-                        Player.STATE_IDLE -> {
+                        if (
+                            !isFinishing &&
+                            !isDestroyed
+                        ) {
+                            updatePlayPauseButton(
+                                isPlaying
+                            )
                         }
                     }
+
+
+                    override fun onPlaybackStateChanged(
+                        playbackState: Int
+                    ) {
+
+                        if (
+                            isFinishing ||
+                            isDestroyed
+                        ) {
+                            return
+                        }
+
+                        when (playbackState) {
+
+                            Player.STATE_BUFFERING -> {
+
+                                liveText.text =
+                                    "●  BUFFERING..."
+                            }
+
+
+                            Player.STATE_READY -> {
+
+                                liveText.text =
+                                    "●  LIVE"
+                            }
+
+
+                            Player.STATE_ENDED -> {
+
+                                /*
+                                 * repeatMode ONE থাকায় সাধারণত
+                                 * এখানে আসার কথা নয়।
+                                 *
+                                 * নিজে থেকে আবার playChannel()
+                                 * করে recursive restart করা হচ্ছে না।
+                                 */
+                                liveText.text =
+                                    "●  LIVE"
+                            }
+
+
+                            Player.STATE_IDLE -> {
+                            }
+                        }
+                    }
+
+
+                    override fun onPlayerError(
+                        error: PlaybackException
+                    ) {
+
+                        if (
+                            isFinishing ||
+                            isDestroyed
+                        ) {
+                            return
+                        }
+
+                        liveText.text =
+                            "●  ERROR"
+
+                        updatePlayPauseButton(false)
+
+                        Toast.makeText(
+                            this@MainActivity,
+                            "এই Channel চালু করা যাচ্ছে না",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
+            )
 
+        } catch (
+            e: Exception
+        ) {
 
-                override fun onPlayerError(
-                    error: PlaybackException
-                ) {
+            player = null
 
-                    Toast.makeText(
-                        this@MainActivity,
-                        "এই Channel চালু করা যাচ্ছে না",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        )
+            Toast.makeText(
+                this,
+                "Player চালু করা যাচ্ছে না",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
 
@@ -1223,49 +1168,59 @@ class MainActivity : AppCompatActivity() {
                 player
                     ?: return@setOnClickListener
 
-            when {
+            try {
 
-                exoPlayer.playbackState ==
-                    Player.STATE_IDLE -> {
+                when {
 
-                    resumePlayback()
+                    exoPlayer.playbackState ==
+                        Player.STATE_IDLE -> {
+
+                        resumePlayback()
+                    }
+
+
+                    exoPlayer.playbackState ==
+                        Player.STATE_ENDED -> {
+
+                        resumePlayback()
+                    }
+
+
+                    exoPlayer.isPlaying -> {
+
+                        exoPlayer.pause()
+                    }
+
+
+                    else -> {
+
+                        exoPlayer.play()
+                    }
                 }
 
+                updatePlayPauseButton(
+                    exoPlayer.isPlaying
+                )
 
-                exoPlayer.playbackState ==
-                    Player.STATE_ENDED -> {
+                showControlsTemporarily()
 
-                    resumePlayback()
-                }
-
-
-                exoPlayer.isPlaying -> {
-
-                    exoPlayer.pause()
-                }
-
-
-                else -> {
-
-                    exoPlayer.play()
-                }
+            } catch (
+                _: Exception
+            ) {
             }
-
-            updatePlayPauseButton(
-                exoPlayer.isPlaying
-            )
-
-            showControlsTemporarily()
         }
 
 
         rewindButton.setOnClickListener {
 
-            val exoPlayer =
-                player
-                    ?: return@setOnClickListener
+            try {
 
-            exoPlayer.seekBack()
+                player?.seekBack()
+
+            } catch (
+                _: Exception
+            ) {
+            }
 
             showControlsTemporarily()
         }
@@ -1273,11 +1228,14 @@ class MainActivity : AppCompatActivity() {
 
         forwardButton.setOnClickListener {
 
-            val exoPlayer =
-                player
-                    ?: return@setOnClickListener
+            try {
 
-            exoPlayer.seekForward()
+                player?.seekForward()
+
+            } catch (
+                _: Exception
+            ) {
+            }
 
             showControlsTemporarily()
         }
@@ -1287,7 +1245,7 @@ class MainActivity : AppCompatActivity() {
 
             if (
                 playerControls.visibility ==
-                    View.VISIBLE
+                View.VISIBLE
             ) {
 
                 playerControls.visibility =
@@ -1307,14 +1265,12 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        updatePlayPauseButton(
-            false
-        )
+        updatePlayPauseButton(false)
     }
 
 
     /* =========================================================
-       PLAY / PAUSE ICON
+       PLAY / PAUSE BUTTON
        ========================================================= */
 
     private fun updatePlayPauseButton(
@@ -1327,11 +1283,8 @@ class MainActivity : AppCompatActivity() {
 
         playPauseButton.text =
             if (isPlaying) {
-
                 "❚❚"
-
             } else {
-
                 "▶"
             }
     }
@@ -1365,6 +1318,13 @@ class MainActivity : AppCompatActivity() {
         channel: Channel
     ) {
 
+        if (
+            isFinishing ||
+            isDestroyed
+        ) {
+            return
+        }
+
         val url =
             channel.streamUrl.trim()
 
@@ -1379,105 +1339,146 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        val exoPlayer =
+            player
+
+        if (exoPlayer == null) {
+
+            Toast.makeText(
+                this,
+                "Player প্রস্তুত নয়",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
         currentChannel =
             channel
 
-        val dataSourceFactory =
-            DefaultHttpDataSource.Factory()
-                .setAllowCrossProtocolRedirects(
-                    true
+        try {
+
+            val dataSourceFactory =
+                DefaultHttpDataSource.Factory()
+                    .setAllowCrossProtocolRedirects(
+                        true
+                    )
+
+            val mediaSource =
+                HlsMediaSource.Factory(
+                    dataSourceFactory
+                ).createMediaSource(
+                    MediaItem.fromUri(url)
                 )
 
-        val mediaSource =
-            HlsMediaSource.Factory(
-                dataSourceFactory
-            ).createMediaSource(
-                MediaItem.fromUri(
-                    url
-                )
-            )
+            exoPlayer.stop()
 
-        player?.apply {
+            exoPlayer.clearMediaItems()
 
-            stop()
-
-            clearMediaItems()
-
-            setMediaSource(
+            exoPlayer.setMediaSource(
                 mediaSource
             )
 
-            prepare()
+            exoPlayer.prepare()
 
-            playWhenReady =
+            exoPlayer.playWhenReady =
                 true
 
-            play()
-        }
+            exoPlayer.play()
 
-        currentChannelName.text =
-            channel.name
+            currentChannelName.text =
+                channel.name
 
-        liveText.text =
-            "●  LIVE"
+            liveText.text =
+                "●  BUFFERING..."
 
-        playerControls.visibility =
-            View.VISIBLE
+            playerControls.visibility =
+                View.VISIBLE
 
-        updatePlayPauseButton(
-            true
-        )
+            updatePlayPauseButton(true)
 
-        showControlsTemporarily()
+            showControlsTemporarily()
 
-        if (!isFullscreen) {
+            if (!isFullscreen) {
 
-            mainScrollView.post {
+                mainScrollView.post {
 
-                mainScrollView.smoothScrollTo(
-                    0,
-                    0
-                )
+                    if (
+                        !isFinishing &&
+                        !isDestroyed
+                    ) {
+
+                        mainScrollView.smoothScrollTo(
+                            0,
+                            0
+                        )
+                    }
+                }
             }
+
+        } catch (
+            _: Exception
+        ) {
+
+            liveText.text =
+                "●  ERROR"
+
+            updatePlayPauseButton(false)
+
+            Toast.makeText(
+                this,
+                "এই Channel চালু করা যাচ্ছে না",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
 
     /* =========================================================
-       RESUME
+       RESUME PLAYBACK
        ========================================================= */
 
     private fun resumePlayback() {
+
+        if (
+            isFinishing ||
+            isDestroyed
+        ) {
+            return
+        }
 
         val exoPlayer =
             player
                 ?: return
 
-        if (
-            exoPlayer.playbackState ==
-                Player.STATE_IDLE ||
-            exoPlayer.playbackState ==
-                Player.STATE_ENDED
-        ) {
+        try {
 
-            currentChannel?.let {
+            if (
+                exoPlayer.playbackState ==
+                    Player.STATE_IDLE ||
+                exoPlayer.playbackState ==
+                    Player.STATE_ENDED
+            ) {
 
-                playChannel(
-                    it
-                )
+                currentChannel?.let {
 
-                return
+                    playChannel(it)
+
+                    return
+                }
             }
+
+            exoPlayer.playWhenReady =
+                true
+
+            exoPlayer.play()
+
+            updatePlayPauseButton(true)
+
+        } catch (
+            _: Exception
+        ) {
         }
-
-        exoPlayer.playWhenReady =
-            true
-
-        exoPlayer.play()
-
-        updatePlayPauseButton(
-            true
-        )
     }
 
 
@@ -1491,7 +1492,7 @@ class MainActivity : AppCompatActivity() {
 
             if (
                 searchBox.visibility ==
-                    View.GONE
+                View.GONE
             ) {
 
                 searchBox.visibility =
@@ -1505,6 +1506,10 @@ class MainActivity : AppCompatActivity() {
                     View.GONE
 
                 searchBox.text.clear()
+
+                if (isAndroidTV) {
+                    channelRecycler.requestFocus()
+                }
             }
         }
 
@@ -1545,9 +1550,7 @@ class MainActivity : AppCompatActivity() {
 
                                 it.name
                                     .lowercase()
-                                    .contains(
-                                        query
-                                    )
+                                    .contains(query)
                             }
                         }
 
@@ -1556,7 +1559,6 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     channelRecycler.post {
-
                         updateRecyclerHeight()
                     }
                 }
@@ -1619,6 +1621,9 @@ class MainActivity : AppCompatActivity() {
         mainScrollView.overScrollMode =
             View.OVER_SCROLL_NEVER
 
+        /*
+         * TV এবং Mobile উভয়ের fullscreen landscape।
+         */
         requestedOrientation =
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
@@ -1655,7 +1660,6 @@ class MainActivity : AppCompatActivity() {
         window.decorView.post {
 
             if (isFullscreen) {
-
                 applyFullscreenPlayerSize()
             }
         }
@@ -1663,7 +1667,6 @@ class MainActivity : AppCompatActivity() {
         window.decorView.postDelayed({
 
             if (isFullscreen) {
-
                 applyFullscreenPlayerSize()
             }
 
@@ -1672,12 +1675,19 @@ class MainActivity : AppCompatActivity() {
 
 
     /* =========================================================
-       APPLY FULLSCREEN PLAYER SIZE
+       FULLSCREEN SIZE
        ========================================================= */
 
     private fun applyFullscreenPlayerSize() {
 
         if (!isFullscreen) {
+            return
+        }
+
+        if (
+            !::mainScrollView.isInitialized ||
+            !::playerContainer.isInitialized
+        ) {
             return
         }
 
@@ -1695,7 +1705,6 @@ class MainActivity : AppCompatActivity() {
             window.decorView.post {
 
                 if (isFullscreen) {
-
                     applyFullscreenPlayerSize()
                 }
             }
@@ -1703,24 +1712,31 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val params =
-            playerContainer.layoutParams
+        try {
 
-        params.width =
-            viewportWidth
+            val params =
+                playerContainer.layoutParams
 
-        params.height =
-            viewportHeight
+            params.width =
+                viewportWidth
 
-        playerContainer.layoutParams =
-            params
+            params.height =
+                viewportHeight
 
-        mainScrollView.scrollTo(
-            0,
-            0
-        )
+            playerContainer.layoutParams =
+                params
 
-        playerContainer.requestLayout()
+            mainScrollView.scrollTo(
+                0,
+                0
+            )
+
+            playerContainer.requestLayout()
+
+        } catch (
+            _: Exception
+        ) {
+        }
     }
 
 
@@ -1741,15 +1757,29 @@ class MainActivity : AppCompatActivity() {
             hideControlsRunnable
         )
 
+        /*
+         * IMPORTANT TV FIX
+         *
+         * TV-তে Portrait force করা হবে না।
+         *
+         * Mobile = Portrait
+         * TV = Landscape
+         */
         requestedOrientation =
-            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            if (isAndroidTV) {
+
+                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+            } else {
+
+                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            }
 
         showSystemBars()
 
         window.decorView.postDelayed({
 
             if (!isFullscreen) {
-
                 restoreNormalLayout()
             }
 
@@ -1767,85 +1797,90 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val density =
-            resources
-                .displayMetrics
-                .density
+        try {
 
-        val params =
-            playerContainer.layoutParams
+            val density =
+                resources.displayMetrics.density
 
-        params.width =
-            ViewGroup.LayoutParams.MATCH_PARENT
+            val params =
+                playerContainer.layoutParams
 
-        params.height =
-            (
-                normalPlayerHeight *
-                    density
-                ).toInt()
+            params.width =
+                ViewGroup.LayoutParams.MATCH_PARENT
 
-        playerContainer.layoutParams =
-            params
+            params.height =
+                (
+                    normalPlayerHeight *
+                        density
+                    ).toInt()
 
-        headerLayout.visibility =
-            View.VISIBLE
+            playerContainer.layoutParams =
+                params
 
-        currentChannelName.visibility =
-            View.VISIBLE
-
-        channelTitle.visibility =
-            View.VISIBLE
-
-        channelRecycler.visibility =
-            View.VISIBLE
-
-        footerLayout.visibility =
-            View.VISIBLE
-
-        bottomNavigation.visibility =
-            View.VISIBLE
-
-        searchBox.visibility =
-            if (searchWasVisible) {
-
+            headerLayout.visibility =
                 View.VISIBLE
 
-            } else {
+            currentChannelName.visibility =
+                View.VISIBLE
 
-                View.GONE
-            }
+            channelTitle.visibility =
+                View.VISIBLE
 
-        mainScrollView.isVerticalScrollBarEnabled =
-            true
+            channelRecycler.visibility =
+                View.VISIBLE
 
-        mainScrollView.overScrollMode =
-            View.OVER_SCROLL_NEVER
+            footerLayout.visibility =
+                View.VISIBLE
 
-        mainScrollView.scrollTo(
-            0,
-            0
-        )
+            bottomNavigation.visibility =
+                View.VISIBLE
 
-        mainScrollView.post {
+            searchBox.visibility =
+                if (searchWasVisible) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
 
-            updateRecyclerHeight()
+            mainScrollView.isVerticalScrollBarEnabled =
+                true
+
+            mainScrollView.overScrollMode =
+                View.OVER_SCROLL_NEVER
 
             mainScrollView.scrollTo(
                 0,
                 0
             )
+
+            mainScrollView.post {
+
+                if (!isFinishing && !isDestroyed) {
+
+                    updateRecyclerHeight()
+
+                    mainScrollView.scrollTo(
+                        0,
+                        0
+                    )
+                }
+            }
+
+            ViewCompat.requestApplyInsets(
+                bottomNavigation
+            )
+
+            playerControls.visibility =
+                View.VISIBLE
+
+            showControlsTemporarily()
+
+            playerContainer.requestLayout()
+
+        } catch (
+            _: Exception
+        ) {
         }
-
-        ViewCompat.requestApplyInsets(
-            bottomNavigation
-        )
-
-        playerControls.visibility =
-            View.VISIBLE
-
-        showControlsTemporarily()
-
-        playerContainer.requestLayout()
     }
 
 
@@ -1855,37 +1890,54 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideSystemBars() {
 
-        val controller =
-            WindowCompat.getInsetsController(
-                window,
-                window.decorView
+        try {
+
+            val controller =
+                WindowCompat.getInsetsController(
+                    window,
+                    window.decorView
+                )
+
+            controller.hide(
+                WindowInsetsCompat.Type.systemBars()
             )
 
-        controller.hide(
-            WindowInsetsCompat.Type.systemBars()
-        )
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat
+                    .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat
-                .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } catch (
+            _: Exception
+        ) {
+        }
     }
 
 
     private fun showSystemBars() {
 
-        val controller =
-            WindowCompat.getInsetsController(
-                window,
-                window.decorView
+        try {
+
+            val controller =
+                WindowCompat.getInsetsController(
+                    window,
+                    window.decorView
+                )
+
+            controller.show(
+                WindowInsetsCompat.Type.systemBars()
             )
 
-        controller.show(
-            WindowInsetsCompat.Type.systemBars()
-        )
+            if (::bottomNavigation.isInitialized) {
 
-        ViewCompat.requestApplyInsets(
-            bottomNavigation
-        )
+                ViewCompat.requestApplyInsets(
+                    bottomNavigation
+                )
+            }
+
+        } catch (
+            _: Exception
+        ) {
+        }
     }
 
 
@@ -1897,39 +1949,44 @@ class MainActivity : AppCompatActivity() {
         newConfig: Configuration
     ) {
 
-        super.onConfigurationChanged(
-            newConfig
-        )
+        super.onConfigurationChanged(newConfig)
 
         window.decorView.post {
 
-            if (
-                isFullscreen &&
-                newConfig.orientation ==
+            if (isFullscreen) {
+
+                /*
+                 * Fullscreen সবসময় landscape।
+                 */
+                if (
+                    newConfig.orientation ==
                     Configuration.ORIENTATION_LANDSCAPE
-            ) {
+                ) {
 
-                hideSystemBars()
+                    hideSystemBars()
 
-                mainScrollView.isVerticalScrollBarEnabled =
-                    false
+                    mainScrollView.isVerticalScrollBarEnabled =
+                        false
 
-                mainScrollView.overScrollMode =
-                    View.OVER_SCROLL_NEVER
+                    mainScrollView.overScrollMode =
+                        View.OVER_SCROLL_NEVER
 
-                mainScrollView.scrollTo(
-                    0,
-                    0
-                )
+                    mainScrollView.scrollTo(
+                        0,
+                        0
+                    )
 
-                applyFullscreenPlayerSize()
+                    applyFullscreenPlayerSize()
+                }
 
-            } else if (
-                !isFullscreen &&
-                newConfig.orientation ==
-                    Configuration.ORIENTATION_PORTRAIT
-            ) {
+            } else {
 
+                /*
+                 * TV-তে landscape normal mode-ও valid।
+                 *
+                 * তাই শুধু portrait হলে restore করার
+                 * আগের logic রাখা হয়নি।
+                 */
                 showSystemBars()
 
                 restoreNormalLayout()
@@ -1949,7 +2006,9 @@ class MainActivity : AppCompatActivity() {
         ).setOnClickListener {
 
             if (isFullscreen) {
+
                 exitFullscreen()
+
                 return@setOnClickListener
             }
 
@@ -1988,7 +2047,9 @@ class MainActivity : AppCompatActivity() {
         ).setOnClickListener {
 
             if (isFullscreen) {
+
                 exitFullscreen()
+
                 return@setOnClickListener
             }
 
@@ -1998,13 +2059,17 @@ class MainActivity : AppCompatActivity() {
                     0,
                     channelRecycler.top
                 )
+
+                if (isAndroidTV) {
+                    channelRecycler.requestFocus()
+                }
             }
         }
     }
 
 
     /* =========================================================
-       SOCIAL
+       SOCIAL LINKS
        ========================================================= */
 
     private fun setupSocialLinks() {
@@ -2056,9 +2121,7 @@ class MainActivity : AppCompatActivity() {
                     Uri.parse(url)
                 )
 
-            startActivity(
-                intent
-            )
+            startActivity(intent)
 
         } catch (
             _: ActivityNotFoundException
@@ -2088,36 +2151,62 @@ class MainActivity : AppCompatActivity() {
             window.decorView.post {
 
                 if (isFullscreen) {
-
                     applyFullscreenPlayerSize()
                 }
             }
 
         } else {
 
-            ViewCompat.requestApplyInsets(
-                bottomNavigation
-            )
+            if (::bottomNavigation.isInitialized) {
+
+                ViewCompat.requestApplyInsets(
+                    bottomNavigation
+                )
+            }
         }
 
-        player?.let {
+        /*
+         * Activity ফিরে এলে player আবার চালু হবে।
+         * কিন্তু error state-এ অযথা নতুন stream request
+         * করা হবে না।
+         */
+        player?.let { exoPlayer ->
 
             if (
-                it.playbackState ==
-                    Player.STATE_IDLE ||
-                it.playbackState ==
-                    Player.STATE_ENDED
+                exoPlayer.playbackState ==
+                Player.STATE_IDLE
             ) {
 
-                resumePlayback()
+                if (currentChannel != null) {
+                    resumePlayback()
+                }
 
-            } else {
+            } else if (
+                exoPlayer.playbackState ==
+                Player.STATE_ENDED
+            ) {
 
-                it.play()
+                if (currentChannel != null) {
+                    resumePlayback()
+                }
 
-                updatePlayPauseButton(
-                    true
-                )
+            } else if (
+                exoPlayer.playbackState ==
+                Player.STATE_READY
+            ) {
+
+                try {
+
+                    exoPlayer.play()
+
+                    updatePlayPauseButton(
+                        true
+                    )
+
+                } catch (
+                    _: Exception
+                ) {
+                }
             }
         }
     }
@@ -2129,7 +2218,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
 
-        player?.pause()
+        try {
+            player?.pause()
+        } catch (
+            _: Exception
+        ) {
+        }
 
         super.onPause()
     }
@@ -2145,7 +2239,24 @@ class MainActivity : AppCompatActivity() {
             null
         )
 
-        player?.release()
+        try {
+
+            playerView.player =
+                null
+
+        } catch (
+            _: Exception
+        ) {
+        }
+
+        try {
+
+            player?.release()
+
+        } catch (
+            _: Exception
+        ) {
+        }
 
         player = null
 
@@ -2153,7 +2264,12 @@ class MainActivity : AppCompatActivity() {
             ::channelAdapter.isInitialized
         ) {
 
-            channelAdapter.shutdown()
+            try {
+                channelAdapter.shutdown()
+            } catch (
+                _: Exception
+            ) {
+            }
         }
 
         super.onDestroy()
