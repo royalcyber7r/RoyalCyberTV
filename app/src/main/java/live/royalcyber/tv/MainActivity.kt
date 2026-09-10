@@ -1,5 +1,6 @@
 package live.royalcyber.tv
 
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -34,6 +35,8 @@ import androidx.media3.ui.PlayerView
 
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
+import org.json.JSONArray
 
 
 class MainActivity : AppCompatActivity() {
@@ -114,6 +117,29 @@ class MainActivity : AppCompatActivity() {
                 playerControls.visibility = View.GONE
             }
         }
+
+    /* =========================================================
+       NOTIFICATION
+       ========================================================= */
+
+    /*
+     * Notification-এর জন্য আলাদা কোনো XML লাগবে না।
+     *
+     * known_channels:
+     * আগে কোন কোন channel app-এ ছিল সেটা মনে রাখবে।
+     *
+     * pending_notifications:
+     * নতুন যোগ হওয়া channelগুলো এখানে থাকবে।
+     */
+    private val notificationPrefsName =
+        "royalcyber_notification_prefs"
+
+    private val knownChannelsKey =
+        "known_channels"
+
+    private val pendingNotificationsKey =
+        "pending_notifications"
+
 
     /* =========================================================
        CHANNEL LIST
@@ -694,6 +720,14 @@ class MainActivity : AppCompatActivity() {
         setupBottomMenu()
         setupSocialLinks()
 
+        /*
+         * নতুন Channel শনাক্ত করার জন্য।
+         *
+         * প্রথমবার বর্তমান সব channel known হিসেবে save হবে।
+         * তাই পুরোনো channelগুলো Notification-এ আসবে না।
+         */
+        syncNewChannelNotifications()
+
         mainScrollView.post {
             updateRecyclerHeight()
         }
@@ -720,6 +754,481 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }, 1500)
+        }
+    }
+
+
+    /* =========================================================
+       NOTIFICATION SYSTEM
+       ========================================================= */
+
+    private fun syncNewChannelNotifications() {
+
+        try {
+
+            val prefs =
+                getSharedPreferences(
+                    notificationPrefsName,
+                    MODE_PRIVATE
+                )
+
+            val currentChannelNames =
+                channels
+                    .map {
+                        it.name.trim()
+                    }
+                    .filter {
+                        it.isNotEmpty()
+                    }
+                    .toSet()
+
+            val savedKnownChannels =
+                prefs.getStringSet(
+                    knownChannelsKey,
+                    null
+                )
+
+            /*
+             * প্রথমবার app চালু হলে:
+             *
+             * বর্তমান সব channel পুরোনো/known হিসেবে
+             * save হবে।
+             *
+             * তাই প্রথমবার 70-80টি notification আসবে না।
+             */
+            if (savedKnownChannels == null) {
+
+                prefs.edit()
+                    .putStringSet(
+                        knownChannelsKey,
+                        currentChannelNames
+                    )
+                    .putString(
+                        pendingNotificationsKey,
+                        JSONArray().toString()
+                    )
+                    .apply()
+
+                return
+            }
+
+            val knownChannels =
+                savedKnownChannels.toMutableSet()
+
+            val pendingNotifications =
+                getPendingNotifications()
+
+            /*
+             * Current list-এর মধ্যে যেগুলো আগে ছিল না,
+             * সেগুলো নতুন Channel।
+             */
+            val newChannels =
+                currentChannelNames.filter {
+                    !knownChannels.contains(it)
+                }
+
+            newChannels.forEach { newChannel ->
+
+                if (
+                    !pendingNotifications.contains(
+                        newChannel
+                    )
+                ) {
+
+                    pendingNotifications.add(
+                        newChannel
+                    )
+                }
+            }
+
+            /*
+             * নতুন channelগুলো known list-এ যোগ করে রাখি।
+             */
+            knownChannels.addAll(
+                currentChannelNames
+            )
+
+            prefs.edit()
+                .putStringSet(
+                    knownChannelsKey,
+                    knownChannels
+                )
+                .apply()
+
+            savePendingNotifications(
+                pendingNotifications
+            )
+
+        } catch (
+            _: Exception
+        ) {
+            /*
+             * Notification system-এর কোনো error হলে
+             * মূল app যেন বন্ধ না হয়।
+             */
+        }
+    }
+
+
+    private fun getPendingNotifications(): MutableList<String> {
+
+        val result =
+            mutableListOf<String>()
+
+        try {
+
+            val prefs =
+                getSharedPreferences(
+                    notificationPrefsName,
+                    MODE_PRIVATE
+                )
+
+            val raw =
+                prefs.getString(
+                    pendingNotificationsKey,
+                    null
+                )
+
+            if (
+                raw.isNullOrBlank()
+            ) {
+                return result
+            }
+
+            val json =
+                JSONArray(raw)
+
+            for (
+                index in 0 until json.length()
+            ) {
+
+                val name =
+                    json.optString(index)
+                        .trim()
+
+                if (
+                    name.isNotEmpty() &&
+                    !result.contains(name)
+                ) {
+
+                    result.add(name)
+                }
+            }
+
+        } catch (
+            _: Exception
+        ) {
+        }
+
+        return result
+    }
+
+
+    private fun savePendingNotifications(
+        notifications: List<String>
+    ) {
+
+        try {
+
+            val json =
+                JSONArray()
+
+            notifications.forEach { name ->
+
+                if (name.trim().isNotEmpty()) {
+                    json.put(
+                        name.trim()
+                    )
+                }
+            }
+
+            getSharedPreferences(
+                notificationPrefsName,
+                MODE_PRIVATE
+            )
+                .edit()
+                .putString(
+                    pendingNotificationsKey,
+                    json.toString()
+                )
+                .apply()
+
+        } catch (
+            _: Exception
+        ) {
+        }
+    }
+
+
+    /* =========================================================
+       SHOW NOTIFICATION
+       ========================================================= */
+
+    private fun showNotificationDialog() {
+
+        if (
+            isFinishing ||
+            isDestroyed
+        ) {
+            return
+        }
+
+        val pendingNotifications =
+            getPendingNotifications()
+
+        if (pendingNotifications.isEmpty()) {
+
+            Toast.makeText(
+                this,
+                "কোনো নতুন Notification নেই",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        /*
+         * Notification-এর মধ্যে channel name দেখানো হবে।
+         */
+        val notificationItems =
+            pendingNotifications
+                .map {
+                    "🔴  নতুন Channel যুক্ত হয়েছে\n${it}"
+                }
+                .toTypedArray()
+
+        try {
+
+            AlertDialog.Builder(this)
+                .setTitle(
+                    "Notification"
+                )
+                .setItems(
+                    notificationItems
+                ) { dialog, which ->
+
+                    if (
+                        which < 0 ||
+                        which >=
+                        pendingNotifications.size
+                    ) {
+                        return@setItems
+                    }
+
+                    val channelName =
+                        pendingNotifications[which]
+
+                    /*
+                     * Notification list থেকে
+                     * selected notification remove হবে।
+                     */
+                    val remainingNotifications =
+                        pendingNotifications
+                            .toMutableList()
+
+                    remainingNotifications.removeAt(
+                        which
+                    )
+
+                    savePendingNotifications(
+                        remainingNotifications
+                    )
+
+                    dialog.dismiss()
+
+                    /*
+                     * Channel list-এর exact Channel object
+                     * খুঁজে বের করা হচ্ছে।
+                     */
+                    val channel =
+                        channels.firstOrNull {
+
+                            it.name.trim()
+                                .equals(
+                                    channelName.trim(),
+                                    ignoreCase = true
+                                )
+                        }
+
+                    if (channel == null) {
+
+                        Toast.makeText(
+                            this,
+                            "Channel পাওয়া যায়নি",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        return@setItems
+                    }
+
+                    openChannelFromNotification(
+                        channel
+                    )
+                }
+                .setNegativeButton(
+                    "বন্ধ করুন",
+                    null
+                )
+                .show()
+
+        } catch (
+            _: Exception
+        ) {
+
+            Toast.makeText(
+                this,
+                "Notification খোলা যাচ্ছে না",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+
+    /* =========================================================
+       OPEN CHANNEL FROM NOTIFICATION
+       ========================================================= */
+
+    private fun openChannelFromNotification(
+        channel: Channel
+    ) {
+
+        if (
+            isFinishing ||
+            isDestroyed
+        ) {
+            return
+        }
+
+        /*
+         * যদি fullscreen চালু থাকে,
+         * আগে normal mode-এ আসবে।
+         */
+        if (isFullscreen) {
+            exitFullscreen()
+        }
+
+        /*
+         * Search করা থাকলে পুরো channel list ফিরিয়ে আনা হবে।
+         */
+        if (
+            searchBox.visibility ==
+            View.VISIBLE
+        ) {
+
+            searchBox.visibility =
+                View.GONE
+
+            searchBox.text.clear()
+        }
+
+        /*
+         * পুরো channel list adapter-এ ফিরিয়ে দিচ্ছি।
+         */
+        channelAdapter.updateList(
+            channels
+        )
+
+        channelRecycler.post {
+            updateRecyclerHeight()
+        }
+
+        /*
+         * Notification থেকে channel চালু হবে।
+         *
+         * এখানে false দেওয়ার কারণে playChannel()
+         * Home-এর একদম উপরে scroll করবে না।
+         */
+        playChannel(
+            channel,
+            false
+        )
+
+        /*
+         * Channel list-এর ওই channel-এর কাছে
+         * Scroll করা হবে।
+         */
+        mainScrollView.post {
+
+            if (
+                isFinishing ||
+                isDestroyed
+            ) {
+                return@post
+            }
+
+            channelRecycler.post {
+
+                if (
+                    isFinishing ||
+                    isDestroyed
+                ) {
+                    return@post
+                }
+
+                val channelIndex =
+                    channels.indexOfFirst {
+
+                        it.name.trim()
+                            .equals(
+                                channel.name.trim(),
+                                ignoreCase = true
+                            )
+                    }
+
+                if (channelIndex < 0) {
+                    return@post
+                }
+
+                /*
+                 * RecyclerView-এর position-এ যাওয়া।
+                 */
+                channelRecycler.scrollToPosition(
+                    channelIndex
+                )
+
+                channelRecycler.post {
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@post
+                    }
+
+                    val holder =
+                        channelRecycler
+                            .findViewHolderForAdapterPosition(
+                                channelIndex
+                            )
+
+                    val itemTop =
+                        holder
+                            ?.itemView
+                            ?.top
+                            ?: 0
+
+                    /*
+                     * Channel list-এর নির্দিষ্ট জায়গায়
+                     * main ScrollView নিয়ে যাওয়া।
+                     */
+                    mainScrollView.smoothScrollTo(
+                        0,
+                        channelRecycler.top +
+                            itemTop
+                    )
+
+                    /*
+                     * Android TV হলে selected channel-এ
+                     * remote focus দেওয়ার চেষ্টা।
+                     */
+                    if (isAndroidTV) {
+
+                        holder
+                            ?.itemView
+                            ?.requestFocus()
+                    }
+                }
+            }
         }
     }
 
@@ -1315,7 +1824,8 @@ class MainActivity : AppCompatActivity() {
        ========================================================= */
 
     private fun playChannel(
-        channel: Channel
+        channel: Channel,
+        scrollHomeToTop: Boolean = true
     ) {
 
         if (
@@ -1399,7 +1909,17 @@ class MainActivity : AppCompatActivity() {
 
             showControlsTemporarily()
 
-            if (!isFullscreen) {
+            /*
+             * সাধারণ Channel click-এর আগের behaviour
+             * ঠিক রাখা হয়েছে।
+             *
+             * Notification থেকে channel খুললে
+             * scrollHomeToTop = false হবে।
+             */
+            if (
+                scrollHomeToTop &&
+                !isFullscreen
+            ) {
 
                 mainScrollView.post {
 
@@ -2026,11 +2546,11 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_notification
         ).setOnClickListener {
 
-            Toast.makeText(
-                this,
-                "কোনো নতুন Notification নেই",
-                Toast.LENGTH_SHORT
-            ).show()
+            /*
+             * আগের Toast-এর পরিবর্তে
+             * এখন আসল Notification খুলবে।
+             */
+            showNotificationDialog()
         }
 
 
