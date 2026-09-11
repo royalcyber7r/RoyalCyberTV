@@ -2,26 +2,34 @@ package live.royalcyber.tv
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 
 class SplashActivity : AppCompatActivity() {
+
+    private val splashDelay = 2500L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_splash)
 
-        try {
-            val intent = Intent(
-                this,
-                MainActivity::class.java
-            )
+        Handler(Looper.getMainLooper()).postDelayed({
 
-            startActivity(intent)
-            finish()
+            try {
+                val intent = Intent(
+                    this,
+                    MainActivity::class.java
+                )
 
-        } catch (_: Exception) {
-            finish()
-        }
+                startActivity(intent)
+                finish()
+
+            } catch (_: Exception) {
+                finish()
+            }
+
+        }, splashDelay)
     }
 }
