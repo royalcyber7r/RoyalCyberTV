@@ -704,47 +704,65 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-   /* =========================================================
+
+       /* =========================================================
        ON CREATE
        ========================================================= */
 
-override fun onCreate(
-    savedInstanceState: Bundle?
-) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+        super.onCreate(savedInstanceState)
 
-    setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main)
 
-    initializeViews()
+        initializeViews()
 
-    setupBottomNavigationInsets()
-    setupChannelList()
-    setupSearch()
-    setupPlayer()
-    setupPlayerControls()
-    setupFullscreenButton()
-    setupBottomMenu()
-    setupSocialLinks()
+        setupBottomNavigationInsets()
+        setupChannelList()
+        setupSearch()
+        setupPlayer()
+        setupPlayerControls()
+        setupFullscreenButton()
+        setupBottomMenu()
+        setupSocialLinks()
 
-    /*
-     * নতুন Channel শনাক্ত করার জন্য।
-     *
-     * প্রথমবার বর্তমান সব channel known হিসেবে save হবে।
-     * তাই পুরোনো channelগুলো Notification-এ আসবে না।
-     */
-    syncNewChannelNotifications()
+        /*
+         * নতুন Channel শনাক্ত করার জন্য।
+         *
+         * প্রথমবার বর্তমান সব channel known হিসেবে save হবে।
+         * তাই পুরোনো channelগুলো Notification-এ আসবে না।
+         */
+        syncNewChannelNotifications()
 
-    mainScrollView.post {
-        updateRecyclerHeight()
+        mainScrollView.post {
+            updateRecyclerHeight()
+        }
+
+        /*
+         * প্রথম Channel চালু হবে।
+         */
+        if (channels.isNotEmpty()) {
+            playChannel(channels[0])
+        }
+
+        /*
+         * Android TV-তে automatic update screen খুলবে না।
+         */
+        if (!isAndroidTV) {
+
+            handler.postDelayed({
+
+                if (
+                    !isFinishing &&
+                    !isDestroyed
+                ) {
+                    checkForUpdateAutomatically()
+                }
+
+            }, 1500)
+        }
     }
-
-    /*
-     * প্রথম Channel চালু হবে।
-     */
-    if (channels.isNotEmpty()) {
-        playChannel(channels[0])
-    }
-}
 
 
     /* =========================================================
