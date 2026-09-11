@@ -154,6 +154,12 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "Star Jalsha HD",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Star_Jalsha_logo_2023.png",
+            streamUrl = "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:starjalsha.smil/chunklist_b1928000.m3u8"
+        ),
+
+        Channel(
             name = "Sony Sports 2",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/187x0-icon.png",
             streamUrl = "https://stream.ottplus.live/live/ten_2_hd_abr/live/ten_2_hd_720/chunks.m3u8"
