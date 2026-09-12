@@ -60,7 +60,7 @@ class ChannelAdapter(
          * focus from the TV remote.
          */
         view.isFocusable = true
-        view.isFocusableInTouchMode = true
+        view.isFocusableInTouchMode = false
 
         return ChannelViewHolder(view)
     }
