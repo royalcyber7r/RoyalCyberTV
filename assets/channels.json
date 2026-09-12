@@ -1,9 +1,9 @@
 [
   
   {
-    "name": "Sony Max 2",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
-    "streamUrl": "https://cloudplay-sonyliv.pages.dev/max2.m3u8"
+    "name": "Movie Club",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022",
+    "streamUrl": "https://sis-global.prod.samsungtv.plus/v1/tvpprd/sc-mp2ar4ca425xo.m3u8"
   },
 
   
