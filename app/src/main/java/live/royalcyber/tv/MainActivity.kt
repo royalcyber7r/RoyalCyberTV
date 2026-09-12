@@ -293,7 +293,7 @@ class MainActivity : AppCompatActivity() {
 
         Channel(
             name = "B4U Music",
-            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umusic.png",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/B4umusic.png",
             streamUrl = "https://streams.tangotv.in/B4UMUSIC/ORIGIN/index.m3u8"
         ),
 
