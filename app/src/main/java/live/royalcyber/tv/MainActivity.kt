@@ -292,6 +292,12 @@ class MainActivity : AppCompatActivity() {
         ),
 
         Channel(
+            name = "B4U Music",
+            logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/b4umusic.png",
+            streamUrl = "https://streams.tangotv.in/B4UMUSIC/ORIGIN/index.m3u8"
+        ),
+
+        Channel(
             name = "Dhoom Music",
             logo = "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/dhoom.png",
             streamUrl = "https://mumt06.tangotv.in/qYyB8fXVDHOOMMUSIC/index.m3u8"
