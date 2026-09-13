@@ -189,11 +189,25 @@ class MainActivity : AppCompatActivity() {
             updateRecyclerHeight()
         }
 
-        /*
-         * Android TV-তে automatic update screen খুলবে না।
-         */
-        
+    /*
+     * Android TV-তে automatic update screen খুলবে না।
+     */
+    if (!isAndroidTV) {
+
+        handler.postDelayed({
+
+            if (
+                !isFinishing &&
+                !isDestroyed
+            ) {
+                checkForUpdateAutomatically()
+            }
+
+        }, 1500)
     }
+}
+
+
 
     /* =========================================================
        LOAD CHANNELS FROM ONLINE JSON
