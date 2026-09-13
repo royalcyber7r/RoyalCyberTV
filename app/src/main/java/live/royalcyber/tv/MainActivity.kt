@@ -162,10 +162,11 @@ class MainActivity : AppCompatActivity() {
         initializeViews()
 
         /*
-         * channels.json থেকে সব Channel load হবে।
+         * Online GitHub channels.json থেকে
+         * সব Channel load হবে।
          *
-         * গুরুত্বপূর্ণ:
-         * setupChannelList() এর আগে অবশ্যই load করতে হবে।
+         * loadChannelsFromJson() background thread-এ
+         * JSON load করবে।
          */
         loadChannelsFromJson()
 
@@ -179,22 +180,13 @@ class MainActivity : AppCompatActivity() {
         setupSocialLinks()
 
         /*
-         * নতুন Channel শনাক্ত করার জন্য।
-         *
-         * প্রথমবার বর্তমান সব channel known হিসেবে save হবে।
-         * তাই পুরোনো channelগুলো Notification-এ আসবে না।
+         * Online JSON load হওয়ার পর
+         * Notification system এবং প্রথম Channel
+         * চালু করা হবে।
          */
-        syncNewChannelNotifications()
 
         mainScrollView.post {
             updateRecyclerHeight()
-        }
-
-        /*
-         * প্রথম Channel চালু হবে।
-         */
-        if (channels.isNotEmpty()) {
-            playChannel(channels[0])
         }
 
         /*
@@ -217,92 +209,173 @@ class MainActivity : AppCompatActivity() {
 
 
     /* =========================================================
-       LOAD CHANNELS FROM JSON
+       LOAD CHANNELS FROM ONLINE JSON
        ========================================================= */
 
     private fun loadChannelsFromJson() {
 
-        try {
+        Thread {
 
-            val jsonText =
-                assets.open("channels.json")
-                    .bufferedReader()
-                    .use {
-                        it.readText()
-                    }
+            try {
 
-            val jsonArray =
-                JSONArray(jsonText)
+                val url =
+                    java.net.URL(
+                        "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/assets/channels.json"
+                    )
 
-            val loadedChannels =
-                mutableListOf<Channel>()
+                val connection =
+                    url.openConnection() as java.net.HttpURLConnection
 
-            for (
-                index in 0 until jsonArray.length()
-            ) {
+                connection.requestMethod = "GET"
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+                connection.useCaches = false
 
-                val item =
-                    jsonArray.optJSONObject(index)
-                        ?: continue
+                val responseCode =
+                    connection.responseCode
 
-                val name =
-                    item.optString("name")
-                        .trim()
+                if (responseCode !in 200..299) {
 
-                val logo =
-                    item.optString("logo")
-                        .trim()
+                    throw Exception(
+                        "HTTP $responseCode"
+                    )
+                }
 
-                val streamUrl =
-                    item.optString("streamUrl")
-                        .trim()
+                val jsonText =
+                    connection.inputStream
+                        .bufferedReader()
+                        .use {
+                            it.readText()
+                        }
 
-                /*
-                 * name এবং streamUrl না থাকলে
-                 * invalid channel হিসেবে বাদ যাবে।
-                 *
-                 * logo empty হলেও channel বাদ যাবে না।
-                 */
-                if (
-                    name.isNotEmpty() &&
-                    streamUrl.isNotEmpty()
+                connection.disconnect()
+
+                val jsonArray =
+                    JSONArray(jsonText)
+
+                val loadedChannels =
+                    mutableListOf<Channel>()
+
+                for (
+                    index in 0 until jsonArray.length()
                 ) {
 
-                    loadedChannels.add(
-                        Channel(
-                            name = name,
-                            logo = logo,
-                            streamUrl = streamUrl
+                    val item =
+                        jsonArray.optJSONObject(index)
+                            ?: continue
+
+                    val name =
+                        item.optString("name")
+                            .trim()
+
+                    val logo =
+                        item.optString("logo")
+                            .trim()
+
+                    val streamUrl =
+                        item.optString("streamUrl")
+                            .trim()
+
+                    /*
+                     * name এবং streamUrl না থাকলে
+                     * invalid channel হিসেবে বাদ যাবে।
+                     *
+                     * logo empty হলেও channel বাদ যাবে না।
+                     */
+                    if (
+                        name.isNotEmpty() &&
+                        streamUrl.isNotEmpty()
+                    ) {
+
+                        loadedChannels.add(
+                            Channel(
+                                name = name,
+                                logo = logo,
+                                streamUrl = streamUrl
+                            )
                         )
-                    )
+                    }
+                }
+
+                runOnUiThread {
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@runOnUiThread
+                    }
+
+                    /*
+                     * JSON-এর সব valid Channel রাখা হবে।
+                     *
+                     * একই নামের Channel থাকলেও
+                     * বাদ দেওয়া হবে না।
+                     */
+                    channels =
+                        loadedChannels
+
+                    /*
+                     * setupChannelList() আগে adapter তৈরি করেছে।
+                     * JSON load হওয়ার পর list update হবে।
+                     */
+                    if (
+                        ::channelAdapter.isInitialized
+                    ) {
+
+                        channelAdapter.updateList(
+                            channels
+                        )
+                    }
+
+                    channelRecycler.post {
+                        updateRecyclerHeight()
+                    }
+
+                    /*
+                     * নতুন Channel শনাক্ত করা হবে।
+                     *
+                     * প্রথমবার বর্তমান সব channel known হিসেবে
+                     * save হবে।
+                     */
+                    syncNewChannelNotifications()
+
+                    /*
+                     * প্রথম Channel চালু হবে।
+                     */
+                    if (
+                        channels.isNotEmpty() &&
+                        currentChannel == null
+                    ) {
+
+                        playChannel(
+                            channels[0]
+                        )
+                    }
+                }
+
+            } catch (
+                _: Exception
+            ) {
+
+                runOnUiThread {
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@runOnUiThread
+                    }
+
+                    Toast.makeText(
+                        this,
+                        "অনলাইন channels.json লোড করা যাচ্ছে না",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
 
-            /*
-             * একই নামের duplicate channel থাকলে
-             * প্রথমটিই রাখা হবে।
-             */
-            channels =
-                loadedChannels.distinctBy {
-                    it.name.trim().lowercase()
-                }
-
-        } catch (
-            _: Exception
-        ) {
-
-            /*
-             * JSON load error হলেও app crash করবে না।
-             */
-            channels =
-                emptyList()
-
-            Toast.makeText(
-                this,
-                "channels.json লোড করা যাচ্ছে না",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+        }.start()
     }
 
 
@@ -484,6 +557,7 @@ class MainActivity : AppCompatActivity() {
             notifications.forEach { name ->
 
                 if (name.trim().isNotEmpty()) {
+
                     json.put(
                         name.trim()
                     )
@@ -1119,6 +1193,7 @@ class MainActivity : AppCompatActivity() {
                             !isFinishing &&
                             !isDestroyed
                         ) {
+
                             updatePlayPauseButton(
                                 isPlaying
                             )
