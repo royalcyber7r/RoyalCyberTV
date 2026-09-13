@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
          * Android TV-তে automatic update screen খুলবে না।
          */
         
-
+    }
 
     /* =========================================================
        LOAD CHANNELS FROM ONLINE JSON
