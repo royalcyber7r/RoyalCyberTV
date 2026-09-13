@@ -2,6 +2,12 @@
 
 
  {
+    "name": "Tapmad",
+    "logo": "https://d34080pnh6e62j.cloudfront.net/images/channels/mobile_large/17891310551020x576.jpg",
+    "streamUrl": "https://multiregion-asia-cdn.tapmad.com/v1/019f067c253015e8f412028003fe/019f067d5e3615e8f060213b29a21b/main.m3u8"
+  },
+
+ {
     "name": "Movie Club",
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/movieclub.webp",
     "streamUrl": "https://sis-global.prod.samsungtv.plus/v1/tvpprd/sc-mp2ar4ca425xo.m3u8"
