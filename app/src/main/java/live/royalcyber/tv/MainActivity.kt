@@ -192,20 +192,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * Android TV-তে automatic update screen খুলবে না।
          */
-        if (!isAndroidTV) {
-
-            handler.postDelayed({
-
-                if (
-                    !isFinishing &&
-                    !isDestroyed
-                ) {
-                    checkForUpdateAutomatically()
-                }
-
-            }, 1500)
-        }
-    }
+        
 
 
     /* =========================================================
