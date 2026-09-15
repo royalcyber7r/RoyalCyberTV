@@ -1610,7 +1610,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            val choices = mutableListOf("CC Off")
+            val choices = mutableListOf<String>("CC Off")
             val selections = mutableListOf<Pair<androidx.media3.common.TrackGroup, Int>?>()
             selections.add(null)
 
@@ -1620,10 +1620,10 @@ class MainActivity : AppCompatActivity() {
                     val language = format.language
                     val label = format.label
 
-                    val name = when {
-                        !label.isNullOrBlank() -> label
-                        !language.isNullOrBlank() -> language.uppercase()
-                        !format.id.isNullOrBlank() -> format.id
+                    val name: String = when {
+                        !label.isNullOrBlank() -> label!!
+                        !language.isNullOrBlank() -> language!!.uppercase()
+                        !format.id.isNullOrBlank() -> format.id!!
                         else -> "Subtitle ${selections.size}"
                     }
 
