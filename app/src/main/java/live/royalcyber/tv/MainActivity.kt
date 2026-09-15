@@ -34,6 +34,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 import androidx.recyclerview.widget.GridLayoutManager
@@ -1213,6 +1214,16 @@ class MainActivity : AppCompatActivity() {
             playerView.useController =
                 false
 
+            // Fill the responsive 16:9 player area without the black bars
+            // produced by FIT mode when the stream aspect ratio differs.
+            playerView.resizeMode =
+                AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+
+            // Make sure Media3 subtitle rendering is enabled/visible.
+            playerView.subtitleView?.visibility = View.VISIBLE
+            playerView.subtitleView?.setApplyEmbeddedStyles(true)
+            playerView.subtitleView?.setApplyEmbeddedFontSizes(true)
+
             playerView.keepScreenOn =
                 true
 
@@ -1599,7 +1610,9 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val textGroups = exoPlayer.currentTracks.groups
-                .filter { it.type == C.TRACK_TYPE_TEXT && it.length > 0 }
+                .filter {
+                    it.type == C.TRACK_TYPE_TEXT && it.length > 0
+                }
 
             if (textGroups.isEmpty()) {
                 Toast.makeText(
@@ -1611,57 +1624,74 @@ class MainActivity : AppCompatActivity() {
             }
 
             val choices = mutableListOf<String>("CC Off")
-            val selections = mutableListOf<Pair<androidx.media3.common.TrackGroup, Int>?>()
+            val selections = mutableListOf<androidx.media3.common.TrackSelectionOverride?>()
             selections.add(null)
+
+            var subtitleNumber = 1
 
             for (group in textGroups) {
                 for (index in 0 until group.length) {
                     val format = group.getTrackFormat(index)
-                    val language = format.language
-                    val label = format.label
 
-                    val name: String = when {
+                    val label = format.label
+                    val language = format.language
+
+                    // Prefer a human-readable subtitle name.
+                    // Do not show HLS/internal IDs such as 1/8219 to the user.
+                    val name = when {
                         !label.isNullOrBlank() -> label!!
                         !language.isNullOrBlank() -> language!!.uppercase()
-                        !format.id.isNullOrBlank() -> format.id!!
-                        else -> "Subtitle ${selections.size}"
+                        else -> "Subtitle $subtitleNumber"
                     }
 
                     choices.add(name)
-                    selections.add(group.mediaTrackGroup to index)
+                    selections.add(
+                        TrackSelectionOverride(
+                            group.mediaTrackGroup,
+                            listOf(index)
+                        )
+                    )
+                    subtitleNumber++
                 }
             }
 
-            AlertDialog.Builder(this)
+            val dialog = AlertDialog.Builder(this)
                 .setTitle("CC / Subtitles")
-                .setItems(choices.toTypedArray()) { dialog, which ->
+                .setItems(choices.toTypedArray()) { dialogInterface, which ->
 
                     try {
-                        val builder = exoPlayer.trackSelectionParameters.buildUpon()
-                            .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                        val selected = selections[which]
 
-                        val selection = selections[which]
-
-                        if (selection == null) {
-                            builder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-                        } else {
-                            builder
-                                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-                                .addOverride(
-                                    TrackSelectionOverride(
-                                        selection.first,
-                                        listOf(selection.second)
-                                    )
+                        val builder =
+                            exoPlayer.trackSelectionParameters.buildUpon()
+                                .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                .setTrackTypeDisabled(
+                                    C.TRACK_TYPE_TEXT,
+                                    selected == null
                                 )
+
+                        if (selected != null) {
+                            builder.addOverride(selected)
                         }
 
-                        exoPlayer.trackSelectionParameters = builder.build()
+                        exoPlayer.trackSelectionParameters =
+                            builder.build()
+
+                        // Keep subtitle rendering visible after changing tracks.
+                        exoPlayer.playWhenReady =
+                            exoPlayer.playWhenReady
+                        playerView.subtitleView?.visibility =
+                            View.VISIBLE
 
                         Toast.makeText(
                             this,
-                            "CC: ${choices[which]}",
+                            if (selected == null)
+                                "CC Off"
+                            else
+                                "CC: ${choices[which]}",
                             Toast.LENGTH_SHORT
                         ).show()
+
                     } catch (_: Exception) {
                         Toast.makeText(
                             this,
@@ -1670,10 +1700,12 @@ class MainActivity : AppCompatActivity() {
                         ).show()
                     }
 
-                    dialog.dismiss()
+                    dialogInterface.dismiss()
                 }
                 .setNegativeButton("বন্ধ করুন", null)
-                .show()
+                .create()
+
+            dialog.show()
 
         } catch (_: Exception) {
             Toast.makeText(
