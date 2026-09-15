@@ -25,9 +25,11 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
@@ -71,6 +73,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var rewindButton: TextView
     private lateinit var forwardButton: TextView
     private lateinit var liveText: TextView
+    private lateinit var qualityButton: TextView
+    private lateinit var ccButton: TextView
 
     private var player: ExoPlayer? = null
 
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
 
     private var isFullscreen = false
 
+    // Normal player height is calculated responsively as 16:9.
     private var normalPlayerHeight = 220
 
     private var searchWasVisible = false
@@ -1037,6 +1042,17 @@ class MainActivity : AppCompatActivity() {
 
         liveText =
             findViewById(R.id.live_text)
+
+        qualityButton =
+            findViewById(R.id.quality_button)
+
+        ccButton =
+            findViewById(R.id.cc_button)
+
+        // Responsive 16:9 player for phones, tablets and Android TV.
+        playerContainer.post {
+            applyResponsivePlayerSize()
+        }
     }
 
 
@@ -1398,6 +1414,18 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        qualityButton.setOnClickListener {
+            showQualityDialog()
+            showControlsTemporarily()
+        }
+
+
+        ccButton.setOnClickListener {
+            showCcDialog()
+            showControlsTemporarily()
+        }
+
+
         playerView.setOnClickListener {
 
             if (
@@ -1463,6 +1491,238 @@ class MainActivity : AppCompatActivity() {
                 hideControlsRunnable,
                 5000
             )
+        }
+    }
+
+
+    /* =========================================================
+       VIDEO QUALITY
+       ========================================================= */
+
+    private fun showQualityDialog() {
+
+        val exoPlayer = player ?: return
+
+        try {
+            val videoGroup = exoPlayer.currentTracks.groups
+                .firstOrNull { it.type == C.TRACK_TYPE_VIDEO }
+
+            if (videoGroup == null || videoGroup.length == 0) {
+                Toast.makeText(
+                    this,
+                    "এই Channel-এর Quality option নেই",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            val qualityItems = mutableListOf<String>()
+            val trackIndexes = mutableListOf<Int>()
+            val seen = mutableSetOf<String>()
+
+            qualityItems.add("Auto")
+            trackIndexes.add(-1)
+
+            for (index in 0 until videoGroup.length) {
+                val format = videoGroup.getTrackFormat(index)
+
+                val label = when {
+                    format.height > 0 -> "${format.height}p"
+                    format.width > 0 -> "${format.width}p"
+                    format.bitrate > 0 -> "${format.bitrate / 1000} kbps"
+                    else -> "Quality ${index + 1}"
+                }
+
+                if (seen.add(label)) {
+                    qualityItems.add(label)
+                    trackIndexes.add(index)
+                }
+            }
+
+            AlertDialog.Builder(this)
+                .setTitle("Video Quality")
+                .setItems(qualityItems.toTypedArray()) { dialog, which ->
+
+                    try {
+                        val builder = exoPlayer.trackSelectionParameters.buildUpon()
+                            .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false)
+
+                        val selectedIndex = trackIndexes[which]
+
+                        if (selectedIndex >= 0) {
+                            builder.addOverride(
+                                TrackSelectionOverride(
+                                    videoGroup.mediaTrackGroup,
+                                    listOf(selectedIndex)
+                                )
+                            )
+                        }
+
+                        exoPlayer.trackSelectionParameters = builder.build()
+
+                        Toast.makeText(
+                            this,
+                            "Quality: ${qualityItems[which]}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (_: Exception) {
+                        Toast.makeText(
+                            this,
+                            "Quality পরিবর্তন করা যাচ্ছে না",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    dialog.dismiss()
+                }
+                .setNegativeButton("বন্ধ করুন", null)
+                .show()
+
+        } catch (_: Exception) {
+            Toast.makeText(
+                this,
+                "Quality option পাওয়া যাচ্ছে না",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+
+    /* =========================================================
+       CC / SUBTITLES
+       ========================================================= */
+
+    private fun showCcDialog() {
+
+        val exoPlayer = player ?: return
+
+        try {
+            val textGroups = exoPlayer.currentTracks.groups
+                .filter { it.type == C.TRACK_TYPE_TEXT && it.length > 0 }
+
+            if (textGroups.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "এই Channel-এ CC / Subtitle নেই",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            val choices = mutableListOf("CC Off")
+            val selections = mutableListOf<Pair<androidx.media3.common.TrackGroup, Int>?>()
+            selections.add(null)
+
+            for (group in textGroups) {
+                for (index in 0 until group.length) {
+                    val format = group.getTrackFormat(index)
+                    val language = format.language
+                    val label = format.label
+
+                    val name = when {
+                        !label.isNullOrBlank() -> label
+                        !language.isNullOrBlank() -> language.uppercase()
+                        !format.id.isNullOrBlank() -> format.id
+                        else -> "Subtitle ${selections.size}"
+                    }
+
+                    choices.add(name)
+                    selections.add(group.mediaTrackGroup to index)
+                }
+            }
+
+            AlertDialog.Builder(this)
+                .setTitle("CC / Subtitles")
+                .setItems(choices.toTypedArray()) { dialog, which ->
+
+                    try {
+                        val builder = exoPlayer.trackSelectionParameters.buildUpon()
+                            .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+
+                        val selection = selections[which]
+
+                        if (selection == null) {
+                            builder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                        } else {
+                            builder
+                                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                                .addOverride(
+                                    TrackSelectionOverride(
+                                        selection.first,
+                                        listOf(selection.second)
+                                    )
+                                )
+                        }
+
+                        exoPlayer.trackSelectionParameters = builder.build()
+
+                        Toast.makeText(
+                            this,
+                            "CC: ${choices[which]}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (_: Exception) {
+                        Toast.makeText(
+                            this,
+                            "CC পরিবর্তন করা যাচ্ছে না",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    dialog.dismiss()
+                }
+                .setNegativeButton("বন্ধ করুন", null)
+                .show()
+
+        } catch (_: Exception) {
+            Toast.makeText(
+                this,
+                "CC option পাওয়া যাচ্ছে না",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+
+    /* =========================================================
+       RESPONSIVE PLAYER SIZE — 16:9
+       ========================================================= */
+
+    private fun applyResponsivePlayerSize() {
+
+        if (isFullscreen) {
+            return
+        }
+
+        if (!::playerContainer.isInitialized) {
+            return
+        }
+
+        try {
+            val width = playerContainer.width.takeIf { it > 0 }
+                ?: mainScrollView.width.takeIf { it > 0 }
+                ?: resources.displayMetrics.widthPixels
+
+            if (width <= 0) {
+                playerContainer.post {
+                    if (!isFullscreen) {
+                        applyResponsivePlayerSize()
+                    }
+                }
+                return
+            }
+
+            val height = (width * 9f / 16f).toInt()
+            normalPlayerHeight = height
+
+            val params = playerContainer.layoutParams
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+            params.height = height
+            playerContainer.layoutParams = params
+            playerContainer.requestLayout()
+
+        } catch (_: Exception) {
         }
     }
 
@@ -1975,20 +2235,28 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
-            val density =
-                resources.displayMetrics.density
-
             val params =
                 playerContainer.layoutParams
 
             params.width =
                 ViewGroup.LayoutParams.MATCH_PARENT
 
-            params.height =
-                (
-                    normalPlayerHeight *
-                        density
-                    ).toInt()
+            // 16:9 responsive height; no fixed 220dp video size.
+            val responsiveWidth =
+                playerContainer.parent?.let { parent ->
+                    (parent as? View)?.width
+                }?.takeIf { it > 0 }
+                    ?: mainScrollView.width
+
+            val responsiveHeight =
+                if (responsiveWidth > 0) {
+                    (responsiveWidth * 9f / 16f).toInt()
+                } else {
+                    normalPlayerHeight
+                }
+
+            normalPlayerHeight = responsiveHeight
+            params.height = responsiveHeight
 
             playerContainer.layoutParams =
                 params
