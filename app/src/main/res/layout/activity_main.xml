@@ -326,6 +326,64 @@
                 
 
                     <!-- ================================================= -->
+                    <!-- YOUTUBE-STYLE OPTIONS: QUALITY | CC -->
+                    <!-- NO SOUND / VOLUME CONTROL -->
+                    <!-- ================================================= -->
+                    <LinearLayout
+                        android:id="@+id/player_extra_controls"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="48dp"
+                        android:layout_marginBottom="7dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="#99000000"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp">
+
+                        <TextView
+                            android:id="@+id/quality_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:minWidth="68dp"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="Quality"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Video Quality" />
+
+                        <TextView
+                            android:id="@+id/cc_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:minWidth="48dp"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="CC"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:background="@android:color/transparent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Subtitles" />
+
+                    </LinearLayout>
+
+
+                    <!-- ================================================= -->
                     <!-- FULLSCREEN BUTTON -->
                     <!-- ================================================= -->
 
