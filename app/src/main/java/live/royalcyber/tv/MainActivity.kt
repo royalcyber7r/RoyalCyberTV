@@ -29,6 +29,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.ui.PlayerView
@@ -1163,8 +1164,31 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
+            /*
+             * Live IPTV-এর জন্য balanced buffer configuration।
+             *
+             * লক্ষ্য:
+             * - Channel দ্রুত শুরু করা
+             * - অযথা অনেকক্ষণ buffer জমিয়ে startup ধীর না করা
+             * - দুর্বল/মাঝারি নেটওয়ার্কে কিছুটা extra safety রাখা
+             *
+             * 100% buffering-free কোনো player configuration দিয়ে
+             * নিশ্চিত করা যায় না; stream server ও internet speed-ও গুরুত্বপূর্ণ।
+             */
+            val loadControl =
+                DefaultLoadControl.Builder()
+                    .setBufferDurationsMs(
+                        2500,   // minimum buffer
+                        12000,  // maximum buffer
+                        1000,   // playback start buffer
+                        2500    // rebuffer start buffer
+                    )
+                    .setPrioritizeTimeOverSizeThresholds(true)
+                    .build()
+
             player =
                 ExoPlayer.Builder(this)
+                    .setLoadControl(loadControl)
                     .build()
 
             playerView.player =
@@ -1498,12 +1522,19 @@ class MainActivity : AppCompatActivity() {
                         true
                     )
 
+            /*
+             * Chunkless preparation HLS manifest/variant information
+             * আগে থেকেই ব্যবহার করতে পারে, ফলে compatible HLS stream-এ
+             * startup আরও দ্রুত হতে পারে।
+             */
             val mediaSource =
                 HlsMediaSource.Factory(
                     dataSourceFactory
-                ).createMediaSource(
-                    MediaItem.fromUri(url)
                 )
+                    .setAllowChunklessPreparation(true)
+                    .createMediaSource(
+                        MediaItem.fromUri(url)
+                    )
 
             exoPlayer.stop()
 
@@ -1515,10 +1546,11 @@ class MainActivity : AppCompatActivity() {
 
             exoPlayer.prepare()
 
+            /*
+             * Prepare শেষ হওয়ার সাথে সাথে playback শুরু হবে।
+             */
             exoPlayer.playWhenReady =
                 true
-
-            exoPlayer.play()
 
             currentChannelName.text =
                 channel.name
