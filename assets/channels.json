@@ -2,7 +2,7 @@
 
  {
     "name": "StarPlus HD",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ENTERR10_BANGLA/images/LOGO_HD/",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/StarPlus_Logo.png",
     "streamUrl": "http://202.70.146.135:8000/play/a009/index.m3u8"
   },
  {
