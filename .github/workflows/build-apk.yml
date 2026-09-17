@@ -45,7 +45,7 @@ jobs:
 
 
       # ==========================================
-      # 4. Setup Android SDK
+      # 4. Setup Android SDK / Build Tools
       # ==========================================
 
       - name: Setup Android SDK
@@ -274,6 +274,21 @@ jobs:
       # ==========================================
       # 11. Rename APK
       # ==========================================
+      #
+      # দুটি নাম তৈরি হবে:
+      #
+      # 1. RoyalCyberTV-1.0.X.apk
+      # 2. RoyalCyberTV.apk
+      #
+      # দুটোই একই signed APK
+      #
+      # পুরোনো UpdateActivity:
+      # RoyalCyberTV.apk
+      #
+      # নতুন UpdateActivity:
+      # RoyalCyberTV-1.0.X.apk
+      #
+      # ==========================================
 
       - name: Rename APK
         shell: bash
@@ -287,9 +302,13 @@ jobs:
 
           SOURCE_APK="app/build/outputs/apk/release/app-release.apk"
 
-          cp "$SOURCE_APK" "$VERSIONED_APK"
+          cp \
+            "$SOURCE_APK" \
+            "$VERSIONED_APK"
 
-          cp "$SOURCE_APK" "$GENERIC_APK"
+          cp \
+            "$SOURCE_APK" \
+            "$GENERIC_APK"
 
           echo "=========================================="
           echo "Final APK Files"
@@ -371,13 +390,10 @@ jobs:
           fi
 
           if [ -z "$APKSIGNER" ]; then
-
             echo "ERROR: apksigner was not found in Android SDK!"
-
             echo ""
             echo "Android SDK:"
             echo "${ANDROID_HOME:-not set}"
-
             echo ""
             echo "Available build-tools:"
 
@@ -481,106 +497,63 @@ jobs:
 
 
       # ==========================================
-      # 16. Create / Update GitHub Release
+      # 16. Create GitHub Release
       # ==========================================
 
       - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+
+          tag_name: v${{ steps.version.outputs.version_name }}
+
+          name: RoyalCyberTV v${{ steps.version.outputs.version_name }}
+
+          body: |
+            RoyalCyberTV Android Application
+
+            ==========================================
+
+            Version Code:
+            ${{ steps.version.outputs.version_code }}
+
+            Version Name:
+            ${{ steps.version.outputs.version_name }}
+
+            Build Number:
+            ${{ github.run_number }}
+
+            ==========================================
+
+            Application ID:
+            live.royalcyber.tv
+
+            ==========================================
+
+            Signed Release APK
+
+            This APK is digitally signed with the
+            RoyalCyberTV release signing key.
+
+            ==========================================
+
+            Update Support
+
+            RoyalCyberTV.apk
+            is included for compatibility with
+            older versions of the automatic updater.
+
+            The versioned APK is also included:
+
+            RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+
+          files: |
+            release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk
+            release/RoyalCyberTV.apk
+
+          generate_release_notes: false
+
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-
-          TAG="v${{ steps.version.outputs.version_name }}"
-
-          VERSIONED_APK="release/RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
-
-          GENERIC_APK="release/RoyalCyberTV.apk"
-
-          echo "=========================================="
-          echo "GitHub Release"
-          echo "=========================================="
-
-          echo ""
-          echo "Tag:"
-          echo "$TAG"
-
-          echo ""
-          echo "Checking existing release..."
-
-          if gh release view "$TAG" >/dev/null 2>&1; then
-
-            echo "Release already exists."
-
-          else
-
-            echo "Creating new release..."
-
-            gh release create "$TAG" \
-              --title "RoyalCyberTV v${{ steps.version.outputs.version_name }}" \
-              --notes "RoyalCyberTV Android Application
-
-Version Code:
-${{ steps.version.outputs.version_code }}
-
-Version Name:
-${{ steps.version.outputs.version_name }}
-
-Build Number:
-${{ github.run_number }}
-
-Application ID:
-live.royalcyber.tv
-
-Signed Release APK
-
-This APK is digitally signed with the RoyalCyberTV release signing key.
-
-Update Support
-
-RoyalCyberTV.apk is included for compatibility with older versions of the automatic updater.
-
-The versioned APK is also included:
-
-RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk"
-
-          fi
-
-          echo ""
-          echo "Removing old release assets if they exist..."
-
-          gh release delete-asset "$TAG" \
-            "RoyalCyberTV-${{ steps.version.outputs.version_name }}.apk" \
-            --yes \
-            >/dev/null 2>&1 || true
-
-          gh release delete-asset "$TAG" \
-            "RoyalCyberTV.apk" \
-            --yes \
-            >/dev/null 2>&1 || true
-
-          echo ""
-          echo "Uploading versioned APK..."
-
-          gh release upload "$TAG" \
-            "$VERSIONED_APK" \
-            --clobber
-
-          echo ""
-          echo "Uploading generic APK..."
-
-          gh release upload "$TAG" \
-            "$GENERIC_APK" \
-            --clobber
-
-          echo ""
-          echo "=========================================="
-          echo "GitHub Release upload completed."
-          echo "=========================================="
-
-          echo ""
-          echo "Release assets:"
-
-          gh release view "$TAG"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
       # ==========================================
