@@ -1000,49 +1000,17 @@ private fun initializeViews() {
         findViewById(R.id.player_container)
 
     /*
-     * Android TV SAFE:
+     * ANDROID TV STARTUP SAFE
      *
-     * TV layout-এ PlayerView XML থেকে inflate করা হয় না।
-     * কারণ পুরোনো Android 7 TV firmware-এ Media3 PlayerView
-     * startup inflation-এর সময় crash করার সম্ভাবনা আছে।
+     * Android 7 / 1 GB TV-তে Activity startup-এর সময়
+     * Media3 PlayerView তৈরি করা হবে না।
      *
-     * Mobile-এ existing XML PlayerView আগের মতোই থাকবে।
+     * TV-তে PlayerView প্রথম Channel select করার সময়
+     * setupPlayer() এর ভিতরে lazy-create হবে।
+     *
+     * Mobile-এর existing XML PlayerView আগের মতোই থাকবে।
      */
-    if (isAndroidTV) {
-
-        val tvPlayerView =
-            PlayerView(this)
-
-        tvPlayerView.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-
-        tvPlayerView.setBackgroundColor(
-            android.graphics.Color.BLACK
-        )
-
-        tvPlayerView.useController =
-            false
-
-        tvPlayerView.keepScreenOn =
-            true
-
-        tvPlayerView.setShowBuffering(
-            PlayerView.SHOW_BUFFERING_WHEN_PLAYING
-        )
-
-        playerView =
-            tvPlayerView
-
-        (playerContainer as ViewGroup).addView(
-            tvPlayerView,
-            0
-        )
-
-    } else {
-
+    if (!isAndroidTV) {
         playerView =
             findViewById(R.id.player_view)
     }
@@ -1237,16 +1205,55 @@ private fun setupPlayer() {
         return
     }
 
-    if (playerView == null) {
-        Toast.makeText(
-            this,
-            "TV Player প্রস্তুত করা যাচ্ছে না",
-            Toast.LENGTH_SHORT
-        ).show()
-        return
-    }
-
     try {
+
+        /*
+         * Android TV-তে PlayerView এখন প্রথমবার এখানে তৈরি হবে।
+         * Constructor-টি try block-এর ভিতরে থাকায় TV device-এ
+         * Media3 সমস্যা হলেও পুরো Activity startup crash করবে না।
+         */
+        if (isAndroidTV && playerView == null) {
+
+            val tvPlayerView =
+                PlayerView(this)
+
+            tvPlayerView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+
+            tvPlayerView.setBackgroundColor(
+                android.graphics.Color.BLACK
+            )
+
+            tvPlayerView.useController =
+                false
+
+            tvPlayerView.keepScreenOn =
+                true
+
+            tvPlayerView.setShowBuffering(
+                PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+            )
+
+            playerView =
+                tvPlayerView
+
+            (playerContainer as ViewGroup).addView(
+                tvPlayerView,
+                0
+            )
+        }
+
+        if (playerView == null) {
+            Toast.makeText(
+                this,
+                "Player প্রস্তুত করা যাচ্ছে না",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
 
         player =
             ExoPlayer.Builder(this)
