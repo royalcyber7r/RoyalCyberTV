@@ -40,7 +40,7 @@ import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
 
-private lateinit var playerView: PlayerView
+private var playerView: PlayerView? = null
 private lateinit var playerContainer: View
 
 private lateinit var channelRecycler: RecyclerView
@@ -996,11 +996,56 @@ private fun openUpdateScreen() {
 
 private fun initializeViews() {
 
-    playerView =
-        findViewById(R.id.player_view)
-
     playerContainer =
         findViewById(R.id.player_container)
+
+    /*
+     * Android TV SAFE:
+     *
+     * TV layout-এ PlayerView XML থেকে inflate করা হয় না।
+     * কারণ পুরোনো Android 7 TV firmware-এ Media3 PlayerView
+     * startup inflation-এর সময় crash করার সম্ভাবনা আছে।
+     *
+     * Mobile-এ existing XML PlayerView আগের মতোই থাকবে।
+     */
+    if (isAndroidTV) {
+
+        val tvPlayerView =
+            PlayerView(this)
+
+        tvPlayerView.layoutParams =
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
+        tvPlayerView.setBackgroundColor(
+            android.graphics.Color.BLACK
+        )
+
+        tvPlayerView.useController =
+            false
+
+        tvPlayerView.keepScreenOn =
+            true
+
+        tvPlayerView.setShowBuffering(
+            PlayerView.SHOW_BUFFERING_WHEN_PLAYING
+        )
+
+        playerView =
+            tvPlayerView
+
+        (playerContainer as ViewGroup).addView(
+            tvPlayerView,
+            0
+        )
+
+    } else {
+
+        playerView =
+            findViewById(R.id.player_view)
+    }
 
     channelRecycler =
         findViewById(R.id.channel_recycler)
@@ -1192,22 +1237,31 @@ private fun setupPlayer() {
         return
     }
 
+    if (playerView == null) {
+        Toast.makeText(
+            this,
+            "TV Player প্রস্তুত করা যাচ্ছে না",
+            Toast.LENGTH_SHORT
+        ).show()
+        return
+    }
+
     try {
 
         player =
             ExoPlayer.Builder(this)
                 .build()
 
-        playerView.player =
+        playerView?.player =
             player
 
-        playerView.useController =
+        playerView?.useController =
             false
 
-        playerView.keepScreenOn =
+        playerView?.keepScreenOn =
             true
 
-        playerView.setShowBuffering(
+        playerView?.setShowBuffering(
             PlayerView.SHOW_BUFFERING_WHEN_PLAYING
         )
 
@@ -1405,7 +1459,7 @@ private fun setupPlayerControls() {
     }
 
 
-    playerView.setOnClickListener {
+    playerView?.setOnClickListener {
 
         if (
             playerControls.visibility ==
@@ -2424,7 +2478,7 @@ override fun onDestroy() {
 
     try {
 
-        playerView.player =
+        playerView?.player =
             null
 
     } catch (
