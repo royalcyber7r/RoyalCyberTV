@@ -172,7 +172,20 @@ override fun onCreate(
     setupBottomNavigationInsets()
     setupChannelList()
     setupSearch()
-    setupPlayer()
+
+    /*
+     * ANDROID TV SAFE START
+     *
+     * 1 GB RAM / পুরোনো Android TV-তে app startup-এর সময়
+     * ExoPlayer initialize করলে কিছু device-এ app crash করতে পারে।
+     *
+     * Mobile-এর existing behaviour অপরিবর্তিত।
+     * TV-তে Player প্রয়োজন হলে playChannel() থেকে lazy initialize হবে।
+     */
+    if (!isAndroidTV) {
+        setupPlayer()
+    }
+
     setupPlayerControls()
     setupFullscreenButton()
     setupBottomMenu()
@@ -343,8 +356,17 @@ private fun loadChannelsFromJson() {
 
                 /*
                  * প্রথম Channel চালু হবে।
+                 *
+                 * Mobile:
+                 * আগের behaviour একই থাকবে।
+                 *
+                 * Android TV:
+                 * app startup-এ প্রথম stream auto-play করা হবে না।
+                 * পুরোনো 1 GB RAM TV-তে startup crash এড়াতে
+                 * channel click করার সময় player চালু হবে।
                  */
                 if (
+                    !isAndroidTV &&
                     channels.isNotEmpty() &&
                     currentChannel == null
                 ) {
@@ -1161,6 +1183,15 @@ private fun updateRecyclerHeight() {
 
 private fun setupPlayer() {
 
+    /*
+     * Player already exists হলে আবার create করা হবে না।
+     * বিশেষ করে Android TV-তে lazy initialization-এর সময়
+     * duplicate ExoPlayer তৈরি হওয়া আটকানো হচ্ছে।
+     */
+    if (player != null) {
+        return
+    }
+
     try {
 
         player =
@@ -1471,6 +1502,14 @@ private fun playChannel(
         ).show()
 
         return
+    }
+
+    /*
+     * Android TV-তে Player startup-এ তৈরি করা হয়নি।
+     * প্রথমবার Channel select করার সময় তৈরি হবে।
+     */
+    if (isAndroidTV && player == null) {
+        setupPlayer()
     }
 
     val exoPlayer =
