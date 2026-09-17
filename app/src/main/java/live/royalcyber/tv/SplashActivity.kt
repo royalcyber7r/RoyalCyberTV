@@ -9,27 +9,30 @@ import androidx.appcompat.app.AppCompatActivity
 class SplashActivity : AppCompatActivity() {
 
     private val splashDelay = 2500L
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val openMainActivity = Runnable {
+        try {
+            startActivity(
+                Intent(this@SplashActivity, MainActivity::class.java)
+            )
+            finish()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_splash)
 
-        Handler(Looper.getMainLooper()).postDelayed({
+        handler.postDelayed(openMainActivity, splashDelay)
+    }
 
-            try {
-                val intent = Intent(
-                    this,
-                    MainActivity::class.java
-                )
-
-                startActivity(intent)
-                finish()
-
-            } catch (_: Exception) {
-                finish()
-            }
-
-        }, splashDelay)
+    override fun onDestroy() {
+        handler.removeCallbacks(openMainActivity)
+        super.onDestroy()
     }
 }
