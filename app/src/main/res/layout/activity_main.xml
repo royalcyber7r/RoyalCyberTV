@@ -171,22 +171,16 @@
 
 
                 <!-- ================================================= -->
-                <!-- EXOPLAYER -->
+                <!--
+                     PLAYER VIEW INTENTIONALLY REMOVED FROM XML
+
+                     PlayerView will be created dynamically by
+                     MainActivity.kt when a channel is played.
+
+                     This prevents Media3 PlayerView from being
+                     inflated during TV startup.
+                -->
                 <!-- ================================================= -->
-
-                <androidx.media3.ui.PlayerView
-                    android:id="@+id/player_view"
-
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-
-                    android:background="#000000"
-
-                    android:keepScreenOn="true"
-
-                    app:use_controller="false"
-                    app:show_buffering="when_playing"
-                    app:resize_mode="fit" />
 
 
                 <!-- ================================================= -->
@@ -321,9 +315,8 @@
 
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
-                        android:textStyle="bold" />      
+                        android:textStyle="bold" />
 
-                
 
                     <!-- ================================================= -->
                     <!-- FULLSCREEN BUTTON -->
@@ -433,7 +426,6 @@
 
             <!-- ================================================= -->
             <!-- CHANNEL GUIDE -->
-            <!-- 3 COLUMNS -->
             <!-- ================================================= -->
 
             <androidx.recyclerview.widget.RecyclerView
