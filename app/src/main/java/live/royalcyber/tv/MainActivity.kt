@@ -91,10 +91,27 @@ private var bottomNavigationBaseHeight = 70
    ========================================================= */
 
 private val isAndroidTV: Boolean
-    get() =
-        packageManager.hasSystemFeature(
-            PackageManager.FEATURE_LEANBACK
-        )
+    get() {
+        val hasLeanback =
+            packageManager.hasSystemFeature(
+                PackageManager.FEATURE_LEANBACK
+            )
+
+        val uiModeType =
+            resources.configuration.uiMode and
+                Configuration.UI_MODE_TYPE_MASK
+
+        val isTelevision =
+            uiModeType ==
+                Configuration.UI_MODE_TYPE_TELEVISION
+
+        val isLargeScreen =
+            resources.configuration.smallestScreenWidthDp >= 600
+
+        return hasLeanback ||
+            isTelevision ||
+            isLargeScreen
+    }
 
 /* =========================================================
    UPDATE
