@@ -6,6 +6,12 @@
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
 },
 {
+  "name": "CR | Star Sports 1 Hindi",
+  "logo": "https://static.epg.best/cn/StarSports1.cn.png",
+  "streamUrl": "https://starsportshindiii.pages.dev/index.m3u8"
+},
+    
+{
   "name": "Zee Bangla Sonar",
   "logo": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
   "streamUrl": "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8"
