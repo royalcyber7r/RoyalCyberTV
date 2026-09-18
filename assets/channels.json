@@ -7,8 +7,14 @@
   },
 {
     "name": "Sony HD",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/",
+    "logo": "https://www.sonypicturesnetworks.com/images/logos/SET-LOGO-HD.png",
     "streamUrl": "http://38.96.178.205/SONYHD/index.m3u8"
+  },
+
+    {
+    "name": "South Station",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/",
+    "streamUrl": "https://cc-yw7ztecy8do3q.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-yw7ztecy8do3q/SS_IN.m3u8"
   },
     
  {
