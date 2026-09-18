@@ -6,10 +6,13 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -40,6 +43,10 @@ import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
 
+    /* =========================================================
+       MOBILE VIEWS
+       ========================================================= */
+
     private lateinit var playerView: PlayerView
     private lateinit var playerContainer: View
 
@@ -62,7 +69,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var footerInstagram: ImageView
     private lateinit var footerTiktok: ImageView
 
-    /* ================= PLAYER CONTROLS ================= */
+    /* =========================================================
+       PLAYER CONTROLS
+       ========================================================= */
 
     private lateinit var playerControls: View
     private lateinit var playPauseButton: TextView
@@ -96,6 +105,13 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.FEATURE_LEANBACK
             )
 
+    /*
+     * TV-এর জন্য আলাদা simple adapter।
+     *
+     * Mobile ChannelAdapter একদম untouched থাকবে।
+     */
+    private var tvAdapter: TVSimpleAdapter? = null
+
     /* =========================================================
        UPDATE
        ========================================================= */
@@ -107,12 +123,14 @@ class MainActivity : AppCompatActivity() {
 
     private val hideControlsRunnable =
         Runnable {
+
             if (
                 ::playerControls.isInitialized &&
                 !isFullscreen &&
                 !isFinishing &&
                 !isDestroyed
             ) {
+
                 playerControls.visibility =
                     View.GONE
             }
@@ -145,22 +163,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-        super.onCreate(savedInstanceState)
+
+        super.onCreate(
+            savedInstanceState
+        )
 
         /*
          * =====================================================
          * ANDROID TV
          * =====================================================
          *
-         * TV-তে আলাদা TV layout ব্যবহার হবে।
+         * TV-তে শুধু:
          *
-         * এই ধাপে:
-         * - channels.json load হবে
-         * - 5 column grid হবে
-         * - Logo + Channel Name দেখাবে
-         * - Remote focus কাজ করবে
+         * 1. TV layout
+         * 2. Simple channel grid
+         * 3. channels.json
          *
-         * এখনো TV-তে video player চালু হবে না।
+         * Mobile-এর কোনো view initialize হবে না।
+         * ExoPlayer-ও TV startup-এ চালু হবে না।
          * =====================================================
          */
 
@@ -170,33 +190,16 @@ class MainActivity : AppCompatActivity() {
                 R.layout.activity_tv_main
             )
 
-            setupTVChannelList()
-
-            findViewById<View>(
-                R.id.tv_update_button
-            ).setOnClickListener {
-                openUpdateScreen()
-            }
-
-            findViewById<View>(
-                R.id.tv_bottom_update
-            ).setOnClickListener {
-                openUpdateScreen()
-            }
+            setupSimpleTV()
 
             loadChannelsFromJson()
 
             return
         }
 
-        /*
-         * =====================================================
-         * MOBILE
-         * =====================================================
-         *
-         * Mobile-এর existing behaviour অপরিবর্তিত।
-         * =====================================================
-         */
+        /* =====================================================
+           MOBILE
+           ===================================================== */
 
         setContentView(
             R.layout.activity_main
@@ -222,14 +225,16 @@ class MainActivity : AppCompatActivity() {
         /*
          * Mobile automatic update check।
          *
-         * TV branch এখানে আসবে না।
+         * TV এখানে আসবে না।
          */
+
         handler.postDelayed({
 
             if (
                 !isFinishing &&
                 !isDestroyed
             ) {
+
                 checkForUpdateAutomatically()
             }
 
@@ -237,67 +242,259 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* =========================================================
-       ANDROID TV CHANNEL LIST
+       SIMPLE TV SETUP
        ========================================================= */
 
-    private fun setupTVChannelList() {
+    private fun setupSimpleTV() {
 
-        channelRecycler =
-            findViewById(
+        val recycler =
+            findViewById<RecyclerView>(
                 R.id.tv_channel_recycler
             )
 
-        channelRecycler.layoutManager =
+        recycler.layoutManager =
             GridLayoutManager(
                 this,
                 5
             )
 
-        channelAdapter =
-            ChannelAdapter(
-                channels = channels,
-                onChannelClick = { channel ->
-
-                    /*
-                     * Step 2:
-                     *
-                     * এখন শুধু channel select হবে।
-                     *
-                     * Video playback পরের ধাপে।
-                     */
-                    currentChannel =
-                        channel
-                }
-            )
-
-        channelRecycler.adapter =
-            channelAdapter
-
-        channelRecycler.isFocusable =
+        recycler.setHasFixedSize(
             true
-
-        channelRecycler.isFocusableInTouchMode =
-            true
-
-        channelRecycler.descendantFocusability =
-            ViewGroup.FOCUS_AFTER_DESCENDANTS
-
-        channelRecycler.setHasFixedSize(
-            false
         )
 
+        recycler.isFocusable =
+            true
+
+        recycler.isFocusableInTouchMode =
+            true
+
+        recycler.descendantFocusability =
+            ViewGroup.FOCUS_AFTER_DESCENDANTS
+
+        tvAdapter =
+            TVSimpleAdapter(
+                emptyList()
+            ) { channel ->
+
+                /*
+                 * TV এখন শুধু channel select করবে।
+                 *
+                 * Player পরের ধাপে যোগ করা হবে।
+                 */
+
+                currentChannel =
+                    channel
+            }
+
+        recycler.adapter =
+            tvAdapter
+
         /*
-         * TV RecyclerView পুরো available
-         * content area ব্যবহার করবে।
+         * প্রথমে RecyclerView focus নেবে।
          */
-        val params =
-            channelRecycler.layoutParams
+        recycler.requestFocus()
+    }
 
-        params.height =
-            ViewGroup.LayoutParams.MATCH_PARENT
+    /* =========================================================
+       SIMPLE TV ADAPTER
+       ========================================================= */
 
-        channelRecycler.layoutParams =
-            params
+    private class TVSimpleAdapter(
+        private var list: List<Channel>,
+        private val onClick: (Channel) -> Unit
+    ) : RecyclerView.Adapter<TVSimpleAdapter.TVHolder>() {
+
+        class TVHolder(
+            val textView: TextView
+        ) : RecyclerView.ViewHolder(
+            textView
+        )
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): TVHolder {
+
+            val density =
+                parent.resources.displayMetrics.density
+
+            val height =
+                (105 * density).toInt()
+
+            val margin =
+                (6 * density).toInt()
+
+            val textView =
+                TextView(
+                    parent.context
+                )
+
+            val params =
+                RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    height
+                )
+
+            params.setMargins(
+                margin,
+                margin,
+                margin,
+                margin
+            )
+
+            textView.layoutParams =
+                params
+
+            textView.gravity =
+                Gravity.CENTER
+
+            textView.textSize =
+                17f
+
+            textView.setTextColor(
+                Color.WHITE
+            )
+
+            textView.setPadding(
+                (8 * density).toInt(),
+                (8 * density).toInt(),
+                (8 * density).toInt(),
+                (8 * density).toInt()
+            )
+
+            textView.isFocusable =
+                true
+
+            textView.isFocusableInTouchMode =
+                true
+
+            textView.isClickable =
+                true
+
+            setTVBackground(
+                textView,
+                false
+            )
+
+            textView.setOnFocusChangeListener {
+                    view,
+                    hasFocus ->
+
+                setTVBackground(
+                    view as TextView,
+                    hasFocus
+                )
+
+                if (hasFocus) {
+
+                    view.animate()
+                        .scaleX(1.05f)
+                        .scaleY(1.05f)
+                        .setDuration(100)
+                        .start()
+
+                } else {
+
+                    view.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(100)
+                        .start()
+                }
+            }
+
+            return TVHolder(
+                textView
+            )
+        }
+
+        override fun onBindViewHolder(
+            holder: TVHolder,
+            position: Int
+        ) {
+
+            val channel =
+                list[position]
+
+            holder.textView.text =
+                channel.name
+
+            holder.textView.setOnClickListener {
+
+                onClick(
+                    channel
+                )
+            }
+
+            setTVBackground(
+                holder.textView,
+                holder.textView.hasFocus()
+            )
+        }
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
+
+        fun update(
+            newList: List<Channel>
+        ) {
+
+            list =
+                newList
+
+            notifyDataSetChanged()
+        }
+
+        private fun setTVBackground(
+            view: TextView,
+            focused: Boolean
+        ) {
+
+            val background =
+                GradientDrawable()
+
+            background.cornerRadius =
+                10f
+
+            if (focused) {
+
+                background.setColor(
+                    Color.rgb(
+                        45,
+                        45,
+                        45
+                    )
+                )
+
+                background.setStroke(
+                    3,
+                    Color.WHITE
+                )
+
+            } else {
+
+                background.setColor(
+                    Color.rgb(
+                        20,
+                        20,
+                        20
+                    )
+                )
+
+                background.setStroke(
+                    1,
+                    Color.rgb(
+                        70,
+                        70,
+                        70
+                    )
+                )
+            }
+
+            view.background =
+                background
+        }
     }
 
     /* =========================================================
@@ -353,7 +550,9 @@ class MainActivity : AppCompatActivity() {
                 connection.disconnect()
 
                 val jsonArray =
-                    JSONArray(jsonText)
+                    JSONArray(
+                        jsonText
+                    )
 
                 val loadedChannels =
                     mutableListOf<Channel>()
@@ -412,8 +611,76 @@ class MainActivity : AppCompatActivity() {
                         loadedChannels
 
                     /*
-                     * Adapter update
+                     * =================================================
+                     * TV
+                     * =================================================
                      */
+
+                    if (isAndroidTV) {
+
+                        tvAdapter?.update(
+                            channels
+                        )
+
+                        val recycler =
+                            findViewById<RecyclerView>(
+                                R.id.tv_channel_recycler
+                            )
+
+                        recycler.post {
+
+                            if (
+                                channels.isNotEmpty()
+                            ) {
+
+                                recycler.scrollToPosition(
+                                    0
+                                )
+
+                                recycler.post {
+
+                                    val holder =
+                                        recycler
+                                            .findViewHolderForAdapterPosition(
+                                                0
+                                            )
+
+                                    holder
+                                        ?.itemView
+                                        ?.requestFocus()
+
+                                    if (
+                                        holder == null
+                                    ) {
+
+                                        recycler.requestFocus()
+                                    }
+                                }
+
+                            } else {
+
+                                recycler.requestFocus()
+                            }
+                        }
+
+                        /*
+                         * TV-তে এখানেই শেষ।
+                         *
+                         * Mobile adapter,
+                         * notification,
+                         * player—
+                         * কিছুই চালানো হবে না।
+                         */
+
+                        return@runOnUiThread
+                    }
+
+                    /*
+                     * =================================================
+                     * MOBILE
+                     * =================================================
+                     */
+
                     if (
                         ::channelAdapter.isInitialized
                     ) {
@@ -423,86 +690,28 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-                    /*
-                     * RecyclerView update
-                     */
                     if (
                         ::channelRecycler.isInitialized
                     ) {
 
                         channelRecycler.post {
 
-                            if (isAndroidTV) {
-
-                                /*
-                                 * TV-তে fixed height নয়।
-                                 * পুরো content area ব্যবহার করবে।
-                                 */
-
-                                val params =
-                                    channelRecycler
-                                        .layoutParams
-
-                                params.height =
-                                    ViewGroup.LayoutParams.MATCH_PARENT
-
-                                channelRecycler.layoutParams =
-                                    params
-
-                                /*
-                                 * JSON load হওয়ার পরে
-                                 * প্রথম channel-এ focus।
-                                 */
-                                val firstItem =
-                                    channelRecycler
-                                        .layoutManager
-                                        ?.findViewByPosition(
-                                            0
-                                        )
-
-                                if (
-                                    firstItem != null &&
-                                    firstItem.isFocusable
-                                ) {
-
-                                    firstItem.requestFocus()
-
-                                } else {
-
-                                    /*
-                                     * প্রথম child তখনো
-                                     * তৈরি না হলে RecyclerView
-                                     * focus নেবে।
-                                     */
-                                    channelRecycler.requestFocus()
-                                }
-
-                            } else {
-
-                                /*
-                                 * Mobile-এর আগের
-                                 * height calculation।
-                                 */
-                                updateRecyclerHeight()
-                            }
+                            updateRecyclerHeight()
                         }
                     }
 
                     /*
-                     * Existing notification system
-                     * অপরিবর্তিত।
+                     * Existing notification system।
                      */
+
                     syncNewChannelNotifications()
 
                     /*
                      * Mobile:
-                     * আগের মতো প্রথম channel auto-play।
-                     *
-                     * TV:
-                     * কোনো auto-play নয়।
+                     * আগের মতো first channel auto-play।
                      */
+
                     if (
-                        !isAndroidTV &&
                         channels.isNotEmpty() &&
                         currentChannel == null
                     ) {
@@ -850,18 +1059,17 @@ class MainActivity : AppCompatActivity() {
         channel: Channel
     ) {
 
-        /*
-         * TV Step 2-এ notification playback
-         * ব্যবহার করছি না।
-         *
-         * Mobile-এর আগের behaviour থাকবে।
-         */
         if (isAndroidTV) {
 
             currentChannel =
                 channel
 
-            channelRecycler.post {
+            val recycler =
+                findViewById<RecyclerView>(
+                    R.id.tv_channel_recycler
+                )
+
+            recycler.post {
 
                 val index =
                     channels.indexOfFirst {
@@ -875,14 +1083,13 @@ class MainActivity : AppCompatActivity() {
 
                 if (index >= 0) {
 
-                    channelRecycler
-                        .scrollToPosition(
-                            index
-                        )
+                    recycler.scrollToPosition(
+                        index
+                    )
 
-                    channelRecycler.post {
+                    recycler.post {
 
-                        channelRecycler
+                        recycler
                             .findViewHolderForAdapterPosition(
                                 index
                             )
@@ -995,12 +1202,9 @@ class MainActivity : AppCompatActivity() {
                             itemTop
                     )
 
-                    if (isAndroidTV) {
-
-                        holder
-                            ?.itemView
-                            ?.requestFocus()
-                    }
+                    holder
+                        ?.itemView
+                        ?.requestFocus()
                 }
             }
         }
@@ -1240,7 +1444,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupChannelList() {
 
         val columns =
-            if (isAndroidTV) 5 else 3
+            3
 
         channelRecycler.layoutManager =
             GridLayoutManager(
@@ -1269,22 +1473,11 @@ class MainActivity : AppCompatActivity() {
             false
         )
 
-        if (isAndroidTV) {
+        channelRecycler.isFocusable =
+            false
 
-            channelRecycler.isFocusable =
-                true
-
-            channelRecycler.isFocusableInTouchMode =
-                true
-
-        } else {
-
-            channelRecycler.isFocusable =
-                false
-
-            channelRecycler.isFocusableInTouchMode =
-                false
-        }
+        channelRecycler.isFocusableInTouchMode =
+            false
 
         updateRecyclerHeight()
     }
@@ -1306,29 +1499,6 @@ class MainActivity : AppCompatActivity() {
         ) {
             return
         }
-
-        /*
-         * TV:
-         * RecyclerView পুরো available area নেবে।
-         */
-        if (isAndroidTV) {
-
-            val params =
-                channelRecycler.layoutParams
-
-            params.height =
-                ViewGroup.LayoutParams.MATCH_PARENT
-
-            channelRecycler.layoutParams =
-                params
-
-            return
-        }
-
-        /*
-         * MOBILE:
-         * আগের fixed-height calculation।
-         */
 
         val itemCount =
             channelAdapter.itemCount
@@ -1863,11 +2033,6 @@ class MainActivity : AppCompatActivity() {
                     View.GONE
 
                 searchBox.text.clear()
-
-                if (isAndroidTV) {
-
-                    channelRecycler.requestFocus()
-                }
             }
         }
 
@@ -2115,14 +2280,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         requestedOrientation =
-            if (isAndroidTV) {
-
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
-            } else {
-
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         showSystemBars()
 
@@ -2307,6 +2465,15 @@ class MainActivity : AppCompatActivity() {
             newConfig
         )
 
+        /*
+         * TV-তে এখন কোনো fullscreen player নেই।
+         * তাই configuration change-এ কিছু করার দরকার নেই।
+         */
+
+        if (isAndroidTV) {
+            return
+        }
+
         window.decorView.post {
 
             if (isFullscreen) {
@@ -2399,11 +2566,6 @@ class MainActivity : AppCompatActivity() {
                     0,
                     channelRecycler.top
                 )
-
-                if (isAndroidTV) {
-
-                    channelRecycler.requestFocus()
-                }
             }
         }
     }
@@ -2482,10 +2644,12 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         /*
-         * TV-তে এখন Player নেই।
-         * তাই Mobile player logic শুধু
-         * player initialized হলে চলবে।
+         * TV:
+         * এখন কোনো Player নেই।
          */
+        if (isAndroidTV) {
+            return
+        }
 
         if (isFullscreen) {
 
@@ -2563,13 +2727,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
 
-        try {
+        /*
+         * TV-তে Player নেই।
+         */
+        if (!isAndroidTV) {
 
-            player?.pause()
+            try {
 
-        } catch (
-            _: Exception
-        ) {
+                player?.pause()
+
+            } catch (
+                _: Exception
+            ) {
+            }
         }
 
         super.onPause()
@@ -2585,6 +2755,15 @@ class MainActivity : AppCompatActivity() {
             null
         )
 
+        /*
+         * TV adapter
+         */
+        tvAdapter =
+            null
+
+        /*
+         * Mobile player
+         */
         if (
             ::playerView.isInitialized
         ) {
@@ -2612,6 +2791,9 @@ class MainActivity : AppCompatActivity() {
         player =
             null
 
+        /*
+         * Mobile ChannelAdapter
+         */
         if (
             ::channelAdapter.isInitialized
         ) {
