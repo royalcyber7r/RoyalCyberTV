@@ -6,7 +6,12 @@
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
   },
 
-{
+  {
+    "name": "PTC Music HD",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/PTC Music.png",
+    "streamUrl": "https://d2lk5u59tns74c.cloudfront.net/out/v1/f913cf893c594f73b114216e74a2efbc/index.m3u8"
+  },
+ {
     "name": "Oscar Movies Bhojpuri",
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Oscar_movies_bhojpuri.webp",
     "streamUrl": "https://mumt05.tangotv.in/87NeALx2OSCARMOVIESBHOJPURI/index.m3u8"
