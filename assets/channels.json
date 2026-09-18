@@ -5,7 +5,13 @@
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/jago24.png",
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
   },
-{
+
+    {
+    "name": "Epic TV India",
+    "logo": "https://www.sonypicturesnetworks.com/images/logos/SET-LOGO-HD.png",
+    "streamUrl": "https://cc-czbq30x55knit.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-czbq30x55knit/DIYC/PMSL/IN10/Epic_TV_IN_B/Epic_TV_IN_B.m3u8"
+  },
+  {
     "name": "Sony HD",
     "logo": "https://www.sonypicturesnetworks.com/images/logos/SET-LOGO-HD.png",
     "streamUrl": "http://38.96.178.205/SONYHD/index.m3u8"
