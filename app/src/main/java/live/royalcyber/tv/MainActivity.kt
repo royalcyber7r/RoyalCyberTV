@@ -145,7 +145,13 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(
+    if (isAndroidTV) {
+        R.layout.activity_tv_main
+    } else {
+        R.layout.activity_main
+    }
+)
 
         initializeViews()
 
