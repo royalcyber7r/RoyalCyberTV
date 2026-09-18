@@ -6,6 +6,16 @@
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
 },
 {
+  "name": "Discovery Bangla",
+  "logo": "https://static.wikia.nocookie.net/logopedia/images/6/6a/Discovery_HD_2009.png",
+  "streamUrl": "http://202.70.146.135:8000/play/a05z/index.m3u8"
+},    
+{
+  "name": "Enter TV",
+  "logo": "https://static.wikia.nocookie.net/logopedia/images/6/65/Ruposhi_Bangla_new.jpeg",
+  "streamUrl": "https://live1.entertv.com.bd/entertv/tracks-v1a1/mono.m3u8"
+},    
+{
   "name": "CR | Star Sports 1 Hindi",
   "logo": "https://static.epg.best/cn/StarSports1.cn.png",
   "streamUrl": "https://starsportshindiii.pages.dev/index.m3u8"
