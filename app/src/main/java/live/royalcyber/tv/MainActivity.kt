@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -40,6 +41,10 @@ import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "RoyalCyberTV"
+    }
 
     /* =========================================================
        MOBILE VIEWS
@@ -103,10 +108,22 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.FEATURE_LEANBACK
             )
 
+    /*
+     * TV views
+     *
+     * এগুলো lateinit রাখা হয়েছে যাতে existing structure
+     * পরিবর্তন না হয়।
+     *
+     * তবে ব্যবহার করার আগে সব জায়গায়
+     * ::variable.isInitialized check করা হয়েছে।
+     */
+
     private lateinit var tvChannelRecycler: RecyclerView
     private lateinit var tvUpdateButton: TextView
     private lateinit var tvBottomUpdate: TextView
     private lateinit var tvHeader: View
+
+    private var tvSetupSuccessful = false
 
     private var tvPlayerView: PlayerView? = null
     private var tvPlayerContainer: FrameLayout? = null
@@ -165,21 +182,58 @@ class MainActivity : AppCompatActivity() {
          * =====================================================
          * ANDROID TV
          * =====================================================
-         *
-         * TV-তে Mobile layout initialize করা হবে না।
-         * এতে mobile-এর lateinit View-এর কারণে crash হওয়ার
-         * সম্ভাবনা কমে যায়।
          */
 
         if (isAndroidTV) {
 
-            setContentView(
-                R.layout.activity_tv_main
-            )
+            try {
 
-            setupAndroidTV()
+                setContentView(
+                    R.layout.activity_tv_main
+                )
 
-            loadChannelsFromJson()
+                tvSetupSuccessful =
+                    setupAndroidTV()
+
+                /*
+                 * JSON load হবে শুধুমাত্র TV layout setup
+                 * ঠিকমতো complete হওয়ার পর।
+                 *
+                 * এতে setupAndroidTV() fail করলে
+                 * uninitialized RecyclerView থেকে crash হবে না।
+                 */
+
+                if (tvSetupSuccessful) {
+
+                    showTvLoading(true)
+
+                    loadChannelsFromJson()
+
+                } else {
+
+                    showTvLoading(false)
+
+                    Toast.makeText(
+                        this,
+                        "TV interface প্রস্তুত করা যায়নি",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+
+                Log.e(
+                    TAG,
+                    "TV onCreate error",
+                    e
+                )
+
+                Toast.makeText(
+                    this,
+                    "TV interface চালু করা যাচ্ছে না",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
 
             /*
              * TV-তে automatic update screen খুলবে না।
@@ -188,11 +242,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        /*
-         * =====================================================
-         * MOBILE
-         * =====================================================
-         */
+        /* =====================================================
+           MOBILE
+           ===================================================== */
 
         setContentView(
             R.layout.activity_main
@@ -212,13 +264,19 @@ class MainActivity : AppCompatActivity() {
         setupSocialLinks()
 
         mainScrollView.post {
-            if (!isFinishing && !isDestroyed) {
+
+            if (
+                !isFinishing &&
+                !isDestroyed
+            ) {
+
                 updateRecyclerHeight()
             }
         }
 
         /*
-         * Mobile-এ আগের automatic update behaviour রাখা হয়েছে।
+         * Mobile automatic update behaviour
+         * আগের মতো রাখা হয়েছে।
          */
 
         handler.postDelayed({
@@ -227,6 +285,7 @@ class MainActivity : AppCompatActivity() {
                 !isFinishing &&
                 !isDestroyed
             ) {
+
                 checkForUpdateAutomatically()
             }
 
@@ -317,6 +376,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+                Log.d(
+                    TAG,
+                    "Channels loaded: ${loadedChannels.size}"
+                )
+
                 runOnUiThread {
 
                     if (
@@ -329,12 +393,9 @@ class MainActivity : AppCompatActivity() {
                     channels =
                         loadedChannels
 
-                    /*
-                     * Adapter update
-                     *
-                     * Mobile ও TV দুটোতেই একই adapter ব্যবহার
-                     * করা হচ্ছে।
-                     */
+                    /* =================================================
+                       UPDATE ADAPTER
+                       ================================================= */
 
                     if (
                         ::channelAdapter.isInitialized
@@ -345,27 +406,47 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-                    /*
-                     * খুব গুরুত্বপূর্ণ:
-                     *
-                     * TV-তে channelRecycler ব্যবহার করা যাবে না।
-                     * Mobile-তে শুধু channelRecycler ব্যবহার হবে।
-                     */
+                    /* =================================================
+                       TV
+                       ================================================= */
 
                     if (isAndroidTV) {
 
-                        tvChannelRecycler.post {
+                        if (
+                            tvSetupSuccessful &&
+                            ::tvChannelRecycler.isInitialized
+                        ) {
 
-                            if (
-                                !isFinishing &&
-                                !isDestroyed
-                            ) {
+                            showTvLoading(false)
 
-                                tvChannelRecycler.requestFocus()
+                            tvChannelRecycler.visibility =
+                                View.VISIBLE
+
+                            tvChannelRecycler.post {
+
+                                if (
+                                    !isFinishing &&
+                                    !isDestroyed &&
+                                    ::tvChannelRecycler.isInitialized
+                                ) {
+
+                                    tvChannelRecycler.requestFocus()
+                                }
                             }
+
+                        } else {
+
+                            Log.e(
+                                TAG,
+                                "TV RecyclerView was not initialized"
+                            )
                         }
 
                     } else {
+
+                        /* =================================================
+                           MOBILE
+                           ================================================= */
 
                         if (
                             ::channelRecycler.isInitialized
@@ -384,19 +465,22 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    /*
-                     * Existing mobile notification system
-                     * preserve করা হয়েছে।
-                     */
+                    /* =================================================
+                       NOTIFICATION
+                       ================================================= */
 
                     syncNewChannelNotifications()
 
-                    /*
-                     * Mobile-এ প্রথম channel automatic play হবে।
-                     *
-                     * TV-তে প্রথম channel automatic play করা হচ্ছে না।
-                     * TV-তে user remote দিয়ে channel select করবে।
-                     */
+                    /* =================================================
+                       FIRST CHANNEL
+                       =================================================
+                       Mobile:
+                           প্রথম channel auto play
+
+                       TV:
+                           প্রথম channel auto play নয়
+                           remote দিয়ে user select করবে
+                       ================================================= */
 
                     if (
                         channels.isNotEmpty() &&
@@ -405,14 +489,20 @@ class MainActivity : AppCompatActivity() {
 
                         if (isAndroidTV) {
 
-                            tvChannelRecycler.post {
+                            if (
+                                tvSetupSuccessful &&
+                                ::tvChannelRecycler.isInitialized
+                            ) {
 
-                                if (
-                                    !isFinishing &&
-                                    !isDestroyed
-                                ) {
+                                tvChannelRecycler.post {
 
-                                    tvChannelRecycler.requestFocus()
+                                    if (
+                                        !isFinishing &&
+                                        !isDestroyed
+                                    ) {
+
+                                        tvChannelRecycler.requestFocus()
+                                    }
                                 }
                             }
 
@@ -423,11 +513,37 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                     }
+
+                    if (channels.isEmpty()) {
+
+                        if (isAndroidTV) {
+
+                            showTvLoading(false)
+
+                            if (
+                                ::tvChannelRecycler.isInitialized
+                            ) {
+
+                                tvChannelRecycler.visibility =
+                                    View.VISIBLE
+                            }
+
+                            Toast.makeText(
+                                this,
+                                "কোনো Channel পাওয়া যায়নি",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 }
 
-            } catch (
-                _: Exception
-            ) {
+            } catch (e: Exception) {
+
+                Log.e(
+                    TAG,
+                    "channels.json loading error",
+                    e
+                )
 
                 runOnUiThread {
 
@@ -438,11 +554,24 @@ class MainActivity : AppCompatActivity() {
                         return@runOnUiThread
                     }
 
-                    Toast.makeText(
-                        this,
-                        "অনলাইন channels.json লোড করা যাচ্ছে না",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (isAndroidTV) {
+
+                        showTvLoading(false)
+
+                        Toast.makeText(
+                            this,
+                            "অনলাইন channels.json লোড করা যাচ্ছে না",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                    } else {
+
+                        Toast.makeText(
+                            this,
+                            "অনলাইন channels.json লোড করা যাচ্ছে না",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
 
@@ -450,36 +579,116 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* =========================================================
-       ANDROID TV SETUP
+       TV LOADING
        ========================================================= */
 
-    private fun setupAndroidTV() {
+    private fun showTvLoading(
+        show: Boolean
+    ) {
+
+        if (!isAndroidTV) {
+            return
+        }
 
         try {
 
-            tvHeader =
-                findViewById(
+            val loadingText =
+                findViewById<TextView>(
+                    R.id.tv_loading_text
+                )
+
+            loadingText?.visibility =
+                if (show) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "TV loading view error",
+                e
+            )
+        }
+    }
+
+    /* =========================================================
+       ANDROID TV SETUP
+       ========================================================= */
+
+    private fun setupAndroidTV(): Boolean {
+
+        return try {
+
+            /*
+             * =================================================
+             * FIND TV VIEWS
+             * =================================================
+             */
+
+            val header =
+                findViewById<View>(
                     R.id.tv_header
                 )
 
-            tvChannelRecycler =
-                findViewById(
+            val recycler =
+                findViewById<RecyclerView>(
                     R.id.tv_channel_recycler
                 )
 
-            tvUpdateButton =
-                findViewById(
+            val updateButton =
+                findViewById<TextView>(
                     R.id.tv_update_button
                 )
 
-            tvBottomUpdate =
-                findViewById(
+            val bottomUpdate =
+                findViewById<TextView>(
                     R.id.tv_bottom_update
                 )
 
             /*
-             * Update buttons
+             * Explicit null validation
+             *
+             * XML-এ কোনো ID missing হলে এখানেই ধরা পড়বে।
              */
+
+            if (
+                header == null ||
+                recycler == null ||
+                updateButton == null ||
+                bottomUpdate == null
+            ) {
+
+                Log.e(
+                    TAG,
+                    "One or more TV views are missing from activity_tv_main.xml"
+                )
+
+                return false
+            }
+
+            /*
+             * lateinit assign
+             */
+
+            tvHeader =
+                header
+
+            tvChannelRecycler =
+                recycler
+
+            tvUpdateButton =
+                updateButton
+
+            tvBottomUpdate =
+                bottomUpdate
+
+            /*
+             * =================================================
+             * UPDATE BUTTONS
+             * ================================================= */
 
             tvUpdateButton.setOnClickListener {
 
@@ -492,8 +701,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             /*
-             * TV channel grid
-             */
+             * =================================================
+             * TV CHANNEL GRID
+             * ================================================= */
 
             tvChannelRecycler.layoutManager =
                 GridLayoutManager(
@@ -515,10 +725,9 @@ class MainActivity : AppCompatActivity() {
             )
 
             /*
-             * TV-র জন্য একই ChannelAdapter ব্যবহার।
-             *
-             * Channel click হলে TV player চালু হবে।
-             */
+             * =================================================
+             * CHANNEL ADAPTER
+             * ================================================= */
 
             channelAdapter =
                 ChannelAdapter(
@@ -535,29 +744,38 @@ class MainActivity : AppCompatActivity() {
                 channelAdapter
 
             /*
-             * প্রথম focus channel grid-এ।
-             */
+             * =================================================
+             * INITIAL TV FOCUS
+             * ================================================= */
 
             tvChannelRecycler.post {
 
                 if (
                     !isFinishing &&
-                    !isDestroyed
+                    !isDestroyed &&
+                    ::tvChannelRecycler.isInitialized
                 ) {
 
                     tvChannelRecycler.requestFocus()
                 }
             }
 
-        } catch (
-            _: Exception
-        ) {
+            Log.d(
+                TAG,
+                "TV interface setup successful"
+            )
 
-            Toast.makeText(
-                this,
-                "TV interface চালু করা যাচ্ছে না",
-                Toast.LENGTH_LONG
-            ).show()
+            true
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "setupAndroidTV() failed",
+                e
+            )
+
+            false
         }
     }
 
@@ -565,30 +783,42 @@ class MainActivity : AppCompatActivity() {
        ANDROID TV PLAYER SETUP
        ========================================================= */
 
-    private fun setupTvPlayer() {
+    private fun setupTvPlayer(): Boolean {
 
         if (tvPlayer != null) {
-            return
+            return true
         }
 
-        try {
+        return try {
 
             val contentArea =
                 findViewById<FrameLayout>(
                     R.id.tv_content_area
                 )
 
+            if (contentArea == null) {
+
+                Log.e(
+                    TAG,
+                    "tv_content_area not found"
+                )
+
+                return false
+            }
+
             /*
-             * ExoPlayer
-             */
+             * =================================================
+             * EXOPLAYER
+             * ================================================= */
 
             tvPlayer =
                 ExoPlayer.Builder(this)
                     .build()
 
             /*
-             * Player container
-             */
+             * =================================================
+             * PLAYER CONTAINER
+             * ================================================= */
 
             tvPlayerContainer =
                 FrameLayout(this)
@@ -600,8 +830,9 @@ class MainActivity : AppCompatActivity() {
                 )
 
             /*
-             * PlayerView
-             */
+             * =================================================
+             * PLAYERVIEW
+             * ================================================= */
 
             tvPlayerView =
                 PlayerView(this)
@@ -650,6 +881,12 @@ class MainActivity : AppCompatActivity() {
                         error: PlaybackException
                     ) {
 
+                        Log.e(
+                            TAG,
+                            "TV player error",
+                            error
+                        )
+
                         if (
                             isFinishing ||
                             isDestroyed
@@ -666,9 +903,35 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
-        } catch (
-            _: Exception
-        ) {
+            Log.d(
+                TAG,
+                "TV Player setup successful"
+            )
+
+            true
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "setupTvPlayer() failed",
+                e
+            )
+
+            try {
+
+                tvPlayerView?.player =
+                    null
+
+            } catch (_: Exception) {
+            }
+
+            try {
+
+                tvPlayer?.release()
+
+            } catch (_: Exception) {
+            }
 
             tvPlayer = null
             tvPlayerView = null
@@ -679,6 +942,8 @@ class MainActivity : AppCompatActivity() {
                 "TV Player চালু করা যাচ্ছে না",
                 Toast.LENGTH_LONG
             ).show()
+
+            false
         }
     }
 
@@ -714,14 +979,28 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
+            /*
+             * TV player তৈরি করা
+             */
+
             if (tvPlayer == null) {
 
-                setupTvPlayer()
+                val created =
+                    setupTvPlayer()
+
+                if (!created) {
+                    return
+                }
             }
 
             val exoPlayer =
                 tvPlayer
                     ?: return
+
+            /*
+             * =================================================
+             * HLS DATA SOURCE
+             * ================================================= */
 
             val dataSourceFactory =
                 DefaultHttpDataSource.Factory()
@@ -737,8 +1016,9 @@ class MainActivity : AppCompatActivity() {
                 )
 
             /*
-             * আগের playback পরিষ্কার
-             */
+             * =================================================
+             * PLAYBACK
+             * ================================================= */
 
             exoPlayer.stop()
 
@@ -757,22 +1037,30 @@ class MainActivity : AppCompatActivity() {
                 channel
 
             /*
-             * Channel grid hide
-             */
+             * =================================================
+             * CHANNEL GRID HIDE
+             * ================================================= */
 
-            tvChannelRecycler.visibility =
-                View.GONE
+            if (
+                ::tvChannelRecycler.isInitialized
+            ) {
+
+                tvChannelRecycler.visibility =
+                    View.GONE
+            }
 
             /*
-             * Player show
-             */
+             * =================================================
+             * PLAYER SHOW
+             * ================================================= */
 
             tvPlayerContainer?.visibility =
                 View.VISIBLE
 
             /*
-             * Player focus
-             */
+             * =================================================
+             * PLAYER FOCUS
+             * ================================================= */
 
             tvPlayerView?.post {
 
@@ -785,9 +1073,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        } catch (
-            _: Exception
-        ) {
+            Log.d(
+                TAG,
+                "Playing TV channel: ${channel.name}"
+            )
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "TV channel playback error: ${channel.name}",
+                e
+            )
 
             Toast.makeText(
                 this,
@@ -819,17 +1116,23 @@ class MainActivity : AppCompatActivity() {
         tvPlayerContainer?.visibility =
             View.GONE
 
-        tvChannelRecycler.visibility =
-            View.VISIBLE
+        if (
+            ::tvChannelRecycler.isInitialized
+        ) {
 
-        tvChannelRecycler.post {
+            tvChannelRecycler.visibility =
+                View.VISIBLE
 
-            if (
-                !isFinishing &&
-                !isDestroyed
-            ) {
+            tvChannelRecycler.post {
 
-                tvChannelRecycler.requestFocus()
+                if (
+                    !isFinishing &&
+                    !isDestroyed &&
+                    ::tvChannelRecycler.isInitialized
+                ) {
+
+                    tvChannelRecycler.requestFocus()
+                }
             }
         }
     }
@@ -912,6 +1215,7 @@ class MainActivity : AppCompatActivity() {
 
             val newChannels =
                 currentChannelNames.filter {
+
                     !knownChannels.contains(it)
                 }
 
@@ -945,8 +1249,14 @@ class MainActivity : AppCompatActivity() {
             )
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Notification sync error",
+                e
+            )
         }
     }
 
@@ -995,8 +1305,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Pending notification read error",
+                e
+            )
         }
 
         return result
@@ -1033,8 +1349,14 @@ class MainActivity : AppCompatActivity() {
                 .apply()
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Pending notification save error",
+                e
+            )
         }
     }
 
@@ -1043,11 +1365,6 @@ class MainActivity : AppCompatActivity() {
        ========================================================= */
 
     private fun showNotificationDialog() {
-
-        /*
-         * TV layout-এ notification button নেই।
-         * তাই TV থেকে এই function call হলে কিছু করবে না।
-         */
 
         if (isAndroidTV) {
             return
@@ -1077,7 +1394,7 @@ class MainActivity : AppCompatActivity() {
         val notificationItems =
             pendingNotifications
                 .map {
-                    "🔴  নতুন Channel যুক্ত হয়েছে\n${it}"
+                    "🔴  নতুন Channel যুক্ত হয়েছে\n$it"
                 }
                 .toTypedArray()
 
@@ -1148,8 +1465,14 @@ class MainActivity : AppCompatActivity() {
                 .show()
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Notification dialog error",
+                e
+            )
 
             Toast.makeText(
                 this,
@@ -1166,10 +1489,6 @@ class MainActivity : AppCompatActivity() {
     private fun openChannelFromNotification(
         channel: Channel
     ) {
-
-        /*
-         * TV-তে এই mobile function ব্যবহার হবে না।
-         */
 
         if (isAndroidTV) {
             return
@@ -1202,6 +1521,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         channelRecycler.post {
+
             updateRecyclerHeight()
         }
 
@@ -1336,6 +1656,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkForUpdateAutomatically() {
 
+        if (isAndroidTV) {
+            return
+        }
+
         if (updateCheckStarted) {
             return
         }
@@ -1352,8 +1676,14 @@ class MainActivity : AppCompatActivity() {
             )
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Automatic update screen error",
+                e
+            )
 
             updateCheckStarted = false
         }
@@ -1375,8 +1705,14 @@ class MainActivity : AppCompatActivity() {
             )
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Manual update screen error",
+                e
+            )
 
             Toast.makeText(
                 this,
@@ -1462,10 +1798,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupChannelList() {
 
-        /*
-         * এই function শুধু Mobile-এর জন্য।
-         */
-
         if (isAndroidTV) {
             return
         }
@@ -1507,10 +1839,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateRecyclerHeight() {
-
-        /*
-         * TV-তে এই function ব্যবহার করা যাবে না।
-         */
 
         if (isAndroidTV) {
             return
@@ -1662,6 +1990,12 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
 
+                        Log.e(
+                            TAG,
+                            "Mobile player error",
+                            error
+                        )
+
                         liveText.text =
                             "●  ERROR"
 
@@ -1679,8 +2013,14 @@ class MainActivity : AppCompatActivity() {
             )
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Mobile player setup error",
+                e
+            )
 
             player = null
 
@@ -1847,10 +2187,6 @@ class MainActivity : AppCompatActivity() {
         scrollHomeToTop: Boolean = true
     ) {
 
-        /*
-         * TV-তে Mobile player ব্যবহার করা যাবে না।
-         */
-
         if (isAndroidTV) {
             return
         }
@@ -1936,11 +2272,6 @@ class MainActivity : AppCompatActivity() {
 
             showControlsTemporarily()
 
-            /*
-             * সাধারণ Channel click-এর আগের behaviour
-             * ঠিক রাখা হয়েছে।
-             */
-
             if (
                 scrollHomeToTop &&
                 !isFullscreen
@@ -1962,8 +2293,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         } catch (
-            _: Exception
+            e: Exception
         ) {
+
+            Log.e(
+                TAG,
+                "Mobile channel playback error: ${channel.name}",
+                e
+            )
 
             liveText.text =
                 "●  ERROR"
@@ -2319,10 +2656,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun restoreNormalLayout() {
 
-        /*
-         * TV-তে Mobile layout restore করার চেষ্টা করা যাবে না।
-         */
-
         if (isAndroidTV) {
             return
         }
@@ -2490,7 +2823,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         /*
-         * TV-তে Mobile fullscreen code চালানো যাবে না।
+         * TV
          */
 
         if (isAndroidTV) {
@@ -2503,6 +2836,10 @@ class MainActivity : AppCompatActivity() {
 
             return
         }
+
+        /*
+         * MOBILE
+         */
 
         window.decorView.post {
 
@@ -2673,8 +3010,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * =====================================================
          * TV
-         * =====================================================
-         */
+         * ===================================================== */
 
         if (isAndroidTV) {
 
@@ -2688,13 +3024,18 @@ class MainActivity : AppCompatActivity() {
 
                     tvPlayer?.playWhenReady =
                         true
-                } else {
+
+                } else if (
+                    tvSetupSuccessful &&
+                    ::tvChannelRecycler.isInitialized
+                ) {
 
                     tvChannelRecycler.post {
 
                         if (
                             !isFinishing &&
-                            !isDestroyed
+                            !isDestroyed &&
+                            ::tvChannelRecycler.isInitialized
                         ) {
 
                             tvChannelRecycler.requestFocus()
@@ -2702,9 +3043,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-            } catch (
-                _: Exception
-            ) {
+            } catch (e: Exception) {
+
+                Log.e(
+                    TAG,
+                    "TV onResume error",
+                    e
+                )
             }
 
             return
@@ -2713,8 +3058,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * =====================================================
          * MOBILE
-         * =====================================================
-         */
+         * ===================================================== */
 
         if (isFullscreen) {
 
@@ -2820,8 +3164,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * =====================================================
          * TV PLAYER RELEASE
-         * =====================================================
-         */
+         * ===================================================== */
 
         try {
 
@@ -2849,8 +3192,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * =====================================================
          * MOBILE PLAYER RELEASE
-         * =====================================================
-         */
+         * ===================================================== */
 
         if (
             ::playerView.isInitialized
@@ -2881,8 +3223,7 @@ class MainActivity : AppCompatActivity() {
         /*
          * =====================================================
          * CHANNEL ADAPTER
-         * =====================================================
-         */
+         * ===================================================== */
 
         if (
             ::channelAdapter.isInitialized
