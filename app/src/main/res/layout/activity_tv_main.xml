@@ -64,6 +64,7 @@
 
     <FrameLayout
         android:id="@+id/tv_player_container"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="270dp"
         android:background="#000000">
@@ -97,6 +98,7 @@
 
     <TextView
         android:id="@+id/tv_current_channel"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:gravity="center_vertical"
