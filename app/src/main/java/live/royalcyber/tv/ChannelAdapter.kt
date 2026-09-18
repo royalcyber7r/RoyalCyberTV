@@ -77,7 +77,7 @@ class ChannelAdapter(
          * Channel name hidden.
          * Every channel shows LIVE.
          */
-        holder.name.text = "🔴 LIVE"
+        holder.name.text = channel.name
 
         /*
          * Default image while logo is loading.
