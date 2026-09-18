@@ -1,1 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
 
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000"
+    android:focusable="false">
+
+    <!-- =====================================================
+         TV HEADER
+         ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/tv_header"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:background="#101010">
+
+        <ImageView
+            android:id="@+id/tv_logo"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:src="@drawable/royalcyber_logo"
+            android:scaleType="fitCenter"
+            android:contentDescription="RoyalCyberTV Logo" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="18dp"
+            android:text="ROYALCYBER IPTV"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/tv_update_button"
+            android:layout_width="130dp"
+            android:layout_height="55dp"
+            android:gravity="center"
+            android:text="UPDATE"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:background="@drawable/tv_focus_button"
+            android:focusable="true"
+            android:clickable="true" />
+
+    </LinearLayout>
+
+
+    <!-- =====================================================
+         CHANNEL AREA
+         ===================================================== -->
+
+    <FrameLayout
+        android:id="@+id/tv_content_area"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tv_channel_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="5dp"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <!-- =================================================
+             EMPTY / LOADING TEXT
+             ================================================= -->
+
+        <TextView
+            android:id="@+id/tv_loading_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Channels loading..."
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+
+    <!-- =====================================================
+         TV BOTTOM UPDATE BAR
+         ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/tv_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#101010">
+
+        <TextView
+            android:id="@+id/tv_bottom_update"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="UPDATE"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/tv_focus_button"
+            android:focusable="true"
+            android:clickable="true" />
+
+    </LinearLayout>
+
+</LinearLayout>
