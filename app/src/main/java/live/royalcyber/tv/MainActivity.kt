@@ -84,9 +84,11 @@ class MainActivity : AppCompatActivity() {
        ANDROID TV
        ========================================================= */
 
-    private lateinit var tvPlayerView: PlayerView
-    private lateinit var tvChannelRecycler: RecyclerView
-    private lateinit var tvCurrentChannel: TextView
+    private var tvPlayerView: PlayerView? = null
+    private var tvChannelRecycler: RecyclerView? = null
+    private var tvCurrentChannel: TextView? = null
+    private var tvUpdateButton: TextView? = null
+    private var tvBottomUpdateButton: TextView? = null
 
     private var tvPlayer: ExoPlayer? = null
     private var tvChannels: List<Channel> = emptyList()
@@ -116,10 +118,15 @@ class MainActivity : AppCompatActivity() {
        ========================================================= */
 
     private val isAndroidTV: Boolean
-        get() =
-            packageManager.hasSystemFeature(
-                PackageManager.FEATURE_LEANBACK
-            )
+        get() {
+            return try {
+                packageManager.hasSystemFeature(
+                    PackageManager.FEATURE_LEANBACK
+                )
+            } catch (_: Exception) {
+                false
+            }
+        }
 
     /* =========================================================
        UPDATE
@@ -139,7 +146,6 @@ class MainActivity : AppCompatActivity() {
                 !isFinishing &&
                 !isDestroyed
             ) {
-
                 playerControls.visibility =
                     View.GONE
             }
@@ -172,27 +178,35 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-
         super.onCreate(savedInstanceState)
 
         /*
          * =====================================================
          * ANDROID TV
          * =====================================================
-         *
-         * TV-এর জন্য আলাদা layout এবং player।
-         *
-         * Mobile-এর কোনো view এখানে initialize হবে না।
-         * =====================================================
          */
 
         if (isAndroidTV) {
 
-            setContentView(
-                R.layout.activity_tv_main
-            )
+            try {
 
-            setupAndroidTV()
+                setContentView(
+                    R.layout.activity_tv_main
+                )
+
+                setupAndroidTV()
+
+            } catch (e: Exception) {
+
+                /*
+                 * TV layout/player-এর কোনো সমস্যা হলে
+                 * Activity যেন সরাসরি crash না করে।
+                 */
+
+                showTVError(
+                    "TV Screen চালু করা যাচ্ছে না"
+                )
+            }
 
             return
         }
@@ -233,18 +247,12 @@ class MainActivity : AppCompatActivity() {
                 !isFinishing &&
                 !isDestroyed
             ) {
-
                 updateRecyclerHeight()
             }
         }
 
         /*
-         * =====================================================
-         * MOBILE ONLY AUTOMATIC UPDATE
-         * =====================================================
-         *
-         * Android TV-তে UpdateActivity automatically খুলবে না।
-         * =====================================================
+         * MOBILE ONLY UPDATE
          */
 
         handler.postDelayed({
@@ -254,11 +262,30 @@ class MainActivity : AppCompatActivity() {
                 !isDestroyed &&
                 !isAndroidTV
             ) {
-
                 checkForUpdateAutomatically()
             }
 
         }, 1500)
+    }
+
+    /* =========================================================
+       TV ERROR
+       ========================================================= */
+
+    private fun showTVError(
+        message: String
+    ) {
+
+        try {
+
+            Toast.makeText(
+                this,
+                message,
+                Toast.LENGTH_LONG
+            ).show()
+
+        } catch (_: Exception) {
+        }
     }
 
     /* =========================================================
@@ -298,7 +325,6 @@ class MainActivity : AppCompatActivity() {
                 if (
                     responseCode !in 200..299
                 ) {
-
                     throw Exception(
                         "HTTP $responseCode"
                     )
@@ -393,10 +419,6 @@ class MainActivity : AppCompatActivity() {
 
                     syncNewChannelNotifications()
 
-                    /*
-                     * প্রথম channel automatically চালু।
-                     */
-
                     if (
                         channels.isNotEmpty() &&
                         currentChannel == null
@@ -408,9 +430,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
 
                 runOnUiThread {
 
@@ -461,10 +481,6 @@ class MainActivity : AppCompatActivity() {
                     knownChannelsKey,
                     null
                 )
-
-            /*
-             * প্রথমবার হলে শুধু known list save করবে।
-             */
 
             if (
                 savedKnownChannels == null
@@ -527,9 +543,7 @@ class MainActivity : AppCompatActivity() {
                 pendingNotifications
             )
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -581,9 +595,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
 
         return result
@@ -621,9 +633,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 .apply()
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -659,7 +669,6 @@ class MainActivity : AppCompatActivity() {
         val notificationItems =
             pendingNotifications
                 .map {
-
                     "🔴  নতুন Channel যুক্ত হয়েছে\n$it"
                 }
                 .toTypedArray()
@@ -734,9 +743,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 .show()
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             Toast.makeText(
                 this,
@@ -764,7 +771,6 @@ class MainActivity : AppCompatActivity() {
         if (
             isFullscreen
         ) {
-
             exitFullscreen()
         }
 
@@ -831,13 +837,6 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 channelRecycler.post {
-
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
-                    }
 
                     val holder =
                         channelRecycler
@@ -924,10 +923,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkForUpdateAutomatically() {
 
-        /*
-         * TV কখনো এখানে আসবে না।
-         */
-
         if (
             isAndroidTV
         ) {
@@ -952,9 +947,7 @@ class MainActivity : AppCompatActivity() {
                 )
             )
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             updateCheckStarted =
                 false
@@ -976,9 +969,7 @@ class MainActivity : AppCompatActivity() {
                 )
             )
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             Toast.makeText(
                 this,
@@ -1106,13 +1097,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupChannelList() {
 
-        val columns =
-            3
-
         channelRecycler.layoutManager =
             GridLayoutManager(
                 this,
-                columns
+                3
             )
 
         channelAdapter =
@@ -1168,11 +1156,8 @@ class MainActivity : AppCompatActivity() {
             if (
                 itemCount == 0
             ) {
-
                 0
-
             } else {
-
                 (
                     itemCount +
                         columns -
@@ -1285,9 +1270,6 @@ class MainActivity : AppCompatActivity() {
                                 liveText.text =
                                     "●  LIVE"
                             }
-
-                            Player.STATE_IDLE -> {
-                            }
                         }
                     }
 
@@ -1318,9 +1300,7 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             player =
                 null
@@ -1378,21 +1358,15 @@ class MainActivity : AppCompatActivity() {
 
                 showControlsTemporarily()
 
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
         }
 
         rewindButton.setOnClickListener {
 
             try {
-
                 player?.seekBack()
-
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
 
             showControlsTemporarily()
@@ -1401,12 +1375,8 @@ class MainActivity : AppCompatActivity() {
         forwardButton.setOnClickListener {
 
             try {
-
                 player?.seekForward()
-
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
 
             showControlsTemporarily()
@@ -1435,14 +1405,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        updatePlayPauseButton(
-            false
-        )
+        updatePlayPauseButton(false)
     }
-
-    /* =========================================================
-       PLAY / PAUSE BUTTON
-       ========================================================= */
 
     private fun updatePlayPauseButton(
         isPlaying: Boolean
@@ -1455,18 +1419,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         playPauseButton.text =
-            if (
-                isPlaying
-            ) {
+            if (isPlaying) {
                 "❚❚"
             } else {
                 "▶"
             }
     }
-
-    /* =========================================================
-       CONTROL AUTO HIDE
-       ========================================================= */
 
     private fun showControlsTemporarily() {
 
@@ -1474,9 +1432,7 @@ class MainActivity : AppCompatActivity() {
             hideControlsRunnable
         )
 
-        if (
-            !isFullscreen
-        ) {
+        if (!isFullscreen) {
 
             handler.postDelayed(
                 hideControlsRunnable,
@@ -1519,19 +1475,7 @@ class MainActivity : AppCompatActivity() {
 
         val exoPlayer =
             player
-
-        if (
-            exoPlayer == null
-        ) {
-
-            Toast.makeText(
-                this,
-                "Player প্রস্তুত নয়",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            return
-        }
+                ?: return
 
         currentChannel =
             channel
@@ -1547,11 +1491,10 @@ class MainActivity : AppCompatActivity() {
             val mediaSource =
                 HlsMediaSource.Factory(
                     dataSourceFactory
-                ).createMediaSource(
-                    MediaItem.fromUri(
-                        url
-                    )
                 )
+                    .createMediaSource(
+                        MediaItem.fromUri(url)
+                    )
 
             exoPlayer.stop()
 
@@ -1575,9 +1518,7 @@ class MainActivity : AppCompatActivity() {
             playerControls.visibility =
                 View.VISIBLE
 
-            updatePlayPauseButton(
-                true
-            )
+            updatePlayPauseButton(true)
 
             showControlsTemporarily()
 
@@ -1601,16 +1542,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             liveText.text =
                 "●  ERROR"
 
-            updatePlayPauseButton(
-                false
-            )
+            updatePlayPauseButton(false)
 
             Toast.makeText(
                 this,
@@ -1619,10 +1556,6 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
     }
-
-    /* =========================================================
-       RESUME PLAYBACK
-       ========================================================= */
 
     private fun resumePlayback() {
 
@@ -1648,9 +1581,7 @@ class MainActivity : AppCompatActivity() {
 
                 currentChannel?.let {
 
-                    playChannel(
-                        it
-                    )
+                    playChannel(it)
 
                     return
                 }
@@ -1661,13 +1592,9 @@ class MainActivity : AppCompatActivity() {
 
             exoPlayer.play()
 
-            updatePlayPauseButton(
-                true
-            )
+            updatePlayPauseButton(true)
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -1727,18 +1654,12 @@ class MainActivity : AppCompatActivity() {
                         if (
                             query.isEmpty()
                         ) {
-
                             channels
-
                         } else {
-
                             channels.filter {
-
                                 it.name
                                     .lowercase()
-                                    .contains(
-                                        query
-                                    )
+                                    .contains(query)
                             }
                         }
 
@@ -1760,35 +1681,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* =========================================================
-       FULLSCREEN BUTTON
+       FULLSCREEN
        ========================================================= */
 
     private fun setupFullscreenButton() {
 
         fullscreenButton.setOnClickListener {
 
-            if (
-                isFullscreen
-            ) {
-
+            if (isFullscreen) {
                 exitFullscreen()
-
             } else {
-
                 enterFullscreen()
             }
         }
     }
 
-    /* =========================================================
-       ENTER FULLSCREEN
-       ========================================================= */
-
     private fun enterFullscreen() {
 
-        if (
-            isFullscreen
-        ) {
+        if (isFullscreen) {
             return
         }
 
@@ -1844,43 +1754,23 @@ class MainActivity : AppCompatActivity() {
         )
 
         window.decorView.post {
-
-            if (
-                isFullscreen
-            ) {
-
+            if (isFullscreen) {
                 applyFullscreenPlayerSize()
             }
         }
 
         window.decorView.postDelayed({
 
-            if (
-                isFullscreen
-            ) {
-
+            if (isFullscreen) {
                 applyFullscreenPlayerSize()
             }
 
         }, 250)
     }
 
-    /* =========================================================
-       FULLSCREEN SIZE
-       ========================================================= */
-
     private fun applyFullscreenPlayerSize() {
 
-        if (
-            !isFullscreen
-        ) {
-            return
-        }
-
-        if (
-            !::mainScrollView.isInitialized ||
-            !::playerContainer.isInitialized
-        ) {
+        if (!isFullscreen) {
             return
         }
 
@@ -1897,10 +1787,7 @@ class MainActivity : AppCompatActivity() {
 
             window.decorView.post {
 
-                if (
-                    isFullscreen
-                ) {
-
+                if (isFullscreen) {
                     applyFullscreenPlayerSize()
                 }
             }
@@ -1929,21 +1816,13 @@ class MainActivity : AppCompatActivity() {
 
             playerContainer.requestLayout()
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
-    /* =========================================================
-       EXIT FULLSCREEN
-       ========================================================= */
-
     private fun exitFullscreen() {
 
-        if (
-            !isFullscreen
-        ) {
+        if (!isFullscreen) {
             return
         }
 
@@ -1961,25 +1840,16 @@ class MainActivity : AppCompatActivity() {
 
         window.decorView.postDelayed({
 
-            if (
-                !isFullscreen
-            ) {
-
+            if (!isFullscreen) {
                 restoreNormalLayout()
             }
 
         }, 250)
     }
 
-    /* =========================================================
-       RESTORE NORMAL LAYOUT
-       ========================================================= */
-
     private fun restoreNormalLayout() {
 
-        if (
-            isFullscreen
-        ) {
+        if (isFullscreen) {
             return
         }
 
@@ -2022,9 +1892,7 @@ class MainActivity : AppCompatActivity() {
                 View.VISIBLE
 
             searchBox.visibility =
-                if (
-                    searchWasVisible
-                ) {
+                if (searchWasVisible) {
                     View.VISIBLE
                 } else {
                     View.GONE
@@ -2068,9 +1936,7 @@ class MainActivity : AppCompatActivity() {
 
             playerContainer.requestLayout()
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -2096,9 +1962,7 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsControllerCompat
                     .BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -2125,9 +1989,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
     }
 
@@ -2143,22 +2005,13 @@ class MainActivity : AppCompatActivity() {
             newConfig
         )
 
-        /*
-         * TV-এর orientation Android TV layout
-         * নিজেই handle করবে।
-         */
-
-        if (
-            isAndroidTV
-        ) {
+        if (isAndroidTV) {
             return
         }
 
         window.decorView.post {
 
-            if (
-                isFullscreen
-            ) {
+            if (isFullscreen) {
 
                 if (
                     newConfig.orientation ==
@@ -2200,9 +2053,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_home
         ).setOnClickListener {
 
-            if (
-                isFullscreen
-            ) {
+            if (isFullscreen) {
 
                 exitFullscreen()
 
@@ -2236,9 +2087,7 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_channel
         ).setOnClickListener {
 
-            if (
-                isFullscreen
-            ) {
+            if (isFullscreen) {
 
                 exitFullscreen()
 
@@ -2298,14 +2147,11 @@ class MainActivity : AppCompatActivity() {
 
         try {
 
-            val intent =
+            startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse(url)
                 )
-
-            startActivity(
-                intent
             )
 
         } catch (
@@ -2329,12 +2175,12 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         /*
+         * =====================================================
          * TV
+         * =====================================================
          */
 
-        if (
-            isAndroidTV
-        ) {
+        if (isAndroidTV) {
 
             tvPlayer?.let { exoPlayer ->
 
@@ -2346,33 +2192,38 @@ class MainActivity : AppCompatActivity() {
                     ) {
 
                         exoPlayer.play()
+
+                    } else if (
+                        exoPlayer.playbackState ==
+                        Player.STATE_IDLE &&
+                        tvCurrentIndex >= 0 &&
+                        tvCurrentIndex <
+                        tvChannels.size
+                    ) {
+
+                        playTVChannel(
+                            tvChannels[tvCurrentIndex]
+                        )
                     }
 
-                } catch (
-                    _: Exception
-                ) {
+                } catch (_: Exception) {
                 }
             }
 
             return
         }
 
-        /*
-         * MOBILE
-         */
+        /* =====================================================
+           MOBILE
+           ===================================================== */
 
-        if (
-            isFullscreen
-        ) {
+        if (isFullscreen) {
 
             hideSystemBars()
 
             window.decorView.post {
 
-                if (
-                    isFullscreen
-                ) {
-
+                if (isFullscreen) {
                     applyFullscreenPlayerSize()
                 }
             }
@@ -2391,47 +2242,33 @@ class MainActivity : AppCompatActivity() {
 
         player?.let { exoPlayer ->
 
-            if (
-                exoPlayer.playbackState ==
-                Player.STATE_IDLE
-            ) {
+            try {
 
-                if (
-                    currentChannel != null
+                when (
+                    exoPlayer.playbackState
                 ) {
 
-                    resumePlayback()
+                    Player.STATE_IDLE,
+                    Player.STATE_ENDED -> {
+
+                        if (
+                            currentChannel != null
+                        ) {
+                            resumePlayback()
+                        }
+                    }
+
+                    Player.STATE_READY -> {
+
+                        exoPlayer.play()
+
+                        updatePlayPauseButton(
+                            true
+                        )
+                    }
                 }
 
-            } else if (
-                exoPlayer.playbackState ==
-                Player.STATE_ENDED
-            ) {
-
-                if (
-                    currentChannel != null
-                ) {
-
-                    resumePlayback()
-                }
-
-            } else if (
-                exoPlayer.playbackState ==
-                Player.STATE_READY
-            ) {
-
-                try {
-
-                    exoPlayer.play()
-
-                    updatePlayPauseButton(
-                        true
-                    )
-
-                } catch (
-                    _: Exception
-                ) {
-                }
+            } catch (_: Exception) {
             }
         }
     }
@@ -2442,36 +2279,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
 
-        /*
-         * TV
-         */
-
-        if (
-            isAndroidTV
-        ) {
+        if (isAndroidTV) {
 
             try {
-
                 tvPlayer?.pause()
-
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
 
         } else {
 
-            /*
-             * MOBILE
-             */
-
             try {
-
                 player?.pause()
-
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
         }
 
@@ -2483,6 +2302,11 @@ class MainActivity : AppCompatActivity() {
        ========================================================= */
 
     private fun setupAndroidTV() {
+
+        /*
+         * TV layout-এর view আলাদাভাবে নেওয়া হচ্ছে।
+         * Mobile-এর কোনো view এখানে ব্যবহার করা হবে না।
+         */
 
         try {
 
@@ -2501,66 +2325,102 @@ class MainActivity : AppCompatActivity() {
                     R.id.tv_current_channel
                 )
 
-            /*
-             * TV Player
-             */
+            tvUpdateButton =
+                findViewById(
+                    R.id.tv_update_button
+                )
 
-            setupTVPlayer()
+            tvBottomUpdateButton =
+                findViewById(
+                    R.id.tv_bottom_update
+                )
 
-            /*
-             * TV Channel RecyclerView
-             */
+        } catch (e: Exception) {
 
-            setupTVChannelList()
+            showTVError(
+                "TV view পাওয়া যাচ্ছে না"
+            )
 
-            /*
-             * JSON load
-             */
+            return
+        }
 
-            loadChannelsForTV()
+        /*
+         * =====================================================
+         * TV HEADER UPDATE BUTTON
+         * =====================================================
+         */
 
-            /*
-             * Update buttons
-             */
+        try {
 
-            findViewById<TextView>(
-                R.id.tv_update_button
-            ).setOnClickListener {
-
-                openUpdateScreen()
-            }
-
-            findViewById<TextView>(
-                R.id.tv_bottom_update
-            ).setOnClickListener {
+            tvUpdateButton?.setOnClickListener {
 
                 openUpdateScreen()
             }
 
-            /*
-             * প্রথম focus channel list-এ।
-             */
+        } catch (_: Exception) {
+        }
 
-            tvChannelRecycler.post {
+        /*
+         * =====================================================
+         * TV BOTTOM UPDATE BUTTON
+         * =====================================================
+         */
 
-                if (
-                    !isFinishing &&
-                    !isDestroyed
-                ) {
+        try {
 
-                    tvChannelRecycler.requestFocus()
+            tvBottomUpdateButton?.setOnClickListener {
+
+                openUpdateScreen()
+            }
+
+        } catch (_: Exception) {
+        }
+
+        /*
+         * =====================================================
+         * TV PLAYER
+         * =====================================================
+         */
+
+        setupTVPlayer()
+
+        /*
+         * =====================================================
+         * TV CHANNEL LIST
+         * =====================================================
+         */
+
+        setupTVChannelList()
+
+        /*
+         * =====================================================
+         * JSON
+         * =====================================================
+         */
+
+        loadChannelsForTV()
+
+        /*
+         * =====================================================
+         * FIRST FOCUS
+         * =====================================================
+         */
+
+        tvChannelRecycler?.post {
+
+            if (
+                !isFinishing &&
+                !isDestroyed
+            ) {
+
+                try {
+
+                    tvChannelRecycler
+                        ?.requestFocus()
+
+                } catch (_: Exception) {
                 }
             }
-
-        } catch (
-            e: Exception
-        ) {
-
-            Toast.makeText(
-                this,
-                "TV setup চালু করা যাচ্ছে না",
-                Toast.LENGTH_LONG
-            ).show()
         }
     }
 
@@ -2570,6 +2430,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupTVPlayer() {
 
+        val playerView =
+            tvPlayerView
+                ?: return
+
         try {
 
             tvPlayer =
@@ -2577,26 +2441,22 @@ class MainActivity : AppCompatActivity() {
                     this
                 ).build()
 
-            tvPlayerView.player =
+            playerView.player =
                 tvPlayer
 
-            /*
-             * TV Player Controller
-             */
-
-            tvPlayerView.useController =
+            playerView.useController =
                 true
 
-            tvPlayerView.controllerAutoShow =
+            playerView.controllerAutoShow =
                 true
 
-            tvPlayerView.controllerHideOnTouch =
+            playerView.controllerHideOnTouch =
                 true
 
-            tvPlayerView.keepScreenOn =
+            playerView.keepScreenOn =
                 true
 
-            tvPlayerView.setShowBuffering(
+            playerView.setShowBuffering(
                 PlayerView.SHOW_BUFFERING_WHEN_PLAYING
             )
 
@@ -2618,51 +2478,57 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
 
+                        val current =
+                            if (
+                                tvCurrentIndex >= 0 &&
+                                tvCurrentIndex <
+                                tvChannels.size
+                            ) {
+                                tvChannels[
+                                    tvCurrentIndex
+                                ].name
+                            } else {
+                                ""
+                            }
+
                         when (
                             playbackState
                         ) {
 
                             Player.STATE_BUFFERING -> {
 
-                                tvCurrentChannel.text =
+                                tvCurrentChannel?.text =
                                     if (
-                                        tvCurrentIndex >= 0 &&
-                                        tvCurrentIndex <
-                                        tvChannels.size
+                                        current.isNotEmpty()
                                     ) {
-
-                                        "● BUFFERING...  ${tvChannels[tvCurrentIndex].name}"
-
+                                        "● BUFFERING...  $current"
                                     } else {
-
                                         "● BUFFERING..."
                                     }
                             }
 
                             Player.STATE_READY -> {
 
-                                if (
-                                    tvCurrentIndex >= 0 &&
-                                    tvCurrentIndex <
-                                    tvChannels.size
-                                ) {
-
-                                    tvCurrentChannel.text =
-                                        "● LIVE  ${tvChannels[tvCurrentIndex].name}"
-                                }
+                                tvCurrentChannel?.text =
+                                    if (
+                                        current.isNotEmpty()
+                                    ) {
+                                        "● LIVE  $current"
+                                    } else {
+                                        "● LIVE"
+                                    }
                             }
 
                             Player.STATE_ENDED -> {
 
-                                if (
-                                    tvCurrentIndex >= 0 &&
-                                    tvCurrentIndex <
-                                    tvChannels.size
-                                ) {
-
-                                    tvCurrentChannel.text =
-                                        "● LIVE  ${tvChannels[tvCurrentIndex].name}"
-                                }
+                                tvCurrentChannel?.text =
+                                    if (
+                                        current.isNotEmpty()
+                                    ) {
+                                        "● LIVE  $current"
+                                    } else {
+                                        "● LIVE"
+                                    }
                             }
 
                             Player.STATE_IDLE -> {
@@ -2681,45 +2547,33 @@ class MainActivity : AppCompatActivity() {
                             return
                         }
 
-                        tvCurrentChannel.text =
+                        val current =
                             if (
                                 tvCurrentIndex >= 0 &&
                                 tvCurrentIndex <
                                 tvChannels.size
                             ) {
-
-                                "● ERROR  ${tvChannels[tvCurrentIndex].name}"
-
+                                tvChannels[
+                                    tvCurrentIndex
+                                ].name
                             } else {
-
-                                "● ERROR  Channel চালু করা যাচ্ছে না"
+                                "Channel"
                             }
-                    }
 
-                    override fun onIsPlayingChanged(
-                        isPlaying: Boolean
-                    ) {
-
-                        /*
-                         * TV Player-এর নিজস্ব controller
-                         * play/pause handle করবে।
-                         */
+                        tvCurrentChannel?.text =
+                            "● ERROR  $current"
                     }
                 }
             )
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (e: Exception) {
 
             tvPlayer =
                 null
 
-            Toast.makeText(
-                this,
-                "TV Player চালু করা যাচ্ছে না",
-                Toast.LENGTH_LONG
-            ).show()
+            showTVError(
+                "TV Player চালু করা যাচ্ছে না"
+            )
         }
     }
 
@@ -2729,45 +2583,54 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupTVChannelList() {
 
-        tvChannelRecycler.layoutManager =
-            GridLayoutManager(
-                this,
-                5
+        val recycler =
+            tvChannelRecycler
+                ?: return
+
+        try {
+
+            recycler.layoutManager =
+                GridLayoutManager(
+                    this,
+                    5
+                )
+
+            tvChannelAdapter =
+                ChannelAdapter(
+                    channels = emptyList(),
+                    onChannelClick = { channel ->
+
+                        playTVChannel(
+                            channel
+                        )
+                    }
+                )
+
+            recycler.adapter =
+                tvChannelAdapter
+
+            recycler.isFocusable =
+                true
+
+            recycler.isFocusableInTouchMode =
+                true
+
+            recycler.descendantFocusability =
+                ViewGroup.FOCUS_AFTER_DESCENDANTS
+
+            recycler.isNestedScrollingEnabled =
+                true
+
+            recycler.setHasFixedSize(
+                false
             )
 
-        tvChannelAdapter =
-            ChannelAdapter(
-                channels = emptyList(),
-                onChannelClick = { channel ->
+        } catch (e: Exception) {
 
-                    playTVChannel(
-                        channel
-                    )
-                }
+            showTVError(
+                "TV Channel list চালু করা যাচ্ছে না"
             )
-
-        tvChannelRecycler.adapter =
-            tvChannelAdapter
-
-        tvChannelRecycler.isFocusable =
-            true
-
-        tvChannelRecycler.isFocusableInTouchMode =
-            true
-
-        tvChannelRecycler.descendantFocusability =
-            ViewGroup.FOCUS_AFTER_DESCENDANTS
-
-        /*
-         * TV-তে scrolling smooth রাখার জন্য।
-         */
-
-        tvChannelRecycler.isNestedScrollingEnabled =
-            true
-
-        tvChannelRecycler.setHasFixedSize(
-            false
-        )
+        }
     }
 
     /* =========================================================
@@ -2807,7 +2670,6 @@ class MainActivity : AppCompatActivity() {
                 if (
                     responseCode !in 200..299
                 ) {
-
                     throw Exception(
                         "HTTP $responseCode"
                     )
@@ -2887,11 +2749,12 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     /*
-                     * প্রথম Channel automatically চালু।
+                     * প্রথম Channel চালু
                      */
 
                     if (
-                        tvChannels.isNotEmpty()
+                        tvChannels.isNotEmpty() &&
+                        tvPlayer != null
                     ) {
 
                         playTVChannel(
@@ -2900,9 +2763,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
 
                 runOnUiThread {
 
@@ -2912,6 +2773,9 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         return@runOnUiThread
                     }
+
+                    tvCurrentChannel?.text =
+                        "● LIVE  Channels loading failed"
 
                     Toast.makeText(
                         this,
@@ -2943,6 +2807,10 @@ class MainActivity : AppCompatActivity() {
             tvPlayer
                 ?: return
 
+        val recycler =
+            tvChannelRecycler
+                ?: return
+
         val url =
             channel.streamUrl.trim()
 
@@ -2950,7 +2818,7 @@ class MainActivity : AppCompatActivity() {
             url.isEmpty()
         ) {
 
-            tvCurrentChannel.text =
+            tvCurrentChannel?.text =
                 "● ERROR  Stream URL পাওয়া যায়নি"
 
             return
@@ -3009,20 +2877,16 @@ class MainActivity : AppCompatActivity() {
             exoPlayer.playWhenReady =
                 true
 
-            tvCurrentChannel.text =
-                "● BUFFERING...  ${channel.name}"
+            tvCurrentChannel?.text =
+                "● LIVE  ${channel.name}"
 
             /*
              * =================================================
-             * SELECTED CHANNEL
+             * SELECTED CHANNEL / FOCUS
              * =================================================
-             *
-             * RecyclerView item-এ focus দেওয়া হচ্ছে।
-             * ChannelAdapter-এর focus/selected background
-             * থাকলে সেটিও এখানে কাজ করবে।
              */
 
-            tvChannelRecycler.post {
+            recycler.post {
 
                 if (
                     isFinishing ||
@@ -3031,34 +2895,31 @@ class MainActivity : AppCompatActivity() {
                     return@post
                 }
 
-                tvChannelRecycler.scrollToPosition(
-                    index
-                )
+                try {
 
-                tvChannelRecycler.post {
+                    recycler.scrollToPosition(
+                        index
+                    )
 
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
+                    recycler.post {
+
+                        val holder =
+                            recycler
+                                .findViewHolderForAdapterPosition(
+                                    index
+                                )
+
+                        holder?.itemView?.requestFocus()
+
                     }
 
-                    val holder =
-                        tvChannelRecycler
-                            .findViewHolderForAdapterPosition(
-                                index
-                            )
-
-                    holder?.itemView?.requestFocus()
+                } catch (_: Exception) {
                 }
             }
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
-            tvCurrentChannel.text =
+            tvCurrentChannel?.text =
                 "● ERROR  ${channel.name}"
 
             Toast.makeText(
@@ -3070,7 +2931,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* =========================================================
-       TV NEXT / PREVIOUS CHANNEL
+       TV NEXT / PREVIOUS
        ========================================================= */
 
     override fun onKeyDown(
@@ -3078,13 +2939,9 @@ class MainActivity : AppCompatActivity() {
         event: android.view.KeyEvent?
     ): Boolean {
 
-        if (
-            isAndroidTV
-        ) {
+        if (isAndroidTV) {
 
-            when (
-                keyCode
-            ) {
+            when (keyCode) {
 
                 android.view.KeyEvent.KEYCODE_MEDIA_NEXT,
                 android.view.KeyEvent.KEYCODE_CHANNEL_UP -> {
@@ -3110,10 +2967,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /* =========================================================
-       NEXT TV CHANNEL
-       ========================================================= */
-
     private fun playNextTVChannel() {
 
         if (
@@ -3129,21 +2982,13 @@ class MainActivity : AppCompatActivity() {
             nextIndex >=
             tvChannels.size
         ) {
-
-            nextIndex =
-                0
+            nextIndex = 0
         }
 
         playTVChannel(
-            tvChannels[
-                nextIndex
-            ]
+            tvChannels[nextIndex]
         )
     }
-
-    /* =========================================================
-       PREVIOUS TV CHANNEL
-       ========================================================= */
 
     private fun playPreviousTVChannel() {
 
@@ -3159,15 +3004,12 @@ class MainActivity : AppCompatActivity() {
         if (
             previousIndex < 0
         ) {
-
             previousIndex =
                 tvChannels.size - 1
         }
 
         playTVChannel(
-            tvChannels[
-                previousIndex
-            ]
+            tvChannels[previousIndex]
         )
     }
 
@@ -3192,31 +3034,21 @@ class MainActivity : AppCompatActivity() {
         ) {
 
             try {
-
-                playerView.player =
-                    null
-
-            } catch (
-                _: Exception
-            ) {
+                playerView.player = null
+            } catch (_: Exception) {
             }
         }
 
         try {
-
             player?.release()
-
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
 
-        player =
-            null
+        player = null
 
         /*
          * =====================================================
-         * MOBILE CHANNEL ADAPTER
+         * MOBILE ADAPTER
          * =====================================================
          */
 
@@ -3225,52 +3057,34 @@ class MainActivity : AppCompatActivity() {
         ) {
 
             try {
-
                 channelAdapter.shutdown()
-
-            } catch (
-                _: Exception
-            ) {
+            } catch (_: Exception) {
             }
+        }
+
+        /*
+         * =====================================================
+         * TV PLAYER VIEW
+         * =====================================================
+         */
+
+        try {
+            tvPlayerView?.player = null
+        } catch (_: Exception) {
         }
 
         /*
          * =====================================================
          * TV PLAYER
          * =====================================================
-         *
-         * IMPORTANT:
-         * tvPlayerView শুধু TV-তে initialize হয়।
-         * তাই lateinit check করা হচ্ছে।
-         * =====================================================
          */
 
-        if (
-            ::tvPlayerView.isInitialized
-        ) {
-
-            try {
-
-                tvPlayerView.player =
-                    null
-
-            } catch (
-                _: Exception
-            ) {
-            }
-        }
-
         try {
-
             tvPlayer?.release()
-
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
         }
 
-        tvPlayer =
-            null
+        tvPlayer = null
 
         /*
          * =====================================================
@@ -3278,20 +3092,18 @@ class MainActivity : AppCompatActivity() {
          * =====================================================
          */
 
-        tvChannelAdapter?.let {
-
-            try {
-
-                it.shutdown()
-
-            } catch (
-                _: Exception
-            ) {
-            }
+        try {
+            tvChannelAdapter?.shutdown()
+        } catch (_: Exception) {
         }
 
-        tvChannelAdapter =
-            null
+        tvChannelAdapter = null
+
+        tvPlayerView = null
+        tvChannelRecycler = null
+        tvCurrentChannel = null
+        tvUpdateButton = null
+        tvBottomUpdateButton = null
 
         super.onDestroy()
     }
