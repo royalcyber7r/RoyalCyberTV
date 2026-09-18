@@ -258,9 +258,7 @@ class MainActivity : AppCompatActivity() {
                 5
             )
 
-        recycler.setHasFixedSize(
-            true
-        )
+
 
         recycler.isFocusable =
             true
