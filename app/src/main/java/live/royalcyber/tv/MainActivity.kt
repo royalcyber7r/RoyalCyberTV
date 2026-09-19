@@ -31,6 +31,7 @@ import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
 
 import androidx.recyclerview.widget.GridLayoutManager
@@ -1498,13 +1499,31 @@ private fun playChannel(
                     true
                 )
 
-        val mediaSource =
-            HlsMediaSource.Factory(
-                dataSourceFactory
-            ).createMediaSource(
-                MediaItem.fromUri(url)
-            )
+        val mediaItem =
+    MediaItem.fromUri(url)
 
+val mediaSource =
+    if (
+        url.contains(
+            ".m3u8",
+            ignoreCase = true
+        )
+    ) {
+
+        HlsMediaSource.Factory(
+            dataSourceFactory
+        ).createMediaSource(
+            mediaItem
+        )
+
+    } else {
+
+        ProgressiveMediaSource.Factory(
+            dataSourceFactory
+        ).createMediaSource(
+            mediaItem
+        )
+    }
         exoPlayer.stop()
 
         exoPlayer.clearMediaItems()
