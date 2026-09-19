@@ -2,29 +2,85 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000">
+    android:background="#000000"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <!-- HEADER -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="ROYALCYBER TV"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_height="70dp"
+        android:gravity="center_vertical"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:background="#111111">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tv_channel_recycler"
+        <ImageView
+            android:id="@+id/tv_logo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@mipmap/ic_launcher"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:text="ROYALCYBER TV"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- PLAYER -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/tv_player"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:background="#000000"
+        android:keepScreenOn="true"
+        app:show_buffering="when_playing"
+        app:use_controller="true" />
+
+    <!-- CHANNEL LIST -->
+    <ScrollView
+        android:id="@+id/tv_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/tv_channel_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp" />
+
+    </ScrollView>
+
+    <!-- FOOTER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:gravity="center"
+        android:background="#111111">
+
+        <Button
+            android:id="@+id/tv_update_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UPDATE APPS"
+            android:textSize="16sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+    </LinearLayout>
 
 </LinearLayout>
