@@ -96,7 +96,7 @@
          ===================================================== -->
 
     <LinearLayout
-        android:id="@+id/tv_bottom_navigation"
+        android:background="@drawable/tv_focus_button"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:orientation="horizontal"
