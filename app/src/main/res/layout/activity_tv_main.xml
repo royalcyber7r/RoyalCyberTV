@@ -47,11 +47,6 @@
         android:layout_weight="1"
         android:background="#000000">
 
-        <!--
-            এখন TV test screen খালি থাকবে।
-            পরে এখানে Channel / Player যোগ করা যাবে।
-        -->
-
         <TextView
             android:id="@+id/tv_test_text"
             android:layout_width="wrap_content"
@@ -96,7 +91,6 @@
          ===================================================== -->
 
     <LinearLayout
-        android:background="@drawable/tv_focus_button"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:orientation="horizontal"
