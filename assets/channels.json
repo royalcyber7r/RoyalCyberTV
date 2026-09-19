@@ -12,32 +12,32 @@
   },
   {
     "name": "Horse & Country",
-    "logo": "",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Horse_%26_Country_%282009%29.webp",
     "streamUrl": "https://hncfree-samsungau.amagi.tv/playlist.m3u8"
   },
   {
     "name": "MTRSPT",
-    "logo": "",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/MTRSPT1_blkred_rgb-1024x410.webp",
     "streamUrl": "https://amg02873-kravemedia-mtrspt1-sportstribal-ajosc.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-sportstribal/playlist.m3u8"
   },
   {
     "name": "Trace Sport",
-    "logo": "",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Logo_TRACE_Sports.svg",
     "streamUrl": "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8"
   },
   {
     "name": "Music TV",
-    "logo": "",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/music-tv-logo-design-template-with-tv-icon-and-music-icon-perfect-for-business-company-mobile-app-restaurant-etc-free-vector.jpg",
     "streamUrl": "http://bitcdn-kronehit.bitmovin.com/v2/hls/chunklist_b3128000.m3u8"
   },
   {
     "name": "Madani Channel Bangla",
-    "logo": "https://i.imgur.com/vIJTVia.png",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/263-2636352_keep-watching-madani-channel-madani-channel-logo-png.png",
     "streamUrl": "https://streaming.madanichannel.tv/static/streaming-playlists/hls/d3e49b76-ac06-4689-a641-9200445b647f/master.m3u8"
   },
   {
     "name": "News 21 Bangla TV",
-    "logo": "https://i.imgur.com/ijuJfmd.png",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/ok2.png",
     "streamUrl": "http://103.190.133.68:1935/news21live/live/playlist.m3u8"
   },
   {
