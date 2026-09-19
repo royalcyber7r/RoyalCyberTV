@@ -4,7 +4,8 @@
     "name": "JagoNews 24",
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/jago24.png",
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
-  {
+},
+{
     "name": "Duronto TV (720p)",
     "logo": "",
     "streamUrl": "https://tvsen6.aynaott.com/6xyZ3N4oHv2KBJdB6W4p/index.m3u8"
