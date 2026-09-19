@@ -4,15 +4,11 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -96,23 +92,6 @@ class MainActivity : AppCompatActivity() {
     private var bottomNavigationBaseHeight = 70
 
     /* =========================================================
-       ANDROID TV
-       ========================================================= */
-
-    private val isAndroidTV: Boolean
-        get() =
-            packageManager.hasSystemFeature(
-                PackageManager.FEATURE_LEANBACK
-            )
-
-    /*
-     * TV-এর জন্য আলাদা simple adapter।
-     *
-     * Mobile ChannelAdapter একদম untouched থাকবে।
-     */
-    private var tvAdapter: TVSimpleAdapter? = null
-
-    /* =========================================================
        UPDATE
        ========================================================= */
 
@@ -168,35 +147,6 @@ class MainActivity : AppCompatActivity() {
             savedInstanceState
         )
 
-        /*
-         * =====================================================
-         * ANDROID TV
-         * =====================================================
-         *
-         * TV-তে শুধু:
-         *
-         * 1. TV layout
-         * 2. Simple channel grid
-         * 3. channels.json
-         *
-         * Mobile-এর কোনো view initialize হবে না।
-         * ExoPlayer-ও TV startup-এ চালু হবে না।
-         * =====================================================
-         */
-
-        if (isAndroidTV) {
-
-            setContentView(
-                R.layout.activity_tv_main
-            )
-
-            setupSimpleTV()
-
-            loadChannelsFromJson()
-
-            return
-        }
-
         /* =====================================================
            MOBILE
            ===================================================== */
@@ -224,8 +174,6 @@ class MainActivity : AppCompatActivity() {
 
         /*
          * Mobile automatic update check।
-         *
-         * TV এখানে আসবে না।
          */
 
         handler.postDelayed({
@@ -239,260 +187,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }, 1500)
-    }
-
-    /* =========================================================
-       SIMPLE TV SETUP
-       ========================================================= */
-
-    private fun setupSimpleTV() {
-
-        val recycler =
-            findViewById<RecyclerView>(
-                R.id.tv_channel_recycler
-            )
-
-        recycler.layoutManager =
-            GridLayoutManager(
-                this,
-                5
-            )
-
-
-
-        recycler.isFocusable =
-            true
-
-        recycler.isFocusableInTouchMode =
-            true
-
-        recycler.descendantFocusability =
-            ViewGroup.FOCUS_AFTER_DESCENDANTS
-
-        tvAdapter =
-            TVSimpleAdapter(
-                emptyList()
-            ) { channel ->
-
-                /*
-                 * TV এখন শুধু channel select করবে।
-                 *
-                 * Player পরের ধাপে যোগ করা হবে।
-                 */
-
-                currentChannel =
-                    channel
-            }
-
-        recycler.adapter =
-            tvAdapter
-
-        /*
-         * প্রথমে RecyclerView focus নেবে।
-         */
-        recycler.requestFocus()
-    }
-
-    /* =========================================================
-       SIMPLE TV ADAPTER
-       ========================================================= */
-
-    private class TVSimpleAdapter(
-        private var list: List<Channel>,
-        private val onClick: (Channel) -> Unit
-    ) : RecyclerView.Adapter<TVSimpleAdapter.TVHolder>() {
-
-        class TVHolder(
-            val textView: TextView
-        ) : RecyclerView.ViewHolder(
-            textView
-        )
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): TVHolder {
-
-            val density =
-                parent.resources.displayMetrics.density
-
-            val height =
-                (105 * density).toInt()
-
-            val margin =
-                (6 * density).toInt()
-
-            val textView =
-                TextView(
-                    parent.context
-                )
-
-            val params =
-                RecyclerView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    height
-                )
-
-            params.setMargins(
-                margin,
-                margin,
-                margin,
-                margin
-            )
-
-            textView.layoutParams =
-                params
-
-            textView.gravity =
-                Gravity.CENTER
-
-            textView.textSize =
-                17f
-
-            textView.setTextColor(
-                Color.WHITE
-            )
-
-            textView.setPadding(
-                (8 * density).toInt(),
-                (8 * density).toInt(),
-                (8 * density).toInt(),
-                (8 * density).toInt()
-            )
-
-            textView.isFocusable =
-                true
-
-            textView.isFocusableInTouchMode =
-                true
-
-            textView.isClickable =
-                true
-
-            setTVBackground(
-                textView,
-                false
-            )
-
-            textView.setOnFocusChangeListener {
-                    view,
-                    hasFocus ->
-
-                setTVBackground(
-                    view as TextView,
-                    hasFocus
-                )
-
-                if (hasFocus) {
-
-                    view.animate()
-                        .scaleX(1.05f)
-                        .scaleY(1.05f)
-                        .setDuration(100)
-                        .start()
-
-                } else {
-
-                    view.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(100)
-                        .start()
-                }
-            }
-
-            return TVHolder(
-                textView
-            )
-        }
-
-        override fun onBindViewHolder(
-            holder: TVHolder,
-            position: Int
-        ) {
-
-            val channel =
-                list[position]
-
-            holder.textView.text =
-                channel.name
-
-            holder.textView.setOnClickListener {
-
-                onClick(
-                    channel
-                )
-            }
-
-            setTVBackground(
-                holder.textView,
-                holder.textView.hasFocus()
-            )
-        }
-
-        override fun getItemCount(): Int {
-            return list.size
-        }
-
-        fun update(
-            newList: List<Channel>
-        ) {
-
-            list =
-                newList
-
-            notifyDataSetChanged()
-        }
-
-        private fun setTVBackground(
-            view: TextView,
-            focused: Boolean
-        ) {
-
-            val background =
-                GradientDrawable()
-
-            background.cornerRadius =
-                10f
-
-            if (focused) {
-
-                background.setColor(
-                    Color.rgb(
-                        45,
-                        45,
-                        45
-                    )
-                )
-
-                background.setStroke(
-                    3,
-                    Color.WHITE
-                )
-
-            } else {
-
-                background.setColor(
-                    Color.rgb(
-                        20,
-                        20,
-                        20
-                    )
-                )
-
-                background.setStroke(
-                    1,
-                    Color.rgb(
-                        70,
-                        70,
-                        70
-                    )
-                )
-            }
-
-            view.background =
-                background
-        }
     }
 
     /* =========================================================
@@ -607,71 +301,6 @@ class MainActivity : AppCompatActivity() {
 
                     channels =
                         loadedChannels
-
-                    /*
-                     * =================================================
-                     * TV
-                     * =================================================
-                     */
-
-                    if (isAndroidTV) {
-
-                        tvAdapter?.update(
-                            channels
-                        )
-
-                        val recycler =
-                            findViewById<RecyclerView>(
-                                R.id.tv_channel_recycler
-                            )
-
-                        recycler.post {
-
-                            if (
-                                channels.isNotEmpty()
-                            ) {
-
-                                recycler.scrollToPosition(
-                                    0
-                                )
-
-                                recycler.post {
-
-                                    val holder =
-                                        recycler
-                                            .findViewHolderForAdapterPosition(
-                                                0
-                                            )
-
-                                    holder
-                                        ?.itemView
-                                        ?.requestFocus()
-
-                                    if (
-                                        holder == null
-                                    ) {
-
-                                        recycler.requestFocus()
-                                    }
-                                }
-
-                            } else {
-
-                                recycler.requestFocus()
-                            }
-                        }
-
-                        /*
-                         * TV-তে এখানেই শেষ।
-                         *
-                         * Mobile adapter,
-                         * notification,
-                         * player—
-                         * কিছুই চালানো হবে না।
-                         */
-
-                        return@runOnUiThread
-                    }
 
                     /*
                      * =================================================
@@ -1057,49 +686,6 @@ class MainActivity : AppCompatActivity() {
         channel: Channel
     ) {
 
-        if (isAndroidTV) {
-
-            currentChannel =
-                channel
-
-            val recycler =
-                findViewById<RecyclerView>(
-                    R.id.tv_channel_recycler
-                )
-
-            recycler.post {
-
-                val index =
-                    channels.indexOfFirst {
-
-                        it.name.trim()
-                            .equals(
-                                channel.name.trim(),
-                                ignoreCase = true
-                            )
-                    }
-
-                if (index >= 0) {
-
-                    recycler.scrollToPosition(
-                        index
-                    )
-
-                    recycler.post {
-
-                        recycler
-                            .findViewHolderForAdapterPosition(
-                                index
-                            )
-                            ?.itemView
-                            ?.requestFocus()
-                    }
-                }
-            }
-
-            return
-        }
-
         if (
             isFinishing ||
             isDestroyed
@@ -1466,10 +1052,6 @@ class MainActivity : AppCompatActivity() {
 
         channelRecycler.isNestedScrollingEnabled =
             false
-
-        channelRecycler.setHasFixedSize(
-            false
-        )
 
         channelRecycler.isFocusable =
             false
@@ -2463,15 +2045,6 @@ class MainActivity : AppCompatActivity() {
             newConfig
         )
 
-        /*
-         * TV-তে এখন কোনো fullscreen player নেই।
-         * তাই configuration change-এ কিছু করার দরকার নেই।
-         */
-
-        if (isAndroidTV) {
-            return
-        }
-
         window.decorView.post {
 
             if (isFullscreen) {
@@ -2641,14 +2214,6 @@ class MainActivity : AppCompatActivity() {
 
         super.onResume()
 
-        /*
-         * TV:
-         * এখন কোনো Player নেই।
-         */
-        if (isAndroidTV) {
-            return
-        }
-
         if (isFullscreen) {
 
             hideSystemBars()
@@ -2725,19 +2290,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
 
-        /*
-         * TV-তে Player নেই।
-         */
-        if (!isAndroidTV) {
-
-            try {
-
-                player?.pause()
-
-            } catch (
-                _: Exception
-            ) {
-            }
+        try {
+            player?.pause()
+        } catch (
+            _: Exception
+        ) {
         }
 
         super.onPause()
@@ -2752,12 +2309,6 @@ class MainActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(
             null
         )
-
-        /*
-         * TV adapter
-         */
-        tvAdapter =
-            null
 
         /*
          * Mobile player
