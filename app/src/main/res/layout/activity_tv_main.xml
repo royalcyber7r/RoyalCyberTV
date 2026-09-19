@@ -2,7 +2,6 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,76 +9,133 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <!-- HEADER -->
+    <!-- =====================================================
+         TV HEADER
+         ===================================================== -->
+
     <LinearLayout
+        android:id="@+id/tv_header"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:gravity="center_vertical"
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:background="#000000"
         android:paddingStart="30dp"
-        android:paddingEnd="30dp"
-        android:background="#111111">
+        android:paddingEnd="30dp">
 
         <ImageView
             android:id="@+id/tv_logo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="220dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:contentDescription="RoyalCyberTV Logo"
             android:src="@mipmap/ic_launcher"
-            android:scaleType="centerInside" />
-
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:text="ROYALCYBER TV"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:scaleType="fitCenter" />
 
     </LinearLayout>
 
-    <!-- PLAYER -->
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/tv_player"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:background="#000000"
-        android:keepScreenOn="true"
-        app:show_buffering="when_playing"
-        app:use_controller="true" />
 
-    <!-- CHANNEL LIST -->
-    <ScrollView
-        android:id="@+id/tv_scroll"
+    <!-- =====================================================
+         TV MAIN AREA
+         ===================================================== -->
+
+    <FrameLayout
+        android:id="@+id/tv_content_area"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:background="#000000">
 
-        <LinearLayout
-            android:id="@+id/tv_channel_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp" />
+        <!--
+            এখন TV test screen খালি থাকবে।
+            পরে এখানে Channel / Player যোগ করা যাবে।
+        -->
 
-    </ScrollView>
-
-    <!-- FOOTER -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:gravity="center"
-        android:background="#111111">
-
-        <Button
-            android:id="@+id/tv_update_button"
+        <TextView
+            android:id="@+id/tv_test_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="UPDATE APPS"
-            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:text="RoyalCyberTV"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+
+    <!-- =====================================================
+         TV FOOTER
+         ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/tv_footer"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:background="#101010">
+
+        <TextView
+            android:id="@+id/tv_footer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RoyalCyberTV"
+            android:textColor="#AAAAAA"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+
+    <!-- =====================================================
+         TV BOTTOM NAVIGATION
+         ===================================================== -->
+
+    <LinearLayout
+        android:id="@+id/tv_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#151515"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <!-- Home -->
+
+        <TextView
+            android:id="@+id/tv_menu_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="⌂&#10;Home"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
             android:focusable="true"
-            android:focusableInTouchMode="true" />
+            android:focusableInTouchMode="true"
+            android:clickable="true"
+            android:background="@drawable/tv_nav_item" />
+
+        <!-- Update -->
+
+        <TextView
+            android:id="@+id/menu_update"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="↻&#10;Update"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
+            android:background="@drawable/tv_nav_item" />
 
     </LinearLayout>
 
