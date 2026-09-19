@@ -42,7 +42,7 @@
   },
   {
     "name": "Sony Max HD",
-    "logo": "",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
     "streamUrl": "https://cloudplay-sonyliv.pages.dev/maxhd.m3u8"
   },    
 {
