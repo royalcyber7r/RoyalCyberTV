@@ -6,13 +6,18 @@
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
 },
 {
+  "name": "SkY Sports",
+  "logo": "https://example.com/logo.png",
+  "streamUrl": "http://179.60.224.196:8000/play/a0i7/index.m3u8"
+},    
+{
   "name": "Xtrem Sports",
   "logo": "https://example.com/logo.png",
   "streamUrl": "https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/manifest.m3u8"
 },    
 {
   "name": "Sananda TV",
-  "logo": "https://example.com/logo.png",
+  "logo": "https://static.wikia.nocookie.net/logopedia/images/4/49/Sananda_TV_logo.jpeg",
   "streamUrl": "http://27.124.71.27/Zee_Bangla/tracks-v1a1/mono.m3u8"
 },  
   {
