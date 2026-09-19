@@ -6,9 +6,14 @@
     "streamUrl": "https://app.ncare.live/live-orgin/jagonews24.stream/playlist.m3u8"
 },
 {
-  "name": "beINSports-fr1",
+  "name": "Xtrem Sports",
   "logo": "https://example.com/logo.png",
-  "streamUrl": "http://iptv.am000.tv:8000/live/add17/add17/566.ts"
+  "streamUrl": "https://streams2.sofast.tv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/manifest.m3u8"
+},    
+{
+  "name": "Sananda TV",
+  "logo": "https://example.com/logo.png",
+  "streamUrl": "http://27.124.71.27/Zee_Bangla/tracks-v1a1/mono.m3u8"
 },  
   {
     "name": "Duronto TV (720p)",
