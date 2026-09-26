@@ -4,52 +4,41 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:background="#000000">
 
+    <!-- TV Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="ROYALCYBER TV"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:background="#151515" />
+
+    <!-- Loading / Error -->
+    <TextView
+        android:id="@+id/tv_loading"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="center"
+        android:text="Loading Channels..."
+        android:textColor="#BBBBBB"
+        android:textSize="16sp"
+        android:background="#101010" />
+
     <!-- Channel List -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.32"
-        android:orientation="vertical"
-        android:background="#151515"
-        android:padding="12dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:gravity="center"
-            android:text="ROYALCYBER TV"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_loading"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:gravity="center"
-            android:text="Loading Channels..."
-            android:textColor="#BBBBBB"
-            android:textSize="16sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tv_channel_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="4dp"
-            android:clipToPadding="false" />
-
-    </LinearLayout>
-
-    <!-- Empty Player Area -->
-    <FrameLayout
-        android:id="@+id/tv_player_container"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.68"
-        android:background="#000000" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tv_channel_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:descendantFocusability="afterDescendants" />
 
 </LinearLayout>
