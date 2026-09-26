@@ -62,6 +62,13 @@
             android:name=".UpdateActivity"
             android:exported="false" />
 
+        <!-- Simple Android TV Activity -->
+<activity
+    android:name=".TvMainActivity"
+    android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+    android:screenOrientation="landscape"
+    android:exported="false" />
+
         <!-- FileProvider -->
         <provider
             android:name="androidx.core.content.FileProvider"
