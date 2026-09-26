@@ -2,20 +2,30 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Internet -->
+    <!-- =========================================================
+         INTERNET
+         ========================================================= -->
     <uses-permission
         android:name="android.permission.INTERNET" />
 
-    <!-- APK install permission -->
+    <!-- =========================================================
+         APK INSTALL PERMISSION
+         ========================================================= -->
     <uses-permission
         android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- Android TV support -->
+    <!-- =========================================================
+         ANDROID TV SUPPORT
+         TV optional, Mobile-এ বাধ্যতামূলক নয়
+         ========================================================= -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
 
-    <!-- Touchscreen is not required -->
+    <!-- =========================================================
+         TOUCHSCREEN OPTIONAL
+         Android TV-তে touchscreen বাধ্যতামূলক নয়
+         ========================================================= -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -28,13 +38,17 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
-        <!--
+        <!-- =====================================================
              MOBILE LAUNCHER
-             Mobile এ Splash → MainActivity
-        -->
+             
+             Mobile:
+             SplashActivity
+                  ↓
+             MainActivity
+             ===================================================== -->
         <activity
             android:name=".SplashActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="true">
 
             <intent-filter>
@@ -42,7 +56,6 @@
                 <action
                     android:name="android.intent.action.MAIN" />
 
-                <!-- Normal Android launcher -->
                 <category
                     android:name="android.intent.category.LAUNCHER" />
 
@@ -51,10 +64,18 @@
         </activity>
 
 
-        <!--
+        <!-- =====================================================
              ANDROID TV LAUNCHER
-             TV-তে Splash ছাড়াই সরাসরি TvMainActivity
-        -->
+
+             TV:
+             TvMainActivity
+                  ↓
+             Channel List
+                  ↓
+             Channel Select
+                  ↓
+             TvPlayerActivity
+             ===================================================== -->
         <activity
             android:name=".TvMainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
@@ -66,7 +87,6 @@
                 <action
                     android:name="android.intent.action.MAIN" />
 
-                <!-- Android TV launcher -->
                 <category
                     android:name="android.intent.category.LEANBACK_LAUNCHER" />
 
@@ -75,20 +95,42 @@
         </activity>
 
 
-        <!-- Main Mobile Activity -->
+        <!-- =====================================================
+             TV PLAYER
+
+             শুধু নির্বাচিত Channel-এর Player
+             ===================================================== -->
+        <activity
+            android:name=".TvPlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:exported="false" />
+
+
+        <!-- =====================================================
+             MOBILE MAIN ACTIVITY
+
+             Mobile-এর আগের সম্পূর্ণ MainActivity code
+             এখানেই থাকবে।
+             ===================================================== -->
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false" />
 
 
-        <!-- Update -->
+        <!-- =====================================================
+             UPDATE ACTIVITY
+             ===================================================== -->
         <activity
             android:name=".UpdateActivity"
             android:exported="false" />
 
 
-        <!-- FileProvider -->
+        <!-- =====================================================
+             FILE PROVIDER
+             APK Update Install-এর জন্য
+             ===================================================== -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
