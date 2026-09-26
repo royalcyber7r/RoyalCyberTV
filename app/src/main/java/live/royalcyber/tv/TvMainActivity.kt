@@ -1,12 +1,7 @@
 package live.royalcyber.tv
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
@@ -22,8 +17,7 @@ import kotlin.concurrent.thread
 class TvMainActivity : AppCompatActivity() {
 
     private lateinit var playerView: PlayerView
-    private lateinit var channelRecyclerView: RecyclerView
-    private lateinit var channelAdapter: ChannelAdapter
+    private lateinit var channelList: RecyclerView
     private lateinit var loadingText: TextView
 
     private var player: ExoPlayer? = null
@@ -37,135 +31,29 @@ class TvMainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         /*
-         * Simple TV screen
+         * TV layout
          */
-        createTvInterface()
+        setContentView(R.layout.activity_tv_main)
 
         /*
-         * Player is created only when needed.
-         * This keeps TV startup light.
+         * Find views
          */
+        playerView = findViewById(R.id.tv_player)
 
-        loadChannels()
-    }
+        channelList = findViewById(R.id.tv_channel_list)
 
-    private fun createTvInterface() {
+        loadingText = findViewById(R.id.tv_loading)
 
         /*
-         * Main horizontal layout
-         *
-         * LEFT  = Channel List
-         * RIGHT = Video Player
+         * Channel list
          */
-        val mainLayout = LinearLayout(this)
-
-        mainLayout.orientation = LinearLayout.HORIZONTAL
-        mainLayout.setBackgroundColor(Color.BLACK)
-
-        /*
-         * Channel list area
-         */
-        val channelArea = LinearLayout(this)
-
-        channelArea.orientation = LinearLayout.VERTICAL
-        channelArea.setBackgroundColor(Color.rgb(18, 18, 18))
-        channelArea.setPadding(18, 18, 18, 18)
-
-        /*
-         * Header
-         */
-        val title = TextView(this)
-
-        title.text = "ROYALCYBER TV"
-        title.textSize = 22f
-        title.setTextColor(Color.WHITE)
-        title.gravity = Gravity.CENTER
-        title.setPadding(8, 12, 8, 20)
-
-        channelArea.addView(
-            title,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-
-        /*
-         * Loading text
-         */
-        loadingText = TextView(this)
-
-        loadingText.text = "Loading Channels..."
-        loadingText.textSize = 18f
-        loadingText.setTextColor(Color.LTGRAY)
-        loadingText.gravity = Gravity.CENTER
-        loadingText.visibility = View.VISIBLE
-
-        channelArea.addView(
-            loadingText,
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-
-        /*
-         * RecyclerView
-         */
-        channelRecyclerView = RecyclerView(this)
-
-        channelRecyclerView.layoutManager =
+        channelList.layoutManager =
             LinearLayoutManager(this)
 
-        channelRecyclerView.isFocusable = true
-        channelRecyclerView.isFocusableInTouchMode = true
-
-        channelArea.addView(
-            channelRecyclerView,
-            LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                1f
-            )
-        )
-
         /*
-         * Video Player
+         * Load channels
          */
-        playerView = PlayerView(this)
-
-        playerView.useController = true
-        playerView.setBackgroundColor(Color.BLACK)
-
-        /*
-         * Add channel area
-         *
-         * 32% screen width
-         */
-        mainLayout.addView(
-            channelArea,
-            LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                0.32f
-            )
-        )
-
-        /*
-         * Add player
-         *
-         * 68% screen width
-         */
-        mainLayout.addView(
-            playerView,
-            LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                0.68f
-            )
-        )
-
-        setContentView(mainLayout)
+        loadChannels()
     }
 
     private fun loadChannels() {
@@ -174,10 +62,12 @@ class TvMainActivity : AppCompatActivity() {
 
             try {
 
-                val url = URL(channelsJsonUrl)
+                val url =
+                    URL(channelsJsonUrl)
 
                 val connection =
-                    url.openConnection() as HttpURLConnection
+                    url.openConnection()
+                        as HttpURLConnection
 
                 connection.requestMethod = "GET"
 
@@ -195,16 +85,16 @@ class TvMainActivity : AppCompatActivity() {
 
                 connection.disconnect()
 
-                val jsonArray =
+                val json =
                     JSONArray(response)
 
-                val loadedChannels =
-                    mutableListOf<Channel>()
+                val list =
+                    ArrayList<Channel>()
 
-                for (i in 0 until jsonArray.length()) {
+                for (i in 0 until json.length()) {
 
                     val item =
-                        jsonArray.getJSONObject(i)
+                        json.getJSONObject(i)
 
                     val name =
                         item.optString("name")
@@ -220,7 +110,7 @@ class TvMainActivity : AppCompatActivity() {
                         streamUrl.isNotEmpty()
                     ) {
 
-                        loadedChannels.add(
+                        list.add(
                             Channel(
                                 name = name,
                                 logo = logo,
@@ -232,22 +122,17 @@ class TvMainActivity : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    channels =
-                        loadedChannels
+                    channels = list
 
                     showChannels()
                 }
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
 
                 runOnUiThread {
 
                     loadingText.text =
                         "Channel loading failed"
-
-                    loadingText.setTextColor(
-                        Color.RED
-                    )
                 }
             }
         }
@@ -255,9 +140,10 @@ class TvMainActivity : AppCompatActivity() {
 
     private fun showChannels() {
 
-        loadingText.visibility = View.GONE
+        loadingText.visibility =
+            View.GONE
 
-        channelAdapter =
+        val adapter =
             ChannelAdapter(
                 channels
             ) { channel ->
@@ -265,35 +151,33 @@ class TvMainActivity : AppCompatActivity() {
                 playChannel(channel)
             }
 
-        channelRecyclerView.adapter =
-            channelAdapter
+        channelList.adapter =
+            adapter
 
         /*
-         * Give focus to first channel
+         * Give focus to the first channel
+         * for Android TV remote.
          */
-        channelRecyclerView.post {
+        channelList.post {
 
             if (channels.isNotEmpty()) {
 
-                channelRecyclerView
+                channelList
                     .getChildAt(0)
                     ?.requestFocus()
 
-                if (
-                    channelRecyclerView
-                        .getChildAt(0) == null
-                ) {
-                    channelRecyclerView.requestFocus()
-                }
+                channelList.requestFocus()
             }
         }
     }
 
-    private fun playChannel(channel: Channel) {
+    private fun playChannel(
+        channel: Channel
+    ) {
 
         /*
          * Create player only when
-         * user selects a channel.
+         * the first channel is selected.
          */
         if (player == null) {
 
@@ -327,15 +211,10 @@ class TvMainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        super.onDestroy()
-
-        try {
-            channelAdapter.shutdown()
-        } catch (_: Exception) {
-        }
-
         player?.release()
 
         player = null
+
+        super.onDestroy()
     }
 }
