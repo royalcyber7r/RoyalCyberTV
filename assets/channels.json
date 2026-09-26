@@ -119,7 +119,13 @@
     "name": "Sony Max HD",
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
     "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/max_hd_abr/index.m3u8"
-  },    
+  },
+
+  {
+    "name": "Sony Max 2",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/SONY_MAX_Logo_2022.png",
+    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/max_2_abr/index.m3u8"
+  },  
 {
   "name": "Discovery HD",
   "logo": "https://static.wikia.nocookie.net/logopedia/images/6/6a/Discovery_HD_2009.png",
