@@ -1,7 +1,9 @@
 package live.royalcyber.tv
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
@@ -16,11 +18,12 @@ import kotlin.concurrent.thread
 
 class TvMainActivity : AppCompatActivity() {
 
-    private lateinit var playerView: PlayerView
     private lateinit var channelList: RecyclerView
     private lateinit var loadingText: TextView
+    private lateinit var playerContainer: FrameLayout
 
     private var player: ExoPlayer? = null
+    private var playerView: PlayerView? = null
 
     private var channels: List<Channel> = emptyList()
 
@@ -30,29 +33,20 @@ class TvMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /*
-         * TV layout
-         */
         setContentView(R.layout.activity_tv_main)
 
-        /*
-         * Find views
-         */
-        playerView = findViewById(R.id.tv_player)
+        channelList =
+            findViewById(R.id.tv_channel_list)
 
-        channelList = findViewById(R.id.tv_channel_list)
+        loadingText =
+            findViewById(R.id.tv_loading)
 
-        loadingText = findViewById(R.id.tv_loading)
+        playerContainer =
+            findViewById(R.id.tv_player_container)
 
-        /*
-         * Channel list
-         */
         channelList.layoutManager =
             LinearLayoutManager(this)
 
-        /*
-         * Load channels
-         */
         loadChannels()
     }
 
@@ -70,7 +64,6 @@ class TvMainActivity : AppCompatActivity() {
                         as HttpURLConnection
 
                 connection.requestMethod = "GET"
-
                 connection.connectTimeout = 15000
                 connection.readTimeout = 15000
 
@@ -127,7 +120,7 @@ class TvMainActivity : AppCompatActivity() {
                     showChannels()
                 }
 
-            } catch (_: Exception) {
+            } catch (e: Exception) {
 
                 runOnUiThread {
 
@@ -154,10 +147,6 @@ class TvMainActivity : AppCompatActivity() {
         channelList.adapter =
             adapter
 
-        /*
-         * Give focus to the first channel
-         * for Android TV remote.
-         */
         channelList.post {
 
             if (channels.isNotEmpty()) {
@@ -176,17 +165,32 @@ class TvMainActivity : AppCompatActivity() {
     ) {
 
         /*
-         * Create player only when
-         * the first channel is selected.
+         * Player is created ONLY after
+         * the user selects a channel.
          */
+
         if (player == null) {
 
             player =
                 ExoPlayer.Builder(this)
                     .build()
 
-            playerView.player =
-                player
+            playerView =
+                PlayerView(this)
+
+            playerView?.useController = true
+            playerView?.setBackgroundColor(Color.BLACK)
+            playerView?.player = player
+
+            playerContainer.removeAllViews()
+
+            playerContainer.addView(
+                playerView,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+            )
         }
 
         try {
@@ -214,6 +218,7 @@ class TvMainActivity : AppCompatActivity() {
         player?.release()
 
         player = null
+        playerView = null
 
         super.onDestroy()
     }
