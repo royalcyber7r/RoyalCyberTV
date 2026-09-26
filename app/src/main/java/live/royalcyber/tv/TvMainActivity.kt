@@ -1,73 +1,165 @@
 package live.royalcyber.tv
 
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
 import org.json.JSONArray
+
 import java.net.HttpURLConnection
 import java.net.URL
+
 import kotlin.concurrent.thread
+
 
 class TvMainActivity : AppCompatActivity() {
 
     private lateinit var channelList: RecyclerView
     private lateinit var loadingText: TextView
-    private lateinit var playerContainer: FrameLayout
-
-    private var player: ExoPlayer? = null
-    private var playerView: PlayerView? = null
 
     private var channels: List<Channel> = emptyList()
 
     private val channelsJsonUrl =
         "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/assets/channels.json"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+
+    companion object {
+
+        const val EXTRA_CHANNEL_NAME =
+            "tv_channel_name"
+
+        const val EXTRA_CHANNEL_LOGO =
+            "tv_channel_logo"
+
+        const val EXTRA_CHANNEL_URL =
+            "tv_channel_url"
+    }
+
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_tv_main)
+        /*
+         * TV Main-এ শুধু Channel List থাকবে।
+         *
+         * Player এখানে তৈরি হবে না।
+         *
+         * Flow:
+         *
+         * TvMainActivity
+         *      ↓
+         * Channel List
+         *      ↓
+         * Channel Select
+         *      ↓
+         * TvPlayerActivity
+         */
+
+        setContentView(
+            R.layout.activity_tv_main
+        )
+
 
         channelList =
-            findViewById(R.id.tv_channel_list)
+            findViewById(
+                R.id.tv_channel_list
+            )
 
         loadingText =
-            findViewById(R.id.tv_loading)
+            findViewById(
+                R.id.tv_loading
+            )
 
-        playerContainer =
-            findViewById(R.id.tv_player_container)
 
+        /*
+         * Remote / D-Pad navigation-এর জন্য
+         * RecyclerView focusable রাখা হচ্ছে।
+         */
+        channelList.isFocusable = true
+
+        channelList.isFocusableInTouchMode = true
+
+
+        /*
+         * Simple vertical TV Channel List
+         */
         channelList.layoutManager =
             LinearLayoutManager(this)
 
+
+        /*
+         * JSON থেকে Channel load
+         */
         loadChannels()
     }
 
+
+    /* =========================================================
+       LOAD CHANNELS
+       ========================================================= */
+
     private fun loadChannels() {
 
+        showLoading(
+            "Loading Channels..."
+        )
+
+
         thread {
+
+            var connection:
+                    HttpURLConnection? = null
 
             try {
 
                 val url =
                     URL(channelsJsonUrl)
 
-                val connection =
+
+                connection =
                     url.openConnection()
                         as HttpURLConnection
 
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 15000
-                connection.readTimeout = 15000
 
-                connection.connect()
+                connection.requestMethod =
+                    "GET"
+
+                connection.connectTimeout =
+                    15000
+
+                connection.readTimeout =
+                    15000
+
+                connection.useCaches =
+                    false
+
+                connection.setRequestProperty(
+                    "Cache-Control",
+                    "no-cache"
+                )
+
+
+                val responseCode =
+                    connection.responseCode
+
+
+                if (
+                    responseCode !in 200..299
+                ) {
+
+                    throw Exception(
+                        "HTTP $responseCode"
+                    )
+                }
+
 
                 val response =
                     connection.inputStream
@@ -76,34 +168,54 @@ class TvMainActivity : AppCompatActivity() {
                             it.readText()
                         }
 
-                connection.disconnect()
 
-                val json =
+                val jsonArray =
                     JSONArray(response)
 
-                val list =
-                    ArrayList<Channel>()
 
-                for (i in 0 until json.length()) {
+                val loadedChannels =
+                    mutableListOf<Channel>()
+
+
+                for (
+                    index in 0 until jsonArray.length()
+                ) {
 
                     val item =
-                        json.getJSONObject(i)
+                        jsonArray.optJSONObject(
+                            index
+                        )
+                            ?: continue
+
 
                     val name =
-                        item.optString("name")
+                        item
+                            .optString("name")
+                            .trim()
+
 
                     val logo =
-                        item.optString("logo")
+                        item
+                            .optString("logo")
+                            .trim()
+
 
                     val streamUrl =
-                        item.optString("streamUrl")
+                        item
+                            .optString("streamUrl")
+                            .trim()
 
+
+                    /*
+                     * Name এবং Stream URL থাকলেই
+                     * Channel valid ধরা হবে।
+                     */
                     if (
                         name.isNotEmpty() &&
                         streamUrl.isNotEmpty()
                     ) {
 
-                        list.add(
+                        loadedChannels.add(
                             Channel(
                                 name = name,
                                 logo = logo,
@@ -113,112 +225,302 @@ class TvMainActivity : AppCompatActivity() {
                     }
                 }
 
+
                 runOnUiThread {
 
-                    channels = list
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@runOnUiThread
+                    }
+
+
+                    channels =
+                        loadedChannels
+
+
+                    if (
+                        channels.isEmpty()
+                    ) {
+
+                        showError(
+                            "কোনো Channel পাওয়া যায়নি"
+                        )
+
+                        return@runOnUiThread
+                    }
+
 
                     showChannels()
                 }
 
-            } catch (e: Exception) {
+
+            } catch (
+                e: Exception
+            ) {
 
                 runOnUiThread {
 
-                    loadingText.text =
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
+                        return@runOnUiThread
+                    }
+
+
+                    showError(
                         "Channel loading failed"
+                    )
+
+
+                    Toast.makeText(
+                        this,
+                        "Channels লোড করা যাচ্ছে না",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+
+            } finally {
+
+                try {
+
+                    connection?.disconnect()
+
+                } catch (
+                    _: Exception
+                ) {
                 }
             }
         }
     }
+
+
+    /* =========================================================
+       SHOW CHANNEL LIST
+       ========================================================= */
 
     private fun showChannels() {
 
         loadingText.visibility =
             View.GONE
 
+
+        /*
+         * আপনার existing ChannelAdapter ব্যবহার করা হবে।
+         *
+         * Channel select করলে সরাসরি
+         * TvPlayerActivity open হবে।
+         */
         val adapter =
             ChannelAdapter(
-                channels
-            ) { channel ->
+                channels = channels,
+                onChannelClick = { channel ->
 
-                playChannel(channel)
-            }
+                    openTvPlayer(
+                        channel
+                    )
+                }
+            )
+
 
         channelList.adapter =
             adapter
 
+
+        /*
+         * প্রথম Channel-এ TV remote focus
+         */
         channelList.post {
 
-            if (channels.isNotEmpty()) {
+            if (
+                channels.isNotEmpty() &&
+                !isFinishing &&
+                !isDestroyed
+            ) {
 
-                channelList
-                    .getChildAt(0)
-                    ?.requestFocus()
+                channelList.scrollToPosition(
+                    0
+                )
+
 
                 channelList.requestFocus()
+
+
+                channelList
+                    .layoutManager
+                    ?.findViewByPosition(0)
+                    ?.requestFocus()
             }
         }
     }
 
-    private fun playChannel(
+
+    /* =========================================================
+       OPEN TV PLAYER
+       ========================================================= */
+
+    private fun openTvPlayer(
         channel: Channel
     ) {
 
-        /*
-         * Player is created ONLY after
-         * the user selects a channel.
-         */
-
-        if (player == null) {
-
-            player =
-                ExoPlayer.Builder(this)
-                    .build()
-
-            playerView =
-                PlayerView(this)
-
-            playerView?.useController = true
-            playerView?.setBackgroundColor(Color.BLACK)
-            playerView?.player = player
-
-            playerContainer.removeAllViews()
-
-            playerContainer.addView(
-                playerView,
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-            )
+        if (
+            isFinishing ||
+            isDestroyed
+        ) {
+            return
         }
 
-        try {
 
-            val mediaItem =
-                MediaItem.fromUri(
-                    channel.streamUrl
-                )
+        val streamUrl =
+            channel.streamUrl.trim()
 
-            player?.apply {
 
-                setMediaItem(mediaItem)
+        if (streamUrl.isEmpty()) {
 
-                prepare()
+            Toast.makeText(
+                this,
+                "এই Channel-এর Stream URL নেই",
+                Toast.LENGTH_SHORT
+            ).show()
 
-                playWhenReady = true
+            return
+        }
+
+
+        /*
+         * TvPlayerActivity-তে Channel information
+         * Intent extras দিয়ে পাঠানো হবে।
+         */
+        val intent =
+            Intent(
+                this,
+                TvPlayerActivity::class.java
+            )
+
+
+        intent.putExtra(
+            EXTRA_CHANNEL_NAME,
+            channel.name
+        )
+
+
+        intent.putExtra(
+            EXTRA_CHANNEL_LOGO,
+            channel.logo
+        )
+
+
+        intent.putExtra(
+            EXTRA_CHANNEL_URL,
+            streamUrl
+        )
+
+
+        startActivity(intent)
+    }
+
+
+    /* =========================================================
+       LOADING
+       ========================================================= */
+
+    private fun showLoading(
+        message: String
+    ) {
+
+        if (
+            !::loadingText.isInitialized
+        ) {
+            return
+        }
+
+
+        loadingText.text =
+            message
+
+
+        loadingText.visibility =
+            View.VISIBLE
+    }
+
+
+    /* =========================================================
+       ERROR
+       ========================================================= */
+
+    private fun showError(
+        message: String
+    ) {
+
+        if (
+            !::loadingText.isInitialized
+        ) {
+            return
+        }
+
+
+        loadingText.text =
+            message
+
+
+        loadingText.visibility =
+            View.VISIBLE
+    }
+
+
+    /* =========================================================
+       RESUME
+       ========================================================= */
+
+    override fun onResume() {
+
+        super.onResume()
+
+
+        /*
+         * TvPlayerActivity থেকে Back করে
+         * Channel List-এ ফিরলে আবার focus থাকবে।
+         */
+        if (
+            ::channelList.isInitialized
+        ) {
+
+            channelList.post {
+
+                if (
+                    !isFinishing &&
+                    !isDestroyed
+                ) {
+
+                    channelList.requestFocus()
+                }
             }
-
-        } catch (_: Exception) {
         }
     }
 
+
+    /* =========================================================
+       DESTROY
+       ========================================================= */
+
     override fun onDestroy() {
 
-        player?.release()
+        /*
+         * কোনো Player নেই।
+         * তাই এখানে ExoPlayer release করার দরকার নেই।
+         */
 
-        player = null
-        playerView = null
+        if (
+            ::channelList.isInitialized
+        ) {
+
+            channelList.adapter =
+                null
+        }
+
 
         super.onDestroy()
     }
