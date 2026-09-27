@@ -1,5 +1,16 @@
 [
 
+  {
+    "name": "Willow HD",
+    "logo": "https://aimages.willow.tv/wlo_logo_200_200.jpg",
+    "streamUrl": "https://warm-caverns-48629-92fab798385f.herokuapp.com/https://d36r8jifhgsk5j.cloudfront.net/Willow_TV540p.m3u8"
+  },
+  {
+    "name": "MIXER | Marquee Sports Network",
+    "logo": "https://s3.aynaott.com/storage/66bdaa21aba96de6d32a3515715f7502",
+    "streamUrl": "https://tvsen6.aynaott.com/MarqueeSportsNetwork/index.m3u8"
+  },  
+
 {
   "name": "Channel 52",
   "logo": "https://yt3.googleusercontent.com/ytc/AIdro_nkJKVbw8obzDxMqr3icQerQ6PvZlkDFjbBaYRBfn83Lw=s160-c-k-c0x00ffffff-no-rj",
