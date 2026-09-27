@@ -1,5 +1,32 @@
 [
 
+
+  {
+    "name": "Star Sports 2",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/star-sports-2.png",
+    "streamUrl": "https://tvsen7.aynaott.com/ssport2hd/index.m3u8"
+  },
+  {
+    "name": "NHL Network",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/nhl-network.png",
+    "streamUrl": "https://nhl-firetv.amagi.tv/playlist.m3u8"
+  },
+  {
+    "name": "Sky Sports Action",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/sky-sports-action.png",
+    "streamUrl": "http://2756d46c.akciatv.ru/iptv/7FRNF6CY9A9TG3/9155/index.m3u"
+  },
+  {
+    "name": "Sky Sports Cricket",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/sky-sports-cricket.png",
+    "streamUrl": "http://2756d46c.akciatv.ru/iptv/7FRNF6CY9A9TG3/9258/index.m3u8"
+  },
+  {
+    "name": "Sky Sports Football",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/sky-sports-football.png",
+    "streamUrl": "http://2756d46c.akciatv.ru/iptv/7FRNF6CY9A9TG3/9289/index.m3u8"
+  },  
+
 {
   "name": "Fox Sports 1",
   "logo": "",
