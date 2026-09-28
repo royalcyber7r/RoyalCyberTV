@@ -1,6 +1,12 @@
 [
 
   {
+    "name": "BBC Drama",
+    "logo": "https://i.imgur.com/hY1M4hL.jpg",
+    "streamUrl": "https://amg00793-amg00793c41-rakuten-it-5445.playouts.now.amagi.tv/playlist.m3u8"
+  },
+
+  {
     "name": "Arirang TV",
     "logo": "https://cdn.theorg.com/78660ec3-1157-4f38-9256-81a539d3d3ca_medium.jpg",
     "streamUrl": "https://amdlive-ch01.ctnd.com.edgesuite.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8"
