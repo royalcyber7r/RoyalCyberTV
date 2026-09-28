@@ -1,7 +1,13 @@
 [
 
   {
-    "name": "Zee Tv",
+    "name": "Goldmines",
+    "logo": "https://i.postimg.cc/7ZNqRywh/20240823-023440.png",
+    "streamUrl": "https://streams.tangotv.in/GOLDMINES/ORIGIN/index.m3u8"
+  },
+
+  {
+    "name": "Zee Tv HD",
     "logo": "https://i.postimg.cc/x8BwX6QW/20240823_022929.png",
     "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/zee_tv_hd_abr/index.m3u8"
   },
