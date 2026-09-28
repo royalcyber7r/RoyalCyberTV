@@ -1,6 +1,12 @@
 [
 
   {
+    "name": "MBC Drama AE",
+    "logo": "https://i.imgur.com/g5PWnqp.png",
+    "streamUrl": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8"
+  },
+
+  {
     "name": "BBC Drama",
     "logo": "https://i.imgur.com/hY1M4hL.jpg",
     "streamUrl": "https://amg00793-amg00793c41-rakuten-it-5445.playouts.now.amagi.tv/playlist.m3u8"
