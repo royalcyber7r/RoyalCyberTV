@@ -39,6 +39,10 @@ class TvMainActivity : AppCompatActivity() {
 
         channelList.layoutManager = LinearLayoutManager(this)
 
+        // TV remote focus
+        channelList.isFocusable = true
+        channelList.isFocusableInTouchMode = true
+
         loadChannels()
     }
 
@@ -60,6 +64,10 @@ class TvMainActivity : AppCompatActivity() {
                 connection.connectTimeout = 15000
                 connection.readTimeout = 15000
                 connection.useCaches = false
+                connection.setRequestProperty(
+                    "Cache-Control",
+                    "no-cache"
+                )
 
                 val responseCode = connection.responseCode
 
@@ -118,6 +126,9 @@ class TvMainActivity : AppCompatActivity() {
                         loadingText.text =
                             "No channels found"
 
+                        loadingText.visibility =
+                            View.VISIBLE
+
                         return@runOnUiThread
                     }
 
@@ -131,14 +142,22 @@ class TvMainActivity : AppCompatActivity() {
                             }
                         )
 
+                    // Give focus to first channel
                     channelList.post {
 
-                        if (!isFinishing &&
+                        if (
+                            !isFinishing &&
                             !isDestroyed &&
                             channels.isNotEmpty()
                         ) {
-                            channelList.requestFocus()
+
                             channelList.scrollToPosition(0)
+
+                            channelList.requestFocus()
+
+                            channelList.layoutManager
+                                ?.findViewByPosition(0)
+                                ?.requestFocus()
                         }
                     }
                 }
@@ -153,6 +172,9 @@ class TvMainActivity : AppCompatActivity() {
 
                     loadingText.text =
                         "Channel loading failed"
+
+                    loadingText.visibility =
+                        View.VISIBLE
                 }
 
             } finally {
