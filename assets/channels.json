@@ -25,7 +25,7 @@
 
 {
 "name": "MBC Drama AE",
-"logo": "https://i.imgur.com/g5PWnqp.png",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8"
 },
 
@@ -37,7 +37,7 @@
 
 {
 "name": "Arirang TV",
-"logo": "http://cdn.theorg.com/78660ec3-1157-4f38-9256-81a539d3d3ca_medium.jpg",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://amdlive-ch01.ctnd.com.edgesuite.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8"
 },
 
@@ -112,74 +112,74 @@
 
 {
 "name": "Peace TV English",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://dzkyvlfyge.erbvr.com/PeaceTvEnglish/index.m3u8"
 },
 {
 "name": "Moon TV",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "http://115.187.41.216:8080/hls/montvbangla/index.m3u8"
 },
 
 {
 "name": "Nan TV",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/nantv.stream/live-orgin/nantv.stream/playlist.m3u8"
 },
 {
 "name": "BeIN Sports Extra 2",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8"
 },
 {
 "name": "Digital Fashion",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "http://115.187.41.216:8080/hls/digitalfashion/index.m3u8"
 },
 
 {
 "name": "Sonic Bangla",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "http://198.195.239.50:8095/sonic/index.m3u8"
 },
 {
 "name": "Nick Bangla",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "http://198.195.239.50:8095/nick/index.m3u8"
 },
 {
 "name": "Pogo",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/pogo_sd_abr/index.m3u8"
 },
 {
 "name": "Discovery Kids",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/discovery_kids_abr/index.m3u8"
 },
 {
 "name": "&TV",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/and_tv_hd_abr/index.m3u8"
 },
 {
 "name": "PTV",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://flussonic.defineatoz.com/PTV/index.m3u8"
 },
 {
 "name": "National Wild HD",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "http://202.70.146.135:8000/play/a05j/index.m3u8"
 },
 {
 "name": "Love Nature",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://bamusa-naturetime-emea-eng-rakuten.amagi.tv/playlist.m3u8"
 },
 {
 "name": "Travel XP TV",
-"logo": "",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
 "streamUrl": "https://27c980761ff9437d929e64647afe183a.mediatailor.us-east-1.amazonaws.com/v1/master/44f73ba4d03e9607dcd9bebdcb8494d86964f1d8/RakutenTV-eu_TravelXP/playlist.m3u8"
 },
 
