@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:background="#000000">
 
-    <!-- TV Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -16,20 +15,18 @@
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:background="#151515" />
+        android:background="#111111" />
 
-    <!-- Loading / Error -->
     <TextView
         android:id="@+id/tv_loading"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:gravity="center"
         android:text="Loading Channels..."
-        android:textColor="#BBBBBB"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
-        android:background="#101010" />
+        android:background="#111111" />
 
-    <!-- Channel List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tv_channel_list"
         android:layout_width="match_parent"
@@ -38,7 +35,6 @@
         android:padding="12dp"
         android:clipToPadding="false"
         android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:descendantFocusability="afterDescendants" />
+        android:focusableInTouchMode="true" />
 
 </LinearLayout>
