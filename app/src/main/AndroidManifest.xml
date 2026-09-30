@@ -1,31 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- =========================================================
-         INTERNET
-         ========================================================= -->
     <uses-permission
         android:name="android.permission.INTERNET" />
 
-    <!-- =========================================================
-         APK INSTALL PERMISSION
-         ========================================================= -->
-    <uses-permission
-        android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-    <!-- =========================================================
-         ANDROID TV SUPPORT
-         TV optional, Mobile-এ বাধ্যতামূলক নয়
-         ========================================================= -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
 
-    <!-- =========================================================
-         TOUCHSCREEN OPTIONAL
-         Android TV-তে touchscreen বাধ্যতামূলক নয়
-         ========================================================= -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -38,14 +22,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
-        <!-- =====================================================
-             MOBILE LAUNCHER
-             
-             Mobile:
-             SplashActivity
-                  ↓
-             MainActivity
-             ===================================================== -->
+        <!-- MOBILE ONLY -->
         <activity
             android:name=".SplashActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
@@ -64,18 +41,7 @@
         </activity>
 
 
-        <!-- =====================================================
-             ANDROID TV LAUNCHER
-
-             TV:
-             TvMainActivity
-                  ↓
-             Channel List
-                  ↓
-             Channel Select
-                  ↓
-             TvPlayerActivity
-             ===================================================== -->
+        <!-- ANDROID TV ONLY -->
         <activity
             android:name=".TvMainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
@@ -95,11 +61,7 @@
         </activity>
 
 
-        <!-- =====================================================
-             TV PLAYER
-
-             শুধু নির্বাচিত Channel-এর Player
-             ===================================================== -->
+        <!-- TV PLAYER -->
         <activity
             android:name=".TvPlayerActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
@@ -107,30 +69,19 @@
             android:exported="false" />
 
 
-        <!-- =====================================================
-             MOBILE MAIN ACTIVITY
-
-             Mobile-এর আগের সম্পূর্ণ MainActivity code
-             এখানেই থাকবে।
-             ===================================================== -->
+        <!-- MOBILE -->
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false" />
 
 
-        <!-- =====================================================
-             UPDATE ACTIVITY
-             ===================================================== -->
+        <!-- MOBILE UPDATE -->
         <activity
             android:name=".UpdateActivity"
             android:exported="false" />
 
 
-        <!-- =====================================================
-             FILE PROVIDER
-             APK Update Install-এর জন্য
-             ===================================================== -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
