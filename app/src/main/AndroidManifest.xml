@@ -28,10 +28,14 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
-        <!-- Splash / Launcher -->
+        <!-- ====================================================== -->
+        <!-- MOBILE LAUNCHER -->
+        <!-- Mobile will start SplashActivity first -->
+        <!-- ====================================================== -->
+
         <activity
             android:name=".SplashActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="true">
 
             <intent-filter>
@@ -39,11 +43,31 @@
                 <action
                     android:name="android.intent.action.MAIN" />
 
-                <!-- Normal Android launcher -->
                 <category
                     android:name="android.intent.category.LAUNCHER" />
 
-                <!-- Android TV launcher -->
+            </intent-filter>
+
+        </activity>
+
+
+        <!-- ====================================================== -->
+        <!-- ANDROID TV MAIN -->
+        <!-- TV starts directly here -->
+        <!-- No Splash / Search / Notification / Update / Footer -->
+        <!-- ====================================================== -->
+
+        <activity
+            android:name=".TvMainActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:exported="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.intent.action.MAIN" />
+
                 <category
                     android:name="android.intent.category.LEANBACK_LAUNCHER" />
 
@@ -51,18 +75,44 @@
 
         </activity>
 
-        <!-- Main -->
+
+        <!-- ====================================================== -->
+        <!-- ANDROID TV PLAYER -->
+        <!-- ====================================================== -->
+
+        <activity
+            android:name=".TvPlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:exported="false" />
+
+
+        <!-- ====================================================== -->
+        <!-- MOBILE MAIN -->
+        <!-- Existing mobile MainActivity remains unchanged -->
+        <!-- ====================================================== -->
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false" />
 
-        <!-- Update -->
+
+        <!-- ====================================================== -->
+        <!-- UPDATE ACTIVITY -->
+        <!-- ====================================================== -->
+
         <activity
             android:name=".UpdateActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
 
-        <!-- FileProvider -->
+
+        <!-- ====================================================== -->
+        <!-- FILE PROVIDER -->
+        <!-- Used for APK update installation -->
+        <!-- ====================================================== -->
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
