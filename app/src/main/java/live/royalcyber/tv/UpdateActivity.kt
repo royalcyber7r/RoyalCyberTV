@@ -18,8 +18,8 @@ import androidx.core.content.FileProvider
 import org.json.JSONArray
 
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -33,19 +33,9 @@ class UpdateActivity : AppCompatActivity() {
         private const val RELEASES_API =
             "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=100"
 
-        /*
-         * GitHub Release Asset-এর নাম
-         *
-         * Release-এ APK-এর নাম অবশ্যই:
-         *
-         * RoyalCyberTV.apk
-         */
         private const val APK_NAME =
             "RoyalCyberTV.apk"
 
-        /*
-         * Temporary file
-         */
         private const val TEMP_APK_NAME =
             "RoyalCyberTV.apk.part"
     }
@@ -95,10 +85,6 @@ class UpdateActivity : AppCompatActivity() {
         setContentView(R.layout.activity_update)
 
 
-        // -----------------------------------------------------
-        // FIND VIEWS
-        // -----------------------------------------------------
-
         titleText =
             findViewById(R.id.update_title)
 
@@ -121,10 +107,6 @@ class UpdateActivity : AppCompatActivity() {
             findViewById(R.id.update_later)
 
 
-        // -----------------------------------------------------
-        // INITIAL STATE
-        // -----------------------------------------------------
-
         progressBar.max = 100
         progressBar.progress = 0
 
@@ -134,17 +116,18 @@ class UpdateActivity : AppCompatActivity() {
         laterText.isEnabled = true
 
 
-        // -----------------------------------------------------
-        // UPDATE BUTTON
-        // -----------------------------------------------------
+        // =====================================================
+        // DOWNLOAD BUTTON
+        // =====================================================
 
         updateButton.setOnClickListener {
 
-            if (isChecking || isDownloading) {
+            if (isDownloading) {
                 return@setOnClickListener
             }
 
-            val apkUrl = latestApkUrl
+            val apkUrl =
+                latestApkUrl
 
             if (apkUrl.isNullOrBlank()) {
 
@@ -158,16 +141,15 @@ class UpdateActivity : AppCompatActivity() {
             }
 
 
-            updateButton.isEnabled = false
-            laterText.isEnabled = false
-
-            startApkDownload(apkUrl)
+            startApkDownload(
+                apkUrl
+            )
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // LATER
-        // -----------------------------------------------------
+        // =====================================================
 
         laterText.setOnClickListener {
 
@@ -179,9 +161,9 @@ class UpdateActivity : AppCompatActivity() {
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // CHECK UPDATE
-        // -----------------------------------------------------
+        // =====================================================
 
         checkLatestRelease()
     }
@@ -199,6 +181,7 @@ class UpdateActivity : AppCompatActivity() {
 
         isChecking = true
 
+
         titleText.text =
             "Checking for Update"
 
@@ -208,7 +191,8 @@ class UpdateActivity : AppCompatActivity() {
         messageText.text =
             "নতুন Version খোঁজা হচ্ছে..."
 
-        updateButton.isEnabled = false
+        updateButton.isEnabled =
+            false
 
 
         thread {
@@ -220,18 +204,27 @@ class UpdateActivity : AppCompatActivity() {
                 val url =
                     URL(RELEASES_API)
 
+
                 connection =
-                    url.openConnection() as HttpURLConnection
+                    url.openConnection()
+                        as HttpURLConnection
 
-                connection.requestMethod = "GET"
 
-                connection.connectTimeout = 15000
+                connection.requestMethod =
+                    "GET"
 
-                connection.readTimeout = 20000
+                connection.connectTimeout =
+                    20000
 
-                connection.useCaches = false
+                connection.readTimeout =
+                    30000
 
-                connection.instanceFollowRedirects = true
+                connection.useCaches =
+                    false
+
+                connection.instanceFollowRedirects =
+                    true
+
 
                 connection.setRequestProperty(
                     "Accept",
@@ -268,36 +261,42 @@ class UpdateActivity : AppCompatActivity() {
                     JSONArray(response)
 
 
-                var selectedTag = ""
+                var selectedTag =
+                    ""
 
-                var selectedApkUrl = ""
+                var selectedApkUrl =
+                    ""
 
 
-                // -------------------------------------------------
-                // FIND FIRST VALID RELEASE WITH APK
-                // -------------------------------------------------
+                // =================================================
+                // FIND APK
+                // =================================================
 
-                for (i in 0 until releases.length()) {
+                for (
+                    i in 0 until releases.length()
+                ) {
 
                     val release =
                         releases.optJSONObject(i)
                             ?: continue
 
 
-                    val draft =
+                    if (
                         release.optBoolean(
                             "draft",
                             false
                         )
+                    ) {
+                        continue
+                    }
 
-                    val prerelease =
+
+                    if (
                         release.optBoolean(
                             "prerelease",
                             false
                         )
-
-
-                    if (draft || prerelease) {
+                    ) {
                         continue
                     }
 
@@ -314,11 +313,15 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     val assets =
-                        release.optJSONArray("assets")
+                        release.optJSONArray(
+                            "assets"
+                        )
                             ?: continue
 
 
-                    for (j in 0 until assets.length()) {
+                    for (
+                        j in 0 until assets.length()
+                    ) {
 
                         val asset =
                             assets.optJSONObject(j)
@@ -331,7 +334,7 @@ class UpdateActivity : AppCompatActivity() {
                             ).trim()
 
 
-                        val browserUrl =
+                        val downloadUrl =
                             asset.optString(
                                 "browser_download_url"
                             ).trim()
@@ -342,21 +345,23 @@ class UpdateActivity : AppCompatActivity() {
                                 APK_NAME,
                                 ignoreCase = true
                             ) &&
-                            browserUrl.isNotEmpty()
+                            downloadUrl.isNotEmpty()
                         ) {
 
                             selectedTag =
                                 tagName
 
                             selectedApkUrl =
-                                browserUrl
+                                downloadUrl
 
                             break
                         }
                     }
 
 
-                    if (selectedApkUrl.isNotEmpty()) {
+                    if (
+                        selectedApkUrl.isNotEmpty()
+                    ) {
                         break
                     }
                 }
@@ -364,15 +369,20 @@ class UpdateActivity : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    if (isFinishing || isDestroyed) {
+                    isChecking = false
+
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
                         return@runOnUiThread
                     }
 
 
-                    isChecking = false
-
-
-                    if (selectedApkUrl.isEmpty()) {
+                    if (
+                        selectedApkUrl.isEmpty()
+                    ) {
 
                         titleText.text =
                             "No Update"
@@ -383,19 +393,21 @@ class UpdateActivity : AppCompatActivity() {
                         messageText.text =
                             "GitHub Release-এ $APK_NAME পাওয়া যায়নি।"
 
-                        updateButton.isEnabled = false
+                        updateButton.isEnabled =
+                            false
 
-                        laterText.isEnabled = true
+                        laterText.isEnabled =
+                            true
 
                         return@runOnUiThread
                     }
 
 
-                    latestApkUrl =
-                        selectedApkUrl
-
                     latestVersionName =
                         selectedTag
+
+                    latestApkUrl =
+                        selectedApkUrl
 
 
                     titleText.text =
@@ -410,18 +422,18 @@ class UpdateActivity : AppCompatActivity() {
                         "নতুন Version পাওয়া গেছে।\n\nUpdate Now চাপুন।"
 
 
-                    updateButton.isEnabled =
-                        true
-
-                    laterText.isEnabled =
-                        true
-
-
                     progressBar.progress =
                         0
 
                     percentText.text =
                         "0 %"
+
+
+                    updateButton.isEnabled =
+                        true
+
+                    laterText.isEnabled =
+                        true
                 }
 
 
@@ -429,12 +441,15 @@ class UpdateActivity : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    if (isFinishing || isDestroyed) {
+                    isChecking = false
+
+
+                    if (
+                        isFinishing ||
+                        isDestroyed
+                    ) {
                         return@runOnUiThread
                     }
-
-
-                    isChecking = false
 
 
                     titleText.text =
@@ -447,7 +462,8 @@ class UpdateActivity : AppCompatActivity() {
 
                     messageText.text =
                         "Update check করা যাচ্ছে না।\n\n${
-                            e.message ?: "Internet connection পরীক্ষা করুন।"
+                            e.message
+                                ?: "Internet connection পরীক্ষা করুন।"
                         }"
 
 
@@ -477,12 +493,20 @@ class UpdateActivity : AppCompatActivity() {
         apkUrl: String
     ) {
 
-        if (isDownloading || isChecking) {
+        if (isDownloading) {
             return
         }
 
 
-        isDownloading = true
+        isDownloading =
+            true
+
+
+        updateButton.isEnabled =
+            false
+
+        laterText.isEnabled =
+            false
 
 
         titleText.text =
@@ -499,25 +523,27 @@ class UpdateActivity : AppCompatActivity() {
             "APK download শুরু হচ্ছে..."
 
 
-        progressBar.progress = 0
+        progressBar.progress =
+            0
 
-        percentText.text = "0 %"
+        percentText.text =
+            "0 %"
 
 
         thread {
 
-            var connection: HttpURLConnection? = null
+            var connection: HttpURLConnection? =
+                null
 
-            var inputStream: InputStream? = null
-
-            var outputStream: FileOutputStream? = null
+            var outputStream: FileOutputStream? =
+                null
 
 
             try {
 
-                // -------------------------------------------------
+                // =================================================
                 // DOWNLOAD DIRECTORY
-                // -------------------------------------------------
+                // =================================================
 
                 val downloadDirectory =
                     getExternalFilesDir(
@@ -542,10 +568,6 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
-                // -------------------------------------------------
-                // FILES
-                // -------------------------------------------------
-
                 val apkFile =
                     File(
                         downloadDirectory,
@@ -560,316 +582,273 @@ class UpdateActivity : AppCompatActivity() {
                     )
 
 
-                // -------------------------------------------------
-                // REMOVE OLD FILE
-                // -------------------------------------------------
-
                 if (tempFile.exists()) {
                     tempFile.delete()
                 }
+
 
                 if (apkFile.exists()) {
                     apkFile.delete()
                 }
 
 
-                // -------------------------------------------------
-                // CONNECT TO GITHUB
-                // -------------------------------------------------
+                // =================================================
+                // OPEN GITHUB APK URL
+                // =================================================
 
-                var currentUrl =
-                    apkUrl
+                val url =
+                    URL(apkUrl)
 
 
-                var redirectCount = 0
+                connection =
+                    url.openConnection()
+                        as HttpURLConnection
+
+
+                connection.requestMethod =
+                    "GET"
+
+
+                connection.connectTimeout =
+                    30000
+
+                connection.readTimeout =
+                    120000
+
+
+                connection.useCaches =
+                    false
 
 
                 /*
-                 * GitHub Release asset সাধারণত redirect করে।
-                 * তাই manually redirect handle করা হচ্ছে।
+                 * GitHub Release APK redirect follow করবে।
                  */
-
-                while (true) {
-
-                    if (redirectCount > 10) {
-
-                        throw Exception(
-                            "Too many redirects"
-                        )
-                    }
+                connection.instanceFollowRedirects =
+                    true
 
 
-                    val url =
-                        URL(currentUrl)
+                connection.setRequestProperty(
+                    "User-Agent",
+                    "RoyalCyberTV"
+                )
 
 
-                    connection =
-                        url.openConnection()
-                            as HttpURLConnection
+                connection.setRequestProperty(
+                    "Accept",
+                    "application/octet-stream"
+                )
 
 
-                    connection.requestMethod =
-                        "GET"
+                // =================================================
+                // CONNECT
+                // =================================================
+
+                val responseCode =
+                    connection.responseCode
 
 
-                    connection.connectTimeout =
-                        30000
+                if (
+                    responseCode !in 200..299
+                ) {
 
-
-                    connection.readTimeout =
-                        60000
-
-
-                    connection.useCaches =
-                        false
-
-
-                    connection.instanceFollowRedirects =
-                        false
-
-
-                    connection.setRequestProperty(
-                        "User-Agent",
-                        "RoyalCyberTV"
+                    throw Exception(
+                        "APK download HTTP $responseCode"
                     )
-
-
-                    connection.setRequestProperty(
-                        "Accept",
-                        "application/octet-stream"
-                    )
-
-
-                    val responseCode =
-                        connection.responseCode
-
-
-                    // -------------------------------------------------
-                    // REDIRECT
-                    // -------------------------------------------------
-
-                    if (
-                        responseCode == 301 ||
-                        responseCode == 302 ||
-                        responseCode == 303 ||
-                        responseCode == 307 ||
-                        responseCode == 308
-                    ) {
-
-                        val location =
-                            connection.getHeaderField(
-                                "Location"
-                            )
-
-
-                        connection.disconnect()
-
-
-                        if (location.isNullOrBlank()) {
-
-                            throw Exception(
-                                "GitHub download redirect পাওয়া যায়নি"
-                            )
-                        }
-
-
-                        currentUrl =
-                            URL(
-                                URL(currentUrl),
-                                location
-                            ).toString()
-
-
-                        redirectCount++
-
-                        continue
-                    }
-
-
-                    // -------------------------------------------------
-                    // SUCCESS
-                    // -------------------------------------------------
-
-                    if (responseCode !in 200..299) {
-
-                        throw Exception(
-                            "APK download HTTP $responseCode"
-                        )
-                    }
-
-
-                    break
                 }
 
-
-                // -------------------------------------------------
-                // FILE SIZE
-                // -------------------------------------------------
 
                 val totalBytes =
                     connection.contentLengthLong
 
 
-                inputStream =
-                    connection.inputStream
-
-
-                outputStream =
-                    FileOutputStream(
-                        tempFile
-                    )
-
-
-                val buffer =
-                    ByteArray(64 * 1024)
-
-
-                var downloadedBytes = 0L
-
-                var lastProgress = -1
-
-
-                // -------------------------------------------------
+                // =================================================
                 // DOWNLOAD
-                // -------------------------------------------------
+                // =================================================
 
-                while (true) {
+                connection.inputStream.use { input ->
 
-                    val count =
-                        inputStream.read(buffer)
-
-
-                    if (count == -1) {
-                        break
-                    }
+                    outputStream =
+                        FileOutputStream(
+                            tempFile
+                        )
 
 
-                    if (count <= 0) {
-                        continue
-                    }
+                    val buffer =
+                        ByteArray(
+                            64 * 1024
+                        )
 
 
-                    outputStream.write(
-                        buffer,
-                        0,
-                        count
-                    )
+                    var downloadedBytes =
+                        0L
+
+                    var lastProgress =
+                        -1
 
 
-                    downloadedBytes += count
+                    while (true) {
+
+                        val count =
+                            input.read(
+                                buffer
+                            )
 
 
-                    if (totalBytes > 0) {
-
-                        val progress =
-                            (
-                                downloadedBytes * 100L /
-                                    totalBytes
-                                )
-                                .toInt()
-                                .coerceIn(0, 100)
+                        if (count == -1) {
+                            break
+                        }
 
 
-                        if (progress != lastProgress) {
+                        if (count <= 0) {
+                            continue
+                        }
 
-                            lastProgress =
-                                progress
+
+                        outputStream!!.write(
+                            buffer,
+                            0,
+                            count
+                        )
 
 
-                            runOnUiThread {
+                        downloadedBytes +=
+                            count
 
-                                if (
-                                    !isFinishing &&
-                                    !isDestroyed
-                                ) {
 
-                                    progressBar.progress =
-                                        progress
+                        if (
+                            totalBytes > 0
+                        ) {
 
-                                    percentText.text =
-                                        "$progress %"
+                            val progress =
+                                (
+                                    downloadedBytes * 100L /
+                                        totalBytes
+                                    )
+                                    .toInt()
+                                    .coerceIn(
+                                        0,
+                                        100
+                                    )
 
-                                    messageText.text =
-                                        "APK download হচ্ছে...\n\n$progress%"
+
+                            if (
+                                progress !=
+                                lastProgress
+                            ) {
+
+                                lastProgress =
+                                    progress
+
+
+                                runOnUiThread {
+
+                                    if (
+                                        !isFinishing &&
+                                        !isDestroyed
+                                    ) {
+
+                                        progressBar.progress =
+                                            progress
+
+                                        percentText.text =
+                                            "$progress %"
+
+                                        messageText.text =
+                                            "APK download হচ্ছে...\n\n$progress%"
+                                    }
                                 }
                             }
                         }
                     }
+
+
+                    outputStream!!.flush()
+                    outputStream!!.close()
+
+                    outputStream =
+                        null
                 }
 
 
-                // -------------------------------------------------
-                // CLOSE
-                // -------------------------------------------------
-
-                inputStream.close()
-                inputStream = null
-
-
-                outputStream.flush()
-                outputStream.close()
-                outputStream = null
-
-
                 connection.disconnect()
-                connection = null
+                connection =
+                    null
 
 
-                // -------------------------------------------------
-                // VERIFY
-                // -------------------------------------------------
+                // =================================================
+                // VERIFY FILE
+                // =================================================
 
                 if (
-                    !tempFile.exists() ||
+                    !tempFile.exists()
+                ) {
+
+                    throw Exception(
+                        "APK file তৈরি হয়নি"
+                    )
+                }
+
+
+                if (
                     tempFile.length() <= 0
                 ) {
 
                     throw Exception(
-                        "APK file download হয়নি"
+                        "APK file empty"
                     )
                 }
 
 
                 /*
-                 * APK ZIP file-এর শুরুতে সাধারণত PK থাকে।
-                 * HTML error page download হলে এখানে ধরা পড়বে।
+                 * APK একটি ZIP file।
+                 * প্রথম দুই byte অবশ্যই PK হওয়া উচিত।
                  */
 
                 val header =
                     ByteArray(2)
 
 
-                java.io.FileInputStream(
+                FileInputStream(
                     tempFile
                 ).use { input ->
 
                     val read =
-                        input.read(header)
+                        input.read(
+                            header
+                        )
 
 
                     if (
-                        read < 2 ||
-                        header[0] != 'P'.code.toByte() ||
-                        header[1] != 'K'.code.toByte()
+                        read != 2 ||
+                        header[0] !=
+                            'P'.code.toByte() ||
+                        header[1] !=
+                            'K'.code.toByte()
                     ) {
 
                         throw Exception(
-                            "GitHub থেকে valid APK পাওয়া যায়নি"
+                            "Valid APK পাওয়া যায়নি"
                         )
                     }
                 }
 
 
-                // -------------------------------------------------
-                // RENAME
-                // -------------------------------------------------
+                // =================================================
+                // MOVE TEMP → APK
+                // =================================================
 
-                if (apkFile.exists()) {
+                if (
+                    apkFile.exists()
+                ) {
                     apkFile.delete()
                 }
 
 
-                if (!tempFile.renameTo(apkFile)) {
+                if (
+                    !tempFile.renameTo(
+                        apkFile
+                    )
+                ) {
 
                     tempFile.copyTo(
                         apkFile,
@@ -879,10 +858,6 @@ class UpdateActivity : AppCompatActivity() {
                     tempFile.delete()
                 }
 
-
-                // -------------------------------------------------
-                // FINAL CHECK
-                // -------------------------------------------------
 
                 if (
                     !apkFile.exists() ||
@@ -895,12 +870,13 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
-                isDownloading = false
+                isDownloading =
+                    false
 
 
-                // -------------------------------------------------
-                // COMPLETE
-                // -------------------------------------------------
+                // =================================================
+                // DOWNLOAD COMPLETE
+                // =================================================
 
                 runOnUiThread {
 
@@ -912,7 +888,8 @@ class UpdateActivity : AppCompatActivity() {
                     }
 
 
-                    progressBar.progress = 100
+                    progressBar.progress =
+                        100
 
                     percentText.text =
                         "100 %"
@@ -936,17 +913,13 @@ class UpdateActivity : AppCompatActivity() {
                         apkFile
 
 
-                    installApk(apkFile)
+                    installApk(
+                        apkFile
+                    )
                 }
 
 
             } catch (e: Exception) {
-
-                try {
-                    inputStream?.close()
-                } catch (_: Exception) {
-                }
-
 
                 try {
                     outputStream?.close()
@@ -961,7 +934,8 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 try {
-                    val temp =
+
+                    val tempFile =
                         File(
                             getExternalFilesDir(
                                 Environment.DIRECTORY_DOWNLOADS
@@ -969,15 +943,18 @@ class UpdateActivity : AppCompatActivity() {
                             TEMP_APK_NAME
                         )
 
-                    if (temp.exists()) {
-                        temp.delete()
+                    if (
+                        tempFile.exists()
+                    ) {
+                        tempFile.delete()
                     }
 
                 } catch (_: Exception) {
                 }
 
 
-                isDownloading = false
+                isDownloading =
+                    false
 
 
                 runOnUiThread {
@@ -1002,12 +979,15 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     versionText.text =
-                        "APK download failed"
+                        latestVersionName?.let {
+                            "Version $it"
+                        } ?: "APK download failed"
 
 
                     messageText.text =
                         "APK download করা যায়নি।\n\n${
-                            e.message ?: "Unknown error"
+                            e.message
+                                ?: "Unknown error"
                         }"
 
 
@@ -1021,7 +1001,8 @@ class UpdateActivity : AppCompatActivity() {
                     Toast.makeText(
                         this,
                         "Download error: ${
-                            e.message ?: "Unknown"
+                            e.message
+                                ?: "Unknown"
                         }",
                         Toast.LENGTH_LONG
                     ).show()
@@ -1050,27 +1031,28 @@ class UpdateActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
 
-            updateButton.isEnabled = true
-            laterText.isEnabled = true
+            updateButton.isEnabled =
+                true
+
+            laterText.isEnabled =
+                true
 
             return
         }
 
 
-        // -----------------------------------------------------
+        // =====================================================
         // ANDROID 8+
-        // -----------------------------------------------------
+        // =====================================================
 
         if (
             Build.VERSION.SDK_INT >=
             Build.VERSION_CODES.O
         ) {
 
-            val allowed =
-                packageManager.canRequestPackageInstalls()
-
-
-            if (!allowed) {
+            if (
+                !packageManager.canRequestPackageInstalls()
+            ) {
 
                 pendingInstallFile =
                     apkFile
@@ -1093,7 +1075,9 @@ class UpdateActivity : AppCompatActivity() {
                         )
 
 
-                    startActivity(intent)
+                    startActivity(
+                        intent
+                    )
 
 
                     titleText.text =
@@ -1115,9 +1099,11 @@ class UpdateActivity : AppCompatActivity() {
                     waitingForInstallPermission =
                         false
 
+                    updateButton.isEnabled =
+                        true
 
-                    updateButton.isEnabled = true
-                    laterText.isEnabled = true
+                    laterText.isEnabled =
+                        true
 
 
                     Toast.makeText(
@@ -1133,9 +1119,9 @@ class UpdateActivity : AppCompatActivity() {
         }
 
 
-        // -----------------------------------------------------
-        // FILE PROVIDER
-        // -----------------------------------------------------
+        // =====================================================
+        // FILE PROVIDER INSTALL
+        // =====================================================
 
         try {
 
@@ -1164,11 +1150,6 @@ class UpdateActivity : AppCompatActivity() {
             )
 
 
-            installIntent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK
-            )
-
-
             startActivity(
                 installIntent
             )
@@ -1185,8 +1166,11 @@ class UpdateActivity : AppCompatActivity() {
             e: ActivityNotFoundException
         ) {
 
-            updateButton.isEnabled = true
-            laterText.isEnabled = true
+            updateButton.isEnabled =
+                true
+
+            laterText.isEnabled =
+                true
 
 
             Toast.makeText(
@@ -1198,20 +1182,25 @@ class UpdateActivity : AppCompatActivity() {
 
         } catch (e: Exception) {
 
-            updateButton.isEnabled = true
-            laterText.isEnabled = true
+            updateButton.isEnabled =
+                true
+
+            laterText.isEnabled =
+                true
 
 
             messageText.text =
                 "Install শুরু করা যাচ্ছে না।\n\n${
-                    e.message ?: "Unknown error"
+                    e.message
+                        ?: "Unknown error"
                 }"
 
 
             Toast.makeText(
                 this,
                 "Install error: ${
-                    e.message ?: "Unknown"
+                    e.message
+                        ?: "Unknown"
                 }",
                 Toast.LENGTH_LONG
             ).show()
@@ -1234,11 +1223,9 @@ class UpdateActivity : AppCompatActivity() {
             Build.VERSION_CODES.O
         ) {
 
-            val allowed =
+            if (
                 packageManager.canRequestPackageInstalls()
-
-
-            if (allowed) {
+            ) {
 
                 waitingForInstallPermission =
                     false
@@ -1253,7 +1240,9 @@ class UpdateActivity : AppCompatActivity() {
                     file.exists()
                 ) {
 
-                    installApk(file)
+                    installApk(
+                        file
+                    )
                 }
             }
         }
@@ -1266,7 +1255,8 @@ class UpdateActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        isChecking = false
+        isChecking =
+            false
 
         super.onDestroy()
     }
