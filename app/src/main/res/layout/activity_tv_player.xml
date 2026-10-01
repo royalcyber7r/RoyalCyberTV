@@ -7,10 +7,7 @@
     android:background="#000000"
     android:keepScreenOn="true">
 
-    <!-- ===================================================== -->
-    <!-- TV VIDEO PLAYER -->
-    <!-- ===================================================== -->
-
+    <!-- TV Video Player -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/tv_player_view"
         android:layout_width="match_parent"
@@ -18,18 +15,9 @@
         android:background="#000000"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:keepScreenOn="true"
+        android:keepScreenOn="true" />
 
-        app:use_controller="true"
-        app:show_buffering="when_playing"
-        app:resize_mode="fit"
-        app:controller_layout_id="@layout/exo_player_control_view" />
-
-
-    <!-- ===================================================== -->
-    <!-- CHANNEL TITLE / ERROR TEXT -->
-    <!-- ===================================================== -->
-
+    <!-- Channel Name / Error Message -->
     <TextView
         android:id="@+id/tv_player_title"
         android:layout_width="wrap_content"
