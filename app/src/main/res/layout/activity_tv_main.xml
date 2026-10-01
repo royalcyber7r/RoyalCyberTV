@@ -29,7 +29,7 @@
         android:id="@+id/tv_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Channels could not be loaded"
+        android:text="No channels available"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:gravity="center"
