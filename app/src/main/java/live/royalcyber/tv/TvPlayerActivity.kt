@@ -1,145 +1,507 @@
 package live.royalcyber.tv
 
-import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerView
 
-@UnstableApi
+
 class TvPlayerActivity : AppCompatActivity() {
 
     private var player: ExoPlayer? = null
+    private var playerView: PlayerView? = null
+
+    private lateinit var rootLayout: FrameLayout
+    private lateinit var channelNameText: TextView
+
+    private var channelName: String = ""
+    private var channelLogo: String = ""
+    private var streamUrl: String = ""
+
 
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
         super.onCreate(savedInstanceState)
 
-        requestedOrientation =
-            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        /*
+         * TvMainActivity থেকে Channel information নেওয়া হচ্ছে।
+         */
+        channelName =
+            intent.getStringExtra(
+                TvMainActivity.EXTRA_CHANNEL_NAME
+            )
+                ?.trim()
+                ?: ""
 
-        val streamUrl =
+        channelLogo =
+            intent.getStringExtra(
+                TvMainActivity.EXTRA_CHANNEL_LOGO
+            )
+                ?.trim()
+                ?: ""
+
+        streamUrl =
             intent.getStringExtra(
                 TvMainActivity.EXTRA_CHANNEL_URL
-            )?.trim().orEmpty()
+            )
+                ?.trim()
+                ?: ""
 
+
+        /*
+         * TV অবশ্যই Landscape থাকবে।
+         */
+        requestedOrientation =
+            android.content.pm.ActivityInfo
+                .SCREEN_ORIENTATION_LANDSCAPE
+
+
+        /*
+         * সম্পূর্ণ Player UI programmatically তৈরি করা হচ্ছে।
+         *
+         * তাই activity_tv_player.xml দরকার নেই।
+         */
+        createPlayerLayout()
+
+
+        /*
+         * Stream URL না থাকলে Player চালানোর চেষ্টা করবে না।
+         */
         if (streamUrl.isEmpty()) {
-            showError("Stream URL পাওয়া যায়নি")
+
+            showError(
+                "Stream URL পাওয়া যায়নি"
+            )
+
             return
         }
 
-        val playerView =
+
+        /*
+         * Channel select করার পরেই Player তৈরি হবে।
+         */
+        initializePlayer()
+    }
+
+
+    /* =========================================================
+       CREATE PLAYER LAYOUT
+       ========================================================= */
+
+    private fun createPlayerLayout() {
+
+        rootLayout =
+            FrameLayout(this)
+
+        rootLayout.setBackgroundColor(
+            Color.BLACK
+        )
+
+
+        /*
+         * PlayerView
+         */
+        playerView =
             PlayerView(this)
 
-        playerView.useController = true
+        playerView?.apply {
 
-        setContentView(playerView)
+            useController = true
 
-        val httpFactory =
-            DefaultHttpDataSource.Factory()
-                .setConnectTimeoutMs(15000)
-                .setReadTimeoutMs(15000)
-                .setAllowCrossProtocolRedirects(true)
-
-        val exoPlayer =
-            ExoPlayer.Builder(this)
-                .setMediaSourceFactory(
-                    androidx.media3.exoplayer.source.DefaultMediaSourceFactory(
-                        httpFactory
-                    )
-                )
-                .build()
-
-        player = exoPlayer
-
-        playerView.player =
-            exoPlayer
-
-        val mediaItem =
-            MediaItem.fromUri(streamUrl)
-
-        if (
-            streamUrl.contains(
-                ".m3u8",
-                ignoreCase = true
-            )
-        ) {
-
-            val mediaSource =
-                HlsMediaSource.Factory(
-                    httpFactory
-                ).createMediaSource(
-                    mediaItem
-                )
-
-            exoPlayer.setMediaSource(
-                mediaSource
+            setShowBuffering(
+                PlayerView.SHOW_BUFFERING_WHEN_PLAYING
             )
 
-        } else {
-
-            val mediaSource =
-                ProgressiveMediaSource.Factory(
-                    httpFactory
-                ).createMediaSource(
-                    mediaItem
-                )
-
-            exoPlayer.setMediaSource(
-                mediaSource
+            setBackgroundColor(
+                Color.BLACK
             )
         }
 
-        exoPlayer.prepare()
 
-        exoPlayer.playWhenReady = true
+        rootLayout.addView(
+            playerView,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
+
+        /*
+         * Channel Name
+         *
+         * শুধু Player-এর উপরে ছোট করে নাম দেখাবে।
+         */
+        channelNameText =
+            TextView(this)
+
+        channelNameText.apply {
+
+            text =
+                if (channelName.isNotEmpty()) {
+                    channelName
+                } else {
+                    "RoyalCyber TV"
+                }
+
+            setTextColor(
+                Color.WHITE
+            )
+
+            setTextSize(
+                18f
+            )
+
+            setPadding(
+                24,
+                16,
+                24,
+                16
+            )
+
+            setBackgroundColor(
+                0x88000000.toInt()
+            )
+
+            gravity =
+                Gravity.CENTER_VERTICAL
+        }
+
+
+        val nameParams =
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+
+        nameParams.gravity =
+            Gravity.TOP or Gravity.START
+
+
+        rootLayout.addView(
+            channelNameText,
+            nameParams
+        )
+
+
+        setContentView(
+            rootLayout
+        )
     }
+
+
+    /* =========================================================
+       INITIALIZE PLAYER
+       ========================================================= */
+
+    private fun initializePlayer() {
+
+        try {
+
+            player =
+                ExoPlayer.Builder(this)
+                    .build()
+
+
+            playerView?.player =
+                player
+
+
+            player?.repeatMode =
+                Player.REPEAT_MODE_OFF
+
+
+            /*
+             * Player state listener
+             */
+            player?.addListener(
+                object : Player.Listener {
+
+                    override fun onPlaybackStateChanged(
+                        playbackState: Int
+                    ) {
+
+                        when (playbackState) {
+
+                            Player.STATE_BUFFERING -> {
+
+                                /*
+                                 * Media3 নিজেই buffering UI দেখাবে।
+                                 */
+                            }
+
+
+                            Player.STATE_READY -> {
+                                // Stream ready
+                            }
+
+
+                            Player.STATE_ENDED -> {
+                                // Stream ended
+                            }
+
+
+                            Player.STATE_IDLE -> {
+                                // Idle
+                            }
+                        }
+                    }
+
+
+                    override fun onPlayerError(
+                        error: PlaybackException
+                    ) {
+
+                        if (
+                            isFinishing ||
+                            isDestroyed
+                        ) {
+                            return
+                        }
+
+
+                        Toast.makeText(
+                            this@TvPlayerActivity,
+                            "এই Channel চালু করা যাচ্ছে না",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            )
+
+
+            /*
+             * HTTP Data Source
+             */
+            val dataSourceFactory =
+                DefaultHttpDataSource.Factory()
+                    .setAllowCrossProtocolRedirects(
+                        true
+                    )
+
+
+            val mediaItem =
+                MediaItem.fromUri(
+                    streamUrl
+                )
+
+
+            /*
+             * M3U8 হলে HLS player
+             *
+             * অন্য stream হলে ProgressiveMediaSource
+             */
+            val mediaSource =
+                if (
+                    streamUrl.contains(
+                        ".m3u8",
+                        ignoreCase = true
+                    )
+                ) {
+
+                    HlsMediaSource.Factory(
+                        dataSourceFactory
+                    ).createMediaSource(
+                        mediaItem
+                    )
+
+                } else {
+
+                    ProgressiveMediaSource.Factory(
+                        dataSourceFactory
+                    ).createMediaSource(
+                        mediaItem
+                    )
+                }
+
+
+            player?.apply {
+
+                setMediaSource(
+                    mediaSource
+                )
+
+                prepare()
+
+                playWhenReady =
+                    true
+
+                play()
+            }
+
+
+        } catch (
+            e: Exception
+        ) {
+
+            showError(
+                "Player চালু করা যাচ্ছে না"
+            )
+        }
+    }
+
+
+    /* =========================================================
+       ERROR
+       ========================================================= */
 
     private fun showError(
         message: String
     ) {
 
-        val textView =
+        if (
+            !::rootLayout.isInitialized
+        ) {
+            return
+        }
+
+
+        val errorText =
             TextView(this)
 
-        textView.text = message
-        textView.textSize = 22f
-        textView.setTextColor(
-            android.graphics.Color.WHITE
-        )
-        textView.gravity = Gravity.CENTER
 
-        val root =
-            FrameLayout(this)
+        errorText.apply {
 
-        root.setBackgroundColor(
-            android.graphics.Color.BLACK
-        )
+            text =
+                message
 
-        root.addView(
-            textView,
+            setTextColor(
+                Color.WHITE
+            )
+
+            setTextSize(
+                22f
+            )
+
+            gravity =
+                Gravity.CENTER
+
+            setBackgroundColor(
+                Color.BLACK
+            )
+        }
+
+
+        rootLayout.removeAllViews()
+
+
+        rootLayout.addView(
+            errorText,
             FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
-
-        setContentView(root)
     }
+
+
+    /* =========================================================
+       RESUME
+       ========================================================= */
+
+    override fun onResume() {
+
+        super.onResume()
+
+        player?.let {
+
+            try {
+
+                if (
+                    it.playbackState !=
+                    Player.STATE_IDLE
+                ) {
+
+                    it.play()
+                }
+
+            } catch (
+                _: Exception
+            ) {
+            }
+        }
+    }
+
+
+    /* =========================================================
+       PAUSE
+       ========================================================= */
+
+    override fun onPause() {
+
+        try {
+
+            player?.pause()
+
+        } catch (
+            _: Exception
+        ) {
+        }
+
+
+        super.onPause()
+    }
+
+
+    /* =========================================================
+       BACK
+       ========================================================= */
+
+    override fun onBackPressed() {
+
+        /*
+         * Remote-এর Back চাপলে Player বন্ধ হয়ে
+         * TvMainActivity-এর Channel List-এ ফিরে যাবে।
+         */
+        finish()
+    }
+
+
+    /* =========================================================
+       DESTROY
+       ========================================================= */
 
     override fun onDestroy() {
 
-        player?.release()
+        try {
+
+            playerView?.player =
+                null
+
+        } catch (
+            _: Exception
+        ) {
+        }
+
+
+        try {
+
+            player?.release()
+
+        } catch (
+            _: Exception
+        ) {
+        }
+
+
         player = null
+        playerView = null
+
 
         super.onDestroy()
     }
