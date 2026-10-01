@@ -10,8 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 import kotlin.concurrent.thread
 
 class TvMainActivity : AppCompatActivity() {
@@ -34,7 +40,8 @@ class TvMainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.tv_progress)
         emptyText = findViewById(R.id.tv_empty)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager =
+            LinearLayoutManager(this)
 
         loadChannels()
     }
@@ -50,53 +57,70 @@ class TvMainActivity : AppCompatActivity() {
 
             try {
 
+                val url = URL(channelsUrl)
+
                 connection =
-                    URL(channelsUrl).openConnection() as HttpURLConnection
+                    url.openConnection() as HttpURLConnection
+
+                if (connection is HttpsURLConnection) {
+
+                    connection.sslSocketFactory =
+                        createTls12SocketFactory()
+                }
 
                 connection.requestMethod = "GET"
 
-                // Cache ব্যবহার করবে না
+                connection.connectTimeout = 20000
+                connection.readTimeout = 30000
+
+                connection.instanceFollowRedirects = true
+
                 connection.useCaches = false
                 connection.defaultUseCaches = false
 
-                connection.doInput = true
-
-                connection.connectTimeout = 15000
-                connection.readTimeout = 20000
-
-                // GitHub Raw-এর জন্য simple request headers
                 connection.setRequestProperty(
                     "User-Agent",
-                    "RoyalCyberTV"
+                    "Mozilla/5.0 (Android 7.0; RoyalCyberTV)"
                 )
 
                 connection.setRequestProperty(
                     "Accept",
-                    "application/json"
+                    "application/json,text/plain,*/*"
                 )
 
                 connection.connect()
 
-                val responseCode = connection.responseCode
+                val responseCode =
+                    connection.responseCode
 
                 if (responseCode !in 200..299) {
                     throw Exception(
-                        "HTTP Error: $responseCode"
+                        "HTTP $responseCode"
                     )
                 }
 
-                val response =
-                    connection.inputStream
-                        .bufferedReader(Charsets.UTF_8)
-                        .use { it.readText() }
+                val reader =
+                    BufferedReader(
+                        InputStreamReader(
+                            connection.inputStream,
+                            Charsets.UTF_8
+                        )
+                    )
 
-                if (response.isBlank()) {
-                    throw Exception("Empty response")
+                val response =
+                    reader.use {
+                        it.readText()
+                    }
+
+                if (response.trim().isEmpty()) {
+                    throw Exception("Empty JSON")
                 }
 
-                val jsonArray = JSONArray(response)
+                val jsonArray =
+                    JSONArray(response)
 
-                val result = ArrayList<TvChannel>()
+                val result =
+                    ArrayList<TvChannel>()
 
                 for (i in 0 until jsonArray.length()) {
 
@@ -130,20 +154,24 @@ class TvMainActivity : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    progressBar.visibility = View.GONE
+                    progressBar.visibility =
+                        View.GONE
 
                     channels.clear()
                     channels.addAll(result)
 
                     if (channels.isEmpty()) {
 
-                        emptyText.visibility = View.VISIBLE
+                        emptyText.visibility =
+                            View.VISIBLE
+
                         emptyText.text =
                             "No channels available"
 
                     } else {
 
-                        emptyText.visibility = View.GONE
+                        emptyText.visibility =
+                            View.GONE
 
                         recyclerView.adapter =
                             TvChannelAdapter(
@@ -155,7 +183,9 @@ class TvMainActivity : AppCompatActivity() {
 
                         recyclerView.post {
 
-                            if (recyclerView.childCount > 0) {
+                            if (
+                                recyclerView.childCount > 0
+                            ) {
 
                                 recyclerView
                                     .getChildAt(0)
@@ -169,9 +199,11 @@ class TvMainActivity : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    progressBar.visibility = View.GONE
+                    progressBar.visibility =
+                        View.GONE
 
-                    emptyText.visibility = View.VISIBLE
+                    emptyText.visibility =
+                        View.VISIBLE
 
                     emptyText.text =
                         "Channels could not be loaded"
@@ -181,6 +213,120 @@ class TvMainActivity : AppCompatActivity() {
 
                 connection?.disconnect()
             }
+        }
+    }
+
+    private fun createTls12SocketFactory(): SSLSocketFactory {
+
+        val sslContext =
+            SSLContext.getInstance("TLS")
+
+        sslContext.init(
+            null,
+            null,
+            null
+        )
+
+        return Tls12SocketFactory(
+            sslContext.socketFactory
+        )
+    }
+
+    private class Tls12SocketFactory(
+        private val delegate: SSLSocketFactory
+    ) : SSLSocketFactory() {
+
+        override fun getDefaultCipherSuites(): Array<String> =
+            delegate.defaultCipherSuites
+
+        override fun getSupportedCipherSuites(): Array<String> =
+            delegate.supportedCipherSuites
+
+        override fun createSocket(
+            socket: java.net.Socket?,
+            host: String?,
+            port: Int,
+            autoClose: Boolean
+        ): SSLSocket {
+
+            return enableTls(
+                delegate.createSocket(
+                    socket,
+                    host,
+                    port,
+                    autoClose
+                )
+            )
+        }
+
+        override fun createSocket(
+            host: String?,
+            port: Int
+        ): SSLSocket {
+
+            return enableTls(
+                delegate.createSocket(
+                    host,
+                    port
+                )
+            )
+        }
+
+        override fun createSocket(
+            host: String?,
+            port: Int,
+            localHost: java.net.InetAddress?,
+            localPort: Int
+        ): SSLSocket {
+
+            return enableTls(
+                delegate.createSocket(
+                    host,
+                    port,
+                    localHost,
+                    localPort
+                )
+            )
+        }
+
+        override fun createSocket(
+            host: java.net.InetAddress?,
+            port: Int
+        ): SSLSocket {
+
+            return enableTls(
+                delegate.createSocket(
+                    host,
+                    port
+                )
+            )
+        }
+
+        override fun createSocket(
+            address: java.net.InetAddress?,
+            port: Int,
+            localAddress: java.net.InetAddress?,
+            localPort: Int
+        ): SSLSocket {
+
+            return enableTls(
+                delegate.createSocket(
+                    address,
+                    port,
+                    localAddress,
+                    localPort
+                )
+            )
+        }
+
+        private fun enableTls(
+            socket: SSLSocket
+        ): SSLSocket {
+
+            socket.enabledProtocols =
+                arrayOf("TLSv1.2")
+
+            return socket
         }
     }
 
@@ -244,10 +390,12 @@ class TvMainActivity : AppCompatActivity() {
             holder: ChannelHolder,
             position: Int
         ) {
+
             holder.bind(list[position])
         }
 
         override fun getItemCount(): Int {
+
             return list.size
         }
 
@@ -260,9 +408,12 @@ class TvMainActivity : AppCompatActivity() {
                     R.id.channel_name
                 )
 
-            fun bind(channel: TvChannel) {
+            fun bind(
+                channel: TvChannel
+            ) {
 
-                nameText.text = channel.name
+                nameText.text =
+                    channel.name
 
                 itemView.setOnClickListener {
 
