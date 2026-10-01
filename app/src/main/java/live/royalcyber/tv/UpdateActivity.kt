@@ -179,6 +179,7 @@ class UpdateActivity : AppCompatActivity() {
 
         return try {
 
+            @Suppress("DEPRECATION")
             val packageInfo =
                 packageManager.getPackageInfo(
                     packageName,
@@ -202,10 +203,6 @@ class UpdateActivity : AppCompatActivity() {
 
     // =========================================================
     // VERSION TO NUMBER LIST
-    //
-    // Example:
-    // v1.0.153 -> [1, 0, 153]
-    // 1.0.154  -> [1, 0, 154]
     // =========================================================
 
     private fun normalizeVersion(
@@ -556,6 +553,12 @@ class UpdateActivity : AppCompatActivity() {
                         laterText.isEnabled =
                             true
 
+                        // ---------------------------------------------
+                        // IMPORTANT:
+                        // No update file পাওয়া না গেলে Home-এ ফিরে যাবে
+                        // ---------------------------------------------
+
+                        finish()
 
                         return@runOnUiThread
                     }
@@ -610,6 +613,16 @@ class UpdateActivity : AppCompatActivity() {
                         laterText.isEnabled =
                             true
 
+
+                        // ---------------------------------------------
+                        // IMPORTANT FIX
+                        //
+                        // Update check শেষ হয়েছে এবং নতুন Version নেই।
+                        // তাই Back চাপার দরকার নেই।
+                        // সরাসরি আগের Home/MainActivity-তে ফিরে যাবে।
+                        // ---------------------------------------------
+
+                        finish()
 
                         return@runOnUiThread
                     }
@@ -1157,19 +1170,25 @@ class UpdateActivity : AppCompatActivity() {
 
                 try {
 
-                    val tempFile =
-                        File(
-                            getExternalFilesDir(
-                                Environment.DIRECTORY_DOWNLOADS
-                            ),
-                            TEMP_APK_NAME
+                    val externalDir =
+                        getExternalFilesDir(
+                            Environment.DIRECTORY_DOWNLOADS
                         )
 
+                    if (externalDir != null) {
 
-                    if (
-                        tempFile.exists()
-                    ) {
-                        tempFile.delete()
+                        val tempFile =
+                            File(
+                                externalDir,
+                                TEMP_APK_NAME
+                            )
+
+
+                        if (
+                            tempFile.exists()
+                        ) {
+                            tempFile.delete()
+                        }
                     }
 
                 } catch (_: Exception) {
