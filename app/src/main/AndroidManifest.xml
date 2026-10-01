@@ -28,6 +28,20 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
+
+<activity
+    android:name=".TvMainActivity"
+    android:screenOrientation="landscape"
+    android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+    android:exported="false" />
+
+<activity
+    android:name=".TvPlayerActivity"
+    android:screenOrientation="landscape"
+    android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+    android:exported="false" />
+        
+
         <!-- Splash / Launcher -->
         <activity
             android:name=".SplashActivity"
