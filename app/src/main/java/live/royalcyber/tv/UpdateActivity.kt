@@ -1,14 +1,13 @@
 package live.royalcyber.tv
 
+import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.Environment
 import android.provider.Settings
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 
@@ -16,866 +15,757 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 
 import org.json.JSONArray
-import org.json.JSONObject
 
 import java.io.File
+import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.Executors
-
+import kotlin.concurrent.thread
 
 class UpdateActivity : AppCompatActivity() {
 
-    private lateinit var progressBar: ProgressBar
-    private lateinit var progressText: TextView
-    private lateinit var versionText: TextView
-    private lateinit var messageText: TextView
-    private lateinit var updateButton: Button
-    private lateinit var laterText: TextView
+```
+companion object {
 
-    private val executor =
-        Executors.newSingleThreadExecutor()
+    private const val RELEASES_API =
+        "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=100"
 
-    private val handler =
-        Handler(Looper.getMainLooper())
+    private const val APK_NAME =
+        "RoyalCyberTV.apk"
 
-    private var apkUrl = ""
+    private const val APK_PREFIX =
+        "RoyalCyberTV-"
+}
 
-    private var isDownloading = false
+private lateinit var titleText: TextView
+private lateinit var messageText: TextView
+private lateinit var updateButton: Button
+private lateinit var laterButton: Button
 
+private var latestApkUrl: String? = null
+private var latestVersionName: String? = null
 
-    companion object {
-
-        /*
-         * =========================================================
-         * GITHUB RELEASES API
-         * =========================================================
-         */
-
-        private const val GITHUB_API =
-            "https://api.github.com/repos/royalcyber7r/RoyalCyberTV/releases?per_page=100"
+private var isChecking = false
+private var isDownloading = false
 
 
-        /*
-         * পুরোনো APK নাম
-         *
-         * RoyalCyberTV.apk
-         */
+override fun onCreate(
+    savedInstanceState: Bundle?
+) {
+    super.onCreate(savedInstanceState)
 
-        private const val APK_NAME =
-            "RoyalCyberTV.apk"
+    setContentView(
+        R.layout.activity_update
+    )
 
+    titleText =
+        findViewById(
+            R.id.update_title
+        )
 
-        /*
-         * বর্তমান GitHub Actions Release APK
-         *
-         * যেমন:
-         *
-         * RoyalCyberTV-1.0.145.apk
-         */
+    messageText =
+        findViewById(
+            R.id.update_message
+        )
 
-        private const val APK_PREFIX =
-            "RoyalCyberTV-"
+    updateButton =
+        findViewById(
+            R.id.update_button
+        )
 
-
-        private const val APK_EXTENSION =
-            ".apk"
-    }
-
-
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-
-        super.onCreate(savedInstanceState)
-
-        setContentView(
-            R.layout.activity_update
+    laterButton =
+        findViewById(
+            R.id.later_button
         )
 
 
-        progressBar =
-            findViewById(
-                R.id.update_progress
-            )
+    updateButton.setOnClickListener {
 
-        progressText =
-            findViewById(
-                R.id.update_percent
-            )
-
-        versionText =
-            findViewById(
-                R.id.update_version
-            )
-
-        messageText =
-            findViewById(
-                R.id.update_message
-            )
-
-        updateButton =
-            findViewById(
-                R.id.update_button
-            )
-
-        laterText =
-            findViewById(
-                R.id.update_later
-            )
-
-
-        /*
-         * =========================================================
-         * UPDATE BUTTON
-         * =========================================================
-         */
-
-        updateButton.setOnClickListener {
-
-            if (isDownloading) {
-                return@setOnClickListener
-            }
-
-
-            if (apkUrl.isNotEmpty()) {
-
-                startDownload()
-
-            } else {
-
-                checkLatestRelease()
-            }
+        if (isDownloading) {
+            return@setOnClickListener
         }
 
+        val apkUrl =
+            latestApkUrl
 
-        /*
-         * =========================================================
-         * LATER BUTTON
-         * =========================================================
-         */
+        if (apkUrl.isNullOrBlank()) {
 
-        laterText.setOnClickListener {
+            Toast.makeText(
+                this,
+                "Update পাওয়া যায়নি",
+                Toast.LENGTH_SHORT
+            ).show()
 
-            finish()
+            return@setOnClickListener
         }
 
-
-        /*
-         * =========================================================
-         * START UPDATE CHECK
-         * =========================================================
-         */
-
-        checkLatestRelease()
+        downloadAndInstall(
+            apkUrl
+        )
     }
 
 
+    laterButton.setOnClickListener {
+
+        finish()
+    }
+
+
+    updateButton.isEnabled =
+        false
+
+
     /*
-     * =========================================================
-     * CHECK LATEST RELEASE
-     * =========================================================
+     * GitHub Release check
      */
-
-    private fun checkLatestRelease() {
-
-        if (isFinishing || isDestroyed) {
-            return
-        }
+    checkLatestRelease()
+}
 
 
-        updateButton.isEnabled =
-            false
+/* =========================================================
+   CHECK LATEST RELEASE
+   ========================================================= */
 
-        updateButton.text =
-            "Checking Update..."
+private fun checkLatestRelease() {
+
+    if (isChecking) {
+        return
+    }
+
+    isChecking = true
+
+    messageText.text =
+        "নতুন Version খোঁজা হচ্ছে..."
+
+    thread {
+
+        var connection:
+            HttpURLConnection? = null
+
+        try {
+
+            val url =
+                URL(
+                    RELEASES_API
+                )
+
+            connection =
+                url.openConnection()
+                    as HttpURLConnection
+
+            connection.requestMethod =
+                "GET"
+
+            connection.connectTimeout =
+                15000
+
+            connection.readTimeout =
+                15000
+
+            connection.useCaches =
+                false
+
+            connection.setRequestProperty(
+                "Accept",
+                "application/vnd.github+json"
+            )
+
+            connection.setRequestProperty(
+                "User-Agent",
+                "RoyalCyberTV"
+            )
 
 
-        executor.execute {
+            val responseCode =
+                connection.responseCode
 
-            var connection: HttpURLConnection? =
-                null
+            if (
+                responseCode !in 200..299
+            ) {
 
-
-            try {
-
-                /*
-                 * =================================================
-                 * CONNECT GITHUB
-                 * =================================================
-                 */
-
-                val apiUrl =
-                    URL(GITHUB_API)
+                throw Exception(
+                    "HTTP $responseCode"
+                )
+            }
 
 
-                connection =
-                    apiUrl.openConnection()
-                            as HttpURLConnection
+            val response =
+                connection.inputStream
+                    .bufferedReader()
+                    .use {
+                        it.readText()
+                    }
 
 
-                connection.requestMethod =
-                    "GET"
-
-
-                connection.connectTimeout =
-                    20000
-
-
-                connection.readTimeout =
-                    20000
-
-
-                connection.useCaches =
-                    false
-
-
-                connection.instanceFollowRedirects =
-                    true
-
-
-                /*
-                 * =================================================
-                 * GITHUB API HEADERS
-                 * =================================================
-                 */
-
-                connection.setRequestProperty(
-                    "Accept",
-                    "application/vnd.github+json"
+            val releases =
+                JSONArray(
+                    response
                 )
 
 
-                connection.setRequestProperty(
-                    "User-Agent",
-                    "RoyalCyberTV Android App"
-                )
+            var selectedTag =
+                ""
+
+            var selectedApkUrl =
+                ""
 
 
-                connection.setRequestProperty(
-                    "X-GitHub-Api-Version",
-                    "2022-11-28"
-                )
+            /*
+             * Highest release in GitHub API order
+             *
+             * Draft / prerelease বাদ
+             */
+            for (
+                i in 0 until releases.length()
+            ) {
+
+                val release =
+                    releases.optJSONObject(i)
+                        ?: continue
 
 
-                connection.connect()
+                val draft =
+                    release.optBoolean(
+                        "draft",
+                        false
+                    )
 
-
-                /*
-                 * =================================================
-                 * RESPONSE CODE
-                 * =================================================
-                 */
-
-                val responseCode =
-                    connection.responseCode
+                val prerelease =
+                    release.optBoolean(
+                        "prerelease",
+                        false
+                    )
 
 
                 if (
-                    responseCode !=
-                    HttpURLConnection.HTTP_OK
+                    draft ||
+                    prerelease
                 ) {
-
-                    throw Exception(
-                        "GitHub Releases API HTTP $responseCode"
-                    )
+                    continue
                 }
 
 
-                /*
-                 * =================================================
-                 * READ RESPONSE
-                 * =================================================
-                 */
-
-                val response =
-                    connection.inputStream
-                        .bufferedReader()
-                        .use {
-                            it.readText()
-                        }
+                val tagName =
+                    release.optString(
+                        "tag_name"
+                    ).trim()
 
 
-                if (response.isBlank()) {
-
-                    throw Exception(
-                        "GitHub থেকে কোনো response পাওয়া যায়নি"
-                    )
+                if (
+                    tagName.isEmpty()
+                ) {
+                    continue
                 }
 
 
-                /*
-                 * =================================================
-                 * JSON ARRAY
-                 * =================================================
-                 */
-
-                val releases =
-                    JSONArray(response)
-
-
-                if (releases.length() == 0) {
-
-                    throw Exception(
-                        "GitHub-এ কোনো Release পাওয়া যায়নি"
+                val assets =
+                    release.optJSONArray(
+                        "assets"
                     )
-                }
+                        ?: continue
 
-
-                /*
-                 * =================================================
-                 * SELECT LATEST RELEASE
-                 * =================================================
-                 */
-
-                var selectedRelease: JSONObject? =
-                    null
-
-
-                var selectedTag =
-                    ""
-
-
-                var selectedName =
-                    ""
-
-
-                var selectedBody =
-                    ""
-
-
-                var selectedDownloadUrl =
-                    ""
-
-
-                var selectedVersionCode =
-                    0
-
-
-                /*
-                 * =================================================
-                 * CHECK ALL RELEASES
-                 * =================================================
-                 */
 
                 for (
-                    i in 0 until releases.length()
+                    j in 0 until assets.length()
                 ) {
 
-                    val release =
-                        releases.getJSONObject(i)
+                    val asset =
+                        assets.optJSONObject(j)
+                            ?: continue
 
 
-                    /*
-                     * =================================================
-                     * DRAFT RELEASE SKIP
-                     * =================================================
-                     */
-
-                    val draft =
-                        release.optBoolean(
-                            "draft",
-                            false
-                        )
-
-
-                    if (draft) {
-                        continue
-                    }
-
-
-                    /*
-                     * =================================================
-                     * PRERELEASE SKIP
-                     *
-                     * Beta / Alpha Release বাদ
-                     * =================================================
-                     */
-
-                    val prerelease =
-                        release.optBoolean(
-                            "prerelease",
-                            false
-                        )
-
-
-                    if (prerelease) {
-                        continue
-                    }
-
-
-                    /*
-                     * =================================================
-                     * TAG NAME
-                     * =================================================
-                     */
-
-                    val tagName =
-                        release.optString(
-                            "tag_name",
-                            ""
+                    val assetName =
+                        asset.optString(
+                            "name"
                         ).trim()
 
 
-                    if (tagName.isEmpty()) {
-                        continue
-                    }
+                    val browserDownloadUrl =
+                        asset.optString(
+                            "browser_download_url"
+                        ).trim()
 
-
-                    /*
-                     * =================================================
-                     * RELEASE ASSETS
-                     * =================================================
-                     */
-
-                    val assets =
-                        release.optJSONArray(
-                            "assets"
-                        )
-
-
-                    if (assets == null) {
-                        continue
-                    }
-
-
-                    var foundApkUrl =
-                        ""
-
-
-                    var foundApkName =
-                        ""
-
-
-                    /*
-                     * =================================================
-                     * SEARCH APK
-                     *
-                     * Support:
-                     *
-                     * RoyalCyberTV.apk
-                     *
-                     * RoyalCyberTV-1.0.145.apk
-                     *
-                     * RoyalCyberTV-145.apk
-                     *
-                     * =================================================
-                     */
-
-                    for (
-                        j in 0 until assets.length()
-                    ) {
-
-                        val asset =
-                            assets.getJSONObject(j)
-
-
-                        val assetName =
-                            asset.optString(
-                                "name",
-                                ""
-                            ).trim()
-
-
-                        val browserDownloadUrl =
-                            asset.optString(
-                                "browser_download_url",
-                                ""
-                            ).trim()
-
-
-                        if (
-                            assetName.isEmpty() ||
-                            browserDownloadUrl.isEmpty()
-                        ) {
-                            continue
-                        }
-
-
-                        /*
-                         * Exact old APK name
-                         */
-
-                        if (
-                            assetName.equals(
-                                APK_NAME,
-                                ignoreCase = true
-                            )
-                        ) {
-
-                            foundApkName =
-                                assetName
-
-
-                            foundApkUrl =
-                                browserDownloadUrl
-
-
-                            break
-                        }
-
-
-                        /*
-                         * New GitHub Actions APK name
-                         *
-                         * RoyalCyberTV-1.0.145.apk
-                         */
-
-                        val lowerName =
-                            assetName.lowercase()
-
-
-                        if (
-                            lowerName.startsWith(
-                                APK_PREFIX.lowercase()
-                            ) &&
-                            lowerName.endsWith(
-                                APK_EXTENSION.lowercase()
-                            )
-                        ) {
-
-                            foundApkName =
-                                assetName
-
-
-                            foundApkUrl =
-                                browserDownloadUrl
-                        }
-                    }
-
-
-                    /*
-                     * =================================================
-                     * APK না থাকলে Release বাদ
-                     * =================================================
-                     */
 
                     if (
-                        foundApkUrl.isEmpty()
+                        assetName.equals(
+                            APK_NAME,
+                            ignoreCase = true
+                        ) &&
+                        browserDownloadUrl.isNotEmpty()
                     ) {
-
-                        continue
-                    }
-
-
-                    /*
-                     * =================================================
-                     * EXTRACT VERSION CODE
-                     * =================================================
-                     */
-
-                    val releaseVersionCode =
-                        extractVersionCode(
-                            tagName
-                        )
-
-
-                    /*
-                     * =================================================
-                     * VERSION INVALID হলে বাদ
-                     * =================================================
-                     */
-
-                    if (
-                        releaseVersionCode <= 0
-                    ) {
-
-                        continue
-                    }
-
-
-                    /*
-                     * =================================================
-                     * SELECT HIGHEST VERSION
-                     * =================================================
-                     *
-                     * Example:
-                     *
-                     * v1.0.140
-                     * v1.0.141
-                     * v1.0.144
-                     * v1.0.145
-                     *
-                     * তাহলে 145 নির্বাচন হবে।
-                     * =================================================
-                     */
-
-                    if (
-                        selectedRelease == null ||
-                        releaseVersionCode >
-                        selectedVersionCode
-                    ) {
-
-                        selectedRelease =
-                            release
-
 
                         selectedTag =
                             tagName
 
+                        selectedApkUrl =
+                            browserDownloadUrl
 
-                        selectedName =
-                            release.optString(
-                                "name",
-                                ""
-                            ).trim()
-
-
-                        selectedBody =
-                            release.optString(
-                                "body",
-                                ""
-                            ).trim()
-
-
-                        selectedDownloadUrl =
-                            foundApkUrl
-
-
-                        selectedVersionCode =
-                            releaseVersionCode
+                        break
                     }
-                }
-
-
-                /*
-                 * =================================================
-                 * NO VALID RELEASE
-                 * =================================================
-                 */
-
-                if (
-                    selectedRelease == null
-                ) {
-
-                    throw Exception(
-                        "GitHub Release-এ RoyalCyberTV APK পাওয়া যায়নি"
-                    )
                 }
 
 
                 if (
-                    selectedDownloadUrl.isEmpty()
+                    selectedApkUrl.isNotEmpty()
+                ) {
+                    break
+                }
+            }
+
+
+            runOnUiThread {
+
+                if (
+                    isFinishing ||
+                    isDestroyed
+                ) {
+                    return@runOnUiThread
+                }
+
+
+                isChecking =
+                    false
+
+
+                if (
+                    selectedApkUrl.isEmpty()
                 ) {
 
-                    throw Exception(
-                        "APK-এর download URL পাওয়া যায়নি"
-                    )
-                }
+                    titleText.text =
+                        "No Update"
 
-
-                /*
-                 * =================================================
-                 * CURRENT INSTALLED VERSION
-                 * =================================================
-                 */
-
-                val currentVersionCode =
-                    getCurrentVersionCode()
-
-
-                /*
-                 * =================================================
-                 * UPDATE UI
-                 * =================================================
-                 */
-
-                handler.post {
-
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
-                    }
-
-
-                    /*
-                     * =================================================
-                     * NEW VERSION AVAILABLE
-                     * =================================================
-                     */
-
-                    if (
-                        selectedVersionCode >
-                        currentVersionCode
-                    ) {
-
-                        apkUrl =
-                            selectedDownloadUrl
-
-
-                        /*
-                         * Version
-                         */
-
-                        versionText.text =
-                            "Version ${formatVersion(selectedTag)} is now available"
-
-
-                        /*
-                         * Release message
-                         */
-
-                        messageText.text =
-                            when {
-
-                                selectedBody.isNotBlank() ->
-                                    selectedBody
-
-                                selectedName.isNotBlank() ->
-                                    selectedName
-
-                                else ->
-                                    "New version is available with important fixes. Please update now to continue watching."
-                            }
-
-
-                        /*
-                         * Update button
-                         */
-
-                        updateButton.text =
-                            "Update Now"
-
-
-                        updateButton.isEnabled =
-                            true
-
-
-                    } else {
-
-                        /*
-                         * =================================================
-                         * ALREADY LATEST
-                         * =================================================
-                         *
-                         * কোনো Toast নয়।
-                         *
-                         * UpdateActivity বন্ধ হবে।
-                         * =================================================
-                         */
-
-                        finish()
-                    }
-                }
-
-
-            } catch (
-                e: Exception
-            ) {
-
-                handler.post {
-
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
-                    }
-
-
-                    apkUrl =
-                        ""
-
-
-                    updateButton.text =
-                        "Try Again"
-
+                    messageText.text =
+                        "বর্তমানে কোনো নতুন APK পাওয়া যায়নি।"
 
                     updateButton.isEnabled =
-                        true
+                        false
 
-
-                    val errorMessage =
-                        e.message
-                            ?: "Unknown error"
-
-
-                    Toast.makeText(
-                        this@UpdateActivity,
-                        "Update check করা যাচ্ছে না\n$errorMessage",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    return@runOnUiThread
                 }
 
 
-            } finally {
+                latestApkUrl =
+                    selectedApkUrl
 
+                latestVersionName =
+                    selectedTag
+
+
+                titleText.text =
+                    "New Update is Available"
+
+
+                messageText.text =
+                    "Version $selectedTag পাওয়া গেছে।\n\nUpdate Now চাপুন।"
+
+
+                updateButton.isEnabled =
+                    true
+            }
+
+
+        } catch (
+            e: Exception
+        ) {
+
+            runOnUiThread {
+
+                if (
+                    isFinishing ||
+                    isDestroyed
+                ) {
+                    return@runOnUiThread
+                }
+
+
+                isChecking =
+                    false
+
+
+                titleText.text =
+                    "Update Check Failed"
+
+
+                messageText.text =
+                    "Update check করা যাচ্ছে না।\n\nইন্টারনেট সংযোগ পরীক্ষা করুন।"
+
+
+                updateButton.isEnabled =
+                    false
+            }
+
+
+        } finally {
+
+            try {
                 connection?.disconnect()
+            } catch (
+                _: Exception
+            ) {
             }
         }
     }
+}
 
 
-    /*
-     * =========================================================
-     * DOWNLOAD APK
-     * =========================================================
-     */
+/* =========================================================
+   DOWNLOAD + INSTALL
+   ========================================================= */
 
-    private fun startDownload() {
+private fun downloadAndInstall(
+    apkUrl: String
+) {
 
-        if (isDownloading) {
-            return
-        }
-
-
-        if (apkUrl.isEmpty()) {
-
-            checkLatestRelease()
-
-            return
-        }
+    if (isDownloading) {
+        return
+    }
 
 
-        /*
-         * =========================================================
-         * ANDROID 8+ UNKNOWN SOURCES PERMISSION
-         * =========================================================
-         */
+    isDownloading =
+        true
 
-        if (
-            Build.VERSION.SDK_INT >=
-            Build.VERSION_CODES.O
-        ) {
+
+    updateButton.isEnabled =
+        false
+
+    laterButton.isEnabled =
+        false
+
+
+    titleText.text =
+        "Downloading Update"
+
+
+    messageText.text =
+        "APK download হচ্ছে...\nঅনুগ্রহ করে অপেক্ষা করুন।"
+
+
+    thread {
+
+        var connection:
+            HttpURLConnection? = null
+
+        var apkFile:
+            File? = null
+
+
+        try {
+
+            /*
+             * Cache directory ব্যবহার করছি।
+             *
+             * file_paths.xml-এ cache-path আছে।
+             */
+            val cacheDir =
+                externalCacheDir
+                    ?: cacheDir
+
+
+            /*
+             * আগের APK delete
+             */
+            val oldFiles =
+                cacheDir.listFiles()
+
+
+            oldFiles?.forEach { file ->
+
+                if (
+                    file.name.startsWith(
+                        APK_PREFIX
+                    ) ||
+                    file.name.equals(
+                        APK_NAME,
+                        ignoreCase = true
+                    )
+                ) {
+
+                    try {
+                        file.delete()
+                    } catch (
+                        _: Exception
+                    ) {
+                    }
+                }
+            }
+
+
+            /*
+             * নতুন APK filename
+             */
+            apkFile =
+                File(
+                    cacheDir,
+                    APK_NAME
+                )
+
+
+            val url =
+                URL(apkUrl)
+
+
+            connection =
+                url.openConnection()
+                    as HttpURLConnection
+
+
+            connection.requestMethod =
+                "GET"
+
+            connection.connectTimeout =
+                20000
+
+            connection.readTimeout =
+                30000
+
+            connection.useCaches =
+                false
+
+            connection.instanceFollowRedirects =
+                true
+
+            connection.setRequestProperty(
+                "User-Agent",
+                "RoyalCyberTV"
+            )
+
+
+            val responseCode =
+                connection.responseCode
+
 
             if (
-                !packageManager
-                    .canRequestPackageInstalls()
+                responseCode !in 200..299
             ) {
 
-                try {
+                throw Exception(
+                    "Download HTTP $responseCode"
+                )
+            }
 
-                    val intent =
-                        Intent(
-                            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse(
-                                "package:$packageName"
+
+            val contentLength =
+                connection.contentLengthLong
+
+
+            connection.inputStream.use { input ->
+
+                FileOutputStream(
+                    apkFile
+                ).use { output ->
+
+                    val buffer =
+                        ByteArray(
+                            8192
+                        )
+
+                    var total =
+                        0L
+
+                    while (true) {
+
+                        val count =
+                            input.read(
+                                buffer
                             )
+
+
+                        if (
+                            count == -1
+                        ) {
+                            break
+                        }
+
+
+                        output.write(
+                            buffer,
+                            0,
+                            count
                         )
 
 
-                    startActivity(intent)
+                        total +=
+                            count
 
 
-                    Toast.makeText(
-                        this,
-                        "Install permission চালু করে আবার Update চাপুন",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        if (
+                            contentLength > 0
+                        ) {
+
+                            val progress =
+                                (
+                                    total * 100L /
+                                        contentLength
+                                    ).toInt()
 
 
-                } catch (
-                    _: Exception
-                ) {
+                            runOnUiThread {
 
-                    Toast.makeText(
-                        this,
-                        "Install permission চালু করুন",
-                        Toast.LENGTH_LONG
-                    ).show()
+                                if (
+                                    !isFinishing &&
+                                    !isDestroyed
+                                ) {
+
+                                    messageText.text =
+                                        "APK download হচ্ছে...\n\n$progress%"
+                                }
+                            }
+                        }
+                    }
+
+
+                    output.flush()
                 }
+            }
+
+
+            if (
+                !apkFile.exists() ||
+                apkFile.length() <= 0
+            ) {
+
+                throw Exception(
+                    "Downloaded APK is empty"
+                )
+            }
+
+
+            val downloadedFile =
+                apkFile
+
+
+            runOnUiThread {
+
+                if (
+                    isFinishing ||
+                    isDestroyed
+                ) {
+                    return@runOnUiThread
+                }
+
+
+                messageText.text =
+                    "Download সম্পন্ন হয়েছে।\nInstall শুরু হচ্ছে..."
+
+
+                installApk(
+                    downloadedFile
+                )
+            }
+
+
+        } catch (
+            e: Exception
+        ) {
+
+            runOnUiThread {
+
+                if (
+                    isFinishing ||
+                    isDestroyed
+                ) {
+                    return@runOnUiThread
+                }
+
+
+                isDownloading =
+                    false
+
+
+                updateButton.isEnabled =
+                    latestApkUrl != null
+
+                laterButton.isEnabled =
+                    true
+
+
+                titleText.text =
+                    "Update Failed"
+
+
+                messageText.text =
+                    "APK download করা যায়নি।\n\nআবার চেষ্টা করুন।"
+
+
+                Toast.makeText(
+                    this,
+                    "Update download failed",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+
+        } finally {
+
+            try {
+                connection?.disconnect()
+            } catch (
+                _: Exception
+            ) {
+            }
+        }
+    }
+}
+
+
+/* =========================================================
+   INSTALL APK
+   ========================================================= */
+
+private fun installApk(
+    apkFile: File
+) {
+
+    try {
+
+        /*
+         * Android 8+:
+         * Unknown Sources permission প্রয়োজন হতে পারে।
+         */
+        if (
+            android.os.Build.VERSION.SDK_INT >=
+            android.os.Build.VERSION_CODES.O
+        ) {
+
+            val canInstall =
+                packageManager.canRequestPackageInstalls()
+
+
+            if (!canInstall) {
+
+                val settingsIntent =
+                    Intent(
+                        Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES
+                    )
+
+
+                settingsIntent.data =
+                    Uri.parse(
+                        "package:$packageName"
+                    )
+
+
+                startActivity(
+                    settingsIntent
+                )
+
+
+                Toast.makeText(
+                    this,
+                    "Install permission Allow করে আবার Update চাপুন",
+                    Toast.LENGTH_LONG
+                ).show()
+
+
+                isDownloading =
+                    false
+
+
+                updateButton.isEnabled =
+                    true
+
+                laterButton.isEnabled =
+                    true
 
 
                 return
@@ -884,431 +774,56 @@ class UpdateActivity : AppCompatActivity() {
 
 
         /*
-         * =========================================================
-         * START DOWNLOAD
-         * =========================================================
+         * FileProvider URI
          */
+        val apkUri =
+            FileProvider.getUriForFile(
+                this,
+                "${packageName}.fileprovider",
+                apkFile
+            )
 
-        isDownloading =
-            true
 
+        val installIntent =
+            Intent(
+                Intent.ACTION_VIEW
+            )
 
-        updateButton.isEnabled =
-            false
 
+        installIntent.setDataAndType(
+            apkUri,
+            "application/vnd.android.package-archive"
+        )
 
-        updateButton.text =
-            "Downloading..."
 
+        installIntent.addFlags(
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
 
-        progressBar.progress =
-            0
 
+        installIntent.addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK
+        )
 
-        progressText.text =
-            "0 %"
-
-
-        executor.execute {
-
-            var connection: HttpURLConnection? =
-                null
-
-
-            try {
-
-                /*
-                 * =================================================
-                 * CONNECT APK URL
-                 * =================================================
-                 */
-
-                connection =
-                    URL(apkUrl)
-                        .openConnection()
-                            as HttpURLConnection
-
-
-                connection.requestMethod =
-                    "GET"
-
-
-                connection.connectTimeout =
-                    20000
-
-
-                connection.readTimeout =
-                    60000
-
-
-                connection.useCaches =
-                    false
-
-
-                connection.instanceFollowRedirects =
-                    true
-
-
-                /*
-                 * =================================================
-                 * HEADERS
-                 * =================================================
-                 */
-
-                connection.setRequestProperty(
-                    "User-Agent",
-                    "RoyalCyberTV Android App"
-                )
-
-
-                connection.setRequestProperty(
-                    "Accept",
-                    "application/octet-stream"
-                )
-
-
-                connection.connect()
-
-
-                /*
-                 * =================================================
-                 * RESPONSE
-                 * =================================================
-                 */
-
-                val responseCode =
-                    connection.responseCode
-
-
-                if (
-                    responseCode !=
-                    HttpURLConnection.HTTP_OK
-                ) {
-
-                    throw Exception(
-                        "APK Download HTTP $responseCode"
-                    )
-                }
-
-
-                /*
-                 * =================================================
-                 * TOTAL SIZE
-                 * =================================================
-                 */
-
-                val totalBytes =
-                    connection.contentLengthLong
-
-
-                /*
-                 * =================================================
-                 * APP-SPECIFIC DOWNLOAD DIRECTORY
-                 * =================================================
-                 */
-
-                val downloadDirectory =
-                    getExternalFilesDir(
-                        "Download"
-                    )
-
-
-                if (
-                    downloadDirectory == null
-                ) {
-
-                    throw Exception(
-                        "Download folder পাওয়া যায়নি"
-                    )
-                }
-
-
-                if (
-                    !downloadDirectory.exists()
-                ) {
-
-                    if (
-                        !downloadDirectory.mkdirs()
-                    ) {
-
-                        throw Exception(
-                            "Download folder তৈরি করা যায়নি"
-                        )
-                    }
-                }
-
-
-                /*
-                 * =================================================
-                 * APK FILE
-                 * =================================================
-                 */
-
-                val apkFile =
-                    File(
-                        downloadDirectory,
-                        APK_NAME
-                    )
-
-
-                /*
-                 * পুরোনো APK delete
-                 */
-
-                if (apkFile.exists()) {
-
-                    apkFile.delete()
-                }
-
-
-                /*
-                 * =================================================
-                 * DOWNLOAD
-                 * =================================================
-                 */
-
-                connection.inputStream.use { input ->
-
-                    apkFile.outputStream().use { output ->
-
-                        val buffer =
-                            ByteArray(8192)
-
-
-                        var downloaded =
-                            0L
-
-
-                        while (true) {
-
-                            val read =
-                                input.read(
-                                    buffer
-                                )
-
-
-                            if (read == -1) {
-                                break
-                            }
-
-
-                            output.write(
-                                buffer,
-                                0,
-                                read
-                            )
-
-
-                            downloaded +=
-                                read.toLong()
-
-
-                            /*
-                             * =================================================
-                             * UPDATE PROGRESS
-                             * =================================================
-                             */
-
-                            if (
-                                totalBytes > 0
-                            ) {
-
-                                val percent =
-                                    (
-                                        downloaded *
-                                            100L /
-                                            totalBytes
-                                    )
-                                        .toInt()
-                                        .coerceIn(
-                                            0,
-                                            100
-                                        )
-
-
-                                handler.post {
-
-                                    if (
-                                        !isFinishing &&
-                                        !isDestroyed
-                                    ) {
-
-                                        progressBar.progress =
-                                            percent
-
-
-                                        progressText.text =
-                                            "$percent %"
-                                    }
-                                }
-                            }
-                        }
-
-
-                        output.flush()
-                    }
-                }
-
-
-                /*
-                 * =================================================
-                 * FILE VALIDATION
-                 * =================================================
-                 */
-
-                if (
-                    !apkFile.exists() ||
-                    apkFile.length() <= 0
-                ) {
-
-                    throw Exception(
-                        "Downloaded APK file invalid"
-                    )
-                }
-
-
-                /*
-                 * =================================================
-                 * INSTALL
-                 * =================================================
-                 */
-
-                handler.post {
-
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
-                    }
-
-
-                    progressBar.progress =
-                        100
-
-
-                    progressText.text =
-                        "100 %"
-
-
-                    updateButton.text =
-                        "Installing..."
-
-
-                    installApk(
-                        apkFile
-                    )
-                }
-
-
-            } catch (
-                e: Exception
-            ) {
-
-                handler.post {
-
-                    if (
-                        isFinishing ||
-                        isDestroyed
-                    ) {
-                        return@post
-                    }
-
-
-                    isDownloading =
-                        false
-
-
-                    updateButton.isEnabled =
-                        true
-
-
-                    updateButton.text =
-                        "Try Again"
-
-
-                    val errorMessage =
-                        e.message
-                            ?: "Unknown error"
-
-
-                    Toast.makeText(
-                        this@UpdateActivity,
-                        "APK Download করা যায়নি\n$errorMessage",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
-
-            } finally {
-
-                connection?.disconnect()
-            }
-        }
-    }
-
-
-    /*
-     * =========================================================
-     * INSTALL APK
-     * =========================================================
-     */
-
-    private fun installApk(
-        apkFile: File
-    ) {
 
         try {
 
-            /*
-             * =================================================
-             * FILE PROVIDER URI
-             * =================================================
-             */
-
-            val apkUri =
-                FileProvider.getUriForFile(
-                    this,
-                    "$packageName.fileprovider",
-                    apkFile
-                )
-
-
-            /*
-             * =================================================
-             * INSTALL INTENT
-             * =================================================
-             */
-
-            val intent =
-                Intent(
-                    Intent.ACTION_VIEW
-                )
-
-
-            intent.setDataAndType(
-                apkUri,
-                "application/vnd.android.package-archive"
-            )
-
-
-            intent.addFlags(
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-
-
-            intent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK
-            )
-
-
             startActivity(
-                intent
+                installIntent
             )
+
+
+            /*
+             * Installer খুলে গেলে
+             * এই Activity-কে আর update button
+             * চাপতে দেওয়া হবে না।
+             */
+            isDownloading =
+                true
 
 
         } catch (
-            e: Exception
+            e: ActivityNotFoundException
         ) {
 
             isDownloading =
@@ -1318,279 +833,84 @@ class UpdateActivity : AppCompatActivity() {
             updateButton.isEnabled =
                 true
 
-
-            updateButton.text =
-                "Try Again"
+            laterButton.isEnabled =
+                true
 
 
             Toast.makeText(
                 this,
-                "APK Install করা যাচ্ছে না\n${e.message ?: ""}",
+                "APK Installer পাওয়া যাচ্ছে না",
                 Toast.LENGTH_LONG
             ).show()
         }
+
+
+    } catch (
+        e: Exception
+    ) {
+
+        isDownloading =
+            false
+
+
+        updateButton.isEnabled =
+            true
+
+        laterButton.isEnabled =
+            true
+
+
+        Toast.makeText(
+            this,
+            "Install শুরু করা যাচ্ছে না",
+            Toast.LENGTH_LONG
+        ).show()
     }
+}
+
+
+/* =========================================================
+   RESUME
+   ========================================================= */
+
+override fun onResume() {
+
+    super.onResume()
 
 
     /*
-     * =========================================================
-     * GET CURRENT APP VERSION CODE
-     * =========================================================
+     * Unknown Sources settings থেকে ফিরে এলে
+     * আবার Update button চালু থাকবে।
      */
+    if (
+        isDownloading &&
+        latestApkUrl != null
+    ) {
 
-    private fun getCurrentVersionCode(): Int {
+        updateButton.isEnabled =
+            true
 
-        return try {
-
-            if (
-                Build.VERSION.SDK_INT >=
-                Build.VERSION_CODES.P
-            ) {
-
-                packageManager
-                    .getPackageInfo(
-                        packageName,
-                        0
-                    )
-                    .longVersionCode
-                    .toInt()
-
-            } else {
-
-                @Suppress("DEPRECATION")
-
-                packageManager
-                    .getPackageInfo(
-                        packageName,
-                        0
-                    )
-                    .versionCode
-            }
-
-        } catch (
-            _: Exception
-        ) {
-
-            1
-        }
+        laterButton.isEnabled =
+            true
     }
+}
 
+
+/* =========================================================
+   DESTROY
+   ========================================================= */
+
+override fun onDestroy() {
+
+    isChecking =
+        false
 
     /*
-     * =========================================================
-     * EXTRACT VERSION CODE
-     * =========================================================
-     *
-     * Supported:
-     *
-     * build-127 -> 127
-     * build_127 -> 127
-     * build 127 -> 127
-     *
-     * v1.0.2 -> 2
-     * 1.0.2 -> 2
-     *
-     * v1.0.145 -> 145
-     * =========================================================
+     * Background thread নিজে নিজেই শেষ হবে।
+     * Activity বন্ধ হলেও UI update করার আগে
+     * isFinishing / isDestroyed check করা হচ্ছে।
      */
 
-    private fun extractVersionCode(
-        tag: String
-    ): Int {
-
-        val cleanTag =
-            tag.trim()
-
-
-        /*
-         * =========================================================
-         * BUILD NUMBER
-         * =========================================================
-         */
-
-        val buildRegex =
-            Regex(
-                "(?i)build[-_ ]?(\\d+)"
-            )
-
-
-        val buildMatch =
-            buildRegex.find(
-                cleanTag
-            )
-
-
-        if (
-            buildMatch != null
-        ) {
-
-            return buildMatch
-                .groupValues[1]
-                .toIntOrNull()
-                ?: 0
-        }
-
-
-        /*
-         * =========================================================
-         * SEMANTIC VERSION
-         *
-         * v1.0.145
-         * 1.0.145
-         * =========================================================
-         */
-
-        val versionRegex =
-            Regex(
-                "^[vV]?(\\d+)\\.(\\d+)\\.(\\d+)"
-            )
-
-
-        val versionMatch =
-            versionRegex.find(
-                cleanTag
-            )
-
-
-        if (
-            versionMatch != null
-        ) {
-
-            return versionMatch
-                .groupValues[3]
-                .toIntOrNull()
-                ?: 0
-        }
-
-
-        /*
-         * =========================================================
-         * FALLBACK LAST NUMBER
-         * =========================================================
-         */
-
-        val numberRegex =
-            Regex(
-                "(\\d+)"
-            )
-
-
-        val matches =
-            numberRegex
-                .findAll(
-                    cleanTag
-                )
-                .toList()
-
-
-        if (
-            matches.isNotEmpty()
-        ) {
-
-            return matches
-                .last()
-                .value
-                .toIntOrNull()
-                ?: 0
-        }
-
-
-        return 0
-    }
-
-
-    /*
-     * =========================================================
-     * FORMAT VERSION
-     * =========================================================
-     */
-
-    private fun formatVersion(
-        tag: String
-    ): String {
-
-        val cleanTag =
-            tag.trim()
-
-
-        /*
-         * build-145
-         */
-
-        if (
-            cleanTag.startsWith(
-                "build-",
-                ignoreCase = true
-            )
-        ) {
-
-            return cleanTag
-        }
-
-
-        /*
-         * build_145
-         */
-
-        if (
-            cleanTag.startsWith(
-                "build_",
-                ignoreCase = true
-            )
-        ) {
-
-            return cleanTag
-        }
-
-
-        /*
-         * build 145
-         */
-
-        if (
-            cleanTag.startsWith(
-                "build ",
-                ignoreCase = true
-            )
-        ) {
-
-            return cleanTag
-        }
-
-
-        /*
-         * v1.0.145
-         *
-         * Display:
-         *
-         * 1.0.145
-         */
-
-        return cleanTag
-            .removePrefix("v")
-            .removePrefix("V")
-            .ifEmpty {
-                "1.0.0"
-            }
-    }
-
-
-    /*
-     * =========================================================
-     * DESTROY
-     * =========================================================
-     */
-
-    override fun onDestroy() {
-
-        handler.removeCallbacksAndMessages(
-            null
-        )
-
-
-        executor.shutdownNow()
-
-
-        super.onDestroy()
-    }
+    super.onDestroy()
+  }
 }
