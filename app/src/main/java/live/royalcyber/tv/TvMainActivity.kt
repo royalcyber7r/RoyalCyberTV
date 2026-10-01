@@ -2,6 +2,7 @@ package live.royalcyber.tv
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -54,14 +55,14 @@ class TvMainActivity : AppCompatActivity() {
                 connection.connectTimeout = 15000
                 connection.readTimeout = 20000
 
-                val response = connection.inputStream
-                    .bufferedReader()
-                    .use { it.readText() }
+                val response =
+                    connection.inputStream
+                        .bufferedReader()
+                        .use { it.readText() }
 
                 connection.disconnect()
 
                 val jsonArray = JSONArray(response)
-
                 val result = ArrayList<TvChannel>()
 
                 for (i in 0 until jsonArray.length()) {
@@ -69,34 +70,19 @@ class TvMainActivity : AppCompatActivity() {
                     val item = jsonArray.optJSONObject(i)
                         ?: continue
 
-                    val name =
-                        item.optString("name")
-                            .ifEmpty {
-                                item.optString("title")
-                            }
+                    val name = item.optString("name")
+                    val logo = item.optString("logo")
+                    val streamUrl = item.optString("streamUrl")
 
-                    val url =
-                        item.optString("url")
-                            .ifEmpty {
-                                item.optString("stream")
-                            }
-                            .ifEmpty {
-                                item.optString("stream_url")
-                            }
-
-                    val logo =
-                        item.optString("logo")
-                            .ifEmpty {
-                                item.optString("logo_url")
-                            }
-
-                    if (name.isNotEmpty() && url.isNotEmpty()) {
-
+                    if (
+                        name.isNotEmpty() &&
+                        streamUrl.isNotEmpty()
+                    ) {
                         result.add(
                             TvChannel(
                                 name = name,
-                                url = url,
-                                logo = logo
+                                logo = logo,
+                                streamUrl = streamUrl
                             )
                         )
                     }
@@ -112,6 +98,7 @@ class TvMainActivity : AppCompatActivity() {
                     if (channels.isEmpty()) {
 
                         emptyText.visibility = View.VISIBLE
+                        emptyText.text = "No channels available"
 
                     } else {
 
@@ -120,29 +107,16 @@ class TvMainActivity : AppCompatActivity() {
                         recyclerView.adapter =
                             TvChannelAdapter(channels) { channel ->
 
-                                val intent =
-                                    Intent(
-                                        this,
-                                        TvPlayerActivity::class.java
-                                    )
-
-                                intent.putExtra(
-                                    "channel_name",
-                                    channel.name
-                                )
-
-                                intent.putExtra(
-                                    "channel_url",
-                                    channel.url
-                                )
-
-                                startActivity(intent)
+                                openChannel(channel)
                             }
 
                         recyclerView.post {
 
-                            recyclerView.getChildAt(0)
-                                ?.requestFocus()
+                            if (recyclerView.childCount > 0) {
+                                recyclerView
+                                    .getChildAt(0)
+                                    ?.requestFocus()
+                            }
                         }
                     }
                 }
@@ -159,10 +133,33 @@ class TvMainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openChannel(channel: TvChannel) {
+
+        val intent =
+            Intent(this, TvPlayerActivity::class.java)
+
+        intent.putExtra(
+            "channel_name",
+            channel.name
+        )
+
+        intent.putExtra(
+            "channel_url",
+            channel.streamUrl
+        )
+
+        intent.putExtra(
+            "channel_logo",
+            channel.logo
+        )
+
+        startActivity(intent)
+    }
+
     data class TvChannel(
         val name: String,
-        val url: String,
-        val logo: String
+        val logo: String,
+        val streamUrl: String
     )
 
     private class TvChannelAdapter(
@@ -175,13 +172,14 @@ class TvMainActivity : AppCompatActivity() {
             viewType: Int
         ): ChannelHolder {
 
-            val view = android.view.LayoutInflater
-                .from(parent.context)
-                .inflate(
-                    R.layout.tv_channel_item,
-                    parent,
-                    false
-                )
+            val view =
+                android.view.LayoutInflater
+                    .from(parent.context)
+                    .inflate(
+                        R.layout.tv_channel_item,
+                        parent,
+                        false
+                    )
 
             return ChannelHolder(view)
         }
@@ -209,20 +207,22 @@ class TvMainActivity : AppCompatActivity() {
                 nameText.text = channel.name
 
                 itemView.setOnClickListener {
+
                     onClick(channel)
                 }
 
                 itemView.setOnKeyListener { _, keyCode, event ->
 
                     if (
-                        event.action ==
-                        android.view.KeyEvent.ACTION_UP &&
-                        keyCode ==
-                        android.view.KeyEvent.KEYCODE_DPAD_CENTER
+                        event.action == KeyEvent.ACTION_UP &&
+                        keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                     ) {
+
                         onClick(channel)
                         true
+
                     } else {
+
                         false
                     }
                 }
