@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:keepScreenOn="true">
+
+    <!-- ===================================================== -->
+    <!-- TV VIDEO PLAYER -->
+    <!-- ===================================================== -->
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/tv_player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:keepScreenOn="true"
+
+        app:use_controller="true"
+        app:show_buffering="when_playing"
+        app:resize_mode="fit"
+        app:controller_layout_id="@layout/exo_player_control_view" />
+
+
+    <!-- ===================================================== -->
+    <!-- CHANNEL TITLE / ERROR TEXT -->
+    <!-- ===================================================== -->
+
+    <TextView
+        android:id="@+id/tv_player_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="25dp"
+        android:background="#99000000"
+        android:paddingStart="18dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="10dp"
+        android:text="RoyalCyber TV"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:visibility="gone" />
+
+</FrameLayout>
