@@ -63,6 +63,8 @@ class UpdateActivity : AppCompatActivity() {
     private var latestApkUrl: String? = null
     private var latestVersionName: String? = null
 
+    private var installedVersionName: String = "0.0.0"
+
     @Volatile
     private var isChecking = false
 
@@ -170,23 +172,154 @@ class UpdateActivity : AppCompatActivity() {
 
 
     // =========================================================
+    // GET INSTALLED VERSION
+    // =========================================================
+
+    private fun getInstalledVersionName(): String {
+
+        return try {
+
+            val packageInfo =
+                packageManager.getPackageInfo(
+                    packageName,
+                    0
+                )
+
+            packageInfo.versionName
+                ?.trim()
+                ?.removePrefix("v")
+                ?.ifEmpty {
+                    "0.0.0"
+                }
+                ?: "0.0.0"
+
+        } catch (_: Exception) {
+
+            "0.0.0"
+        }
+    }
+
+
+    // =========================================================
+    // VERSION TO NUMBER LIST
+    //
+    // Example:
+    // v1.0.153 -> [1, 0, 153]
+    // 1.0.154  -> [1, 0, 154]
+    // =========================================================
+
+    private fun normalizeVersion(
+        version: String
+    ): List<Int> {
+
+        return version
+            .trim()
+            .removePrefix("v")
+            .removePrefix("V")
+            .split(".")
+            .map {
+
+                it
+                    .takeWhile { char ->
+                        char.isDigit()
+                    }
+                    .toIntOrNull()
+                    ?: 0
+            }
+    }
+
+
+    // =========================================================
+    // CHECK WHETHER GITHUB VERSION IS NEWER
+    // =========================================================
+
+    private fun isNewerVersion(
+        latestVersion: String,
+        currentVersion: String
+    ): Boolean {
+
+        val latest =
+            normalizeVersion(
+                latestVersion
+            )
+
+        val current =
+            normalizeVersion(
+                currentVersion
+            )
+
+
+        val maxSize =
+            maxOf(
+                latest.size,
+                current.size
+            )
+
+
+        for (
+            i in 0 until maxSize
+        ) {
+
+            val latestPart =
+                latest.getOrElse(i) {
+                    0
+                }
+
+            val currentPart =
+                current.getOrElse(i) {
+                    0
+                }
+
+
+            if (
+                latestPart >
+                currentPart
+            ) {
+
+                return true
+            }
+
+
+            if (
+                latestPart <
+                currentPart
+            ) {
+
+                return false
+            }
+        }
+
+
+        return false
+    }
+
+
+    // =========================================================
     // CHECK LATEST RELEASE
     // =========================================================
 
     private fun checkLatestRelease() {
 
-        if (isChecking || isDownloading) {
+        if (
+            isChecking ||
+            isDownloading
+        ) {
             return
         }
 
+
         isChecking = true
+
+
+        installedVersionName =
+            getInstalledVersionName()
 
 
         titleText.text =
             "Checking for Update"
 
         versionText.text =
-            "Please wait..."
+            "Current Version $installedVersionName"
 
         messageText.text =
             "নতুন Version খোঁজা হচ্ছে..."
@@ -197,7 +330,10 @@ class UpdateActivity : AppCompatActivity() {
 
         thread {
 
-            var connection: HttpURLConnection? = null
+            var connection:
+                    HttpURLConnection? =
+                null
+
 
             try {
 
@@ -212,6 +348,7 @@ class UpdateActivity : AppCompatActivity() {
 
                 connection.requestMethod =
                     "GET"
+
 
                 connection.connectTimeout =
                     20000
@@ -241,7 +378,9 @@ class UpdateActivity : AppCompatActivity() {
                     connection.responseCode
 
 
-                if (responseCode !in 200..299) {
+                if (
+                    responseCode !in 200..299
+                ) {
 
                     throw Exception(
                         "GitHub HTTP $responseCode"
@@ -250,7 +389,8 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 val response =
-                    connection.inputStream
+                    connection
+                        .inputStream
                         .bufferedReader()
                         .use {
                             it.readText()
@@ -258,7 +398,9 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 val releases =
-                    JSONArray(response)
+                    JSONArray(
+                        response
+                    )
 
 
                 var selectedTag =
@@ -269,7 +411,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                 // =================================================
-                // FIND APK
+                // FIND LATEST VALID RELEASE WITH APK
                 // =================================================
 
                 for (
@@ -302,20 +444,25 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     val tagName =
-                        release.optString(
-                            "tag_name"
-                        ).trim()
+                        release
+                            .optString(
+                                "tag_name"
+                            )
+                            .trim()
 
 
-                    if (tagName.isEmpty()) {
+                    if (
+                        tagName.isEmpty()
+                    ) {
                         continue
                     }
 
 
                     val assets =
-                        release.optJSONArray(
-                            "assets"
-                        )
+                        release
+                            .optJSONArray(
+                                "assets"
+                            )
                             ?: continue
 
 
@@ -324,20 +471,25 @@ class UpdateActivity : AppCompatActivity() {
                     ) {
 
                         val asset =
-                            assets.optJSONObject(j)
+                            assets
+                                .optJSONObject(j)
                                 ?: continue
 
 
                         val assetName =
-                            asset.optString(
-                                "name"
-                            ).trim()
+                            asset
+                                .optString(
+                                    "name"
+                                )
+                                .trim()
 
 
                         val downloadUrl =
-                            asset.optString(
-                                "browser_download_url"
-                            ).trim()
+                            asset
+                                .optString(
+                                    "browser_download_url"
+                                )
+                                .trim()
 
 
                         if (
@@ -380,6 +532,10 @@ class UpdateActivity : AppCompatActivity() {
                     }
 
 
+                    // =================================================
+                    // NO APK FOUND
+                    // =================================================
+
                     if (
                         selectedApkUrl.isEmpty()
                     ) {
@@ -388,10 +544,11 @@ class UpdateActivity : AppCompatActivity() {
                             "No Update"
 
                         versionText.text =
-                            "No APK available"
+                            "Current Version $installedVersionName"
 
                         messageText.text =
                             "GitHub Release-এ $APK_NAME পাওয়া যায়নি।"
+
 
                         updateButton.isEnabled =
                             false
@@ -399,9 +556,68 @@ class UpdateActivity : AppCompatActivity() {
                         laterText.isEnabled =
                             true
 
+
                         return@runOnUiThread
                     }
 
+
+                    // =================================================
+                    // COMPARE VERSION
+                    // =================================================
+
+                    val newerVersion =
+                        isNewerVersion(
+                            selectedTag,
+                            installedVersionName
+                        )
+
+
+                    // =================================================
+                    // SAME VERSION / OLDER VERSION
+                    // =================================================
+
+                    if (!newerVersion) {
+
+                        latestVersionName =
+                            selectedTag
+
+                        latestApkUrl =
+                            selectedApkUrl
+
+
+                        titleText.text =
+                            "No Update"
+
+
+                        versionText.text =
+                            "Current Version $installedVersionName"
+
+
+                        messageText.text =
+                            "আপনার App ইতিমধ্যে সর্বশেষ Version ব্যবহার করছে।"
+
+
+                        progressBar.progress =
+                            0
+
+                        percentText.text =
+                            "0 %"
+
+
+                        updateButton.isEnabled =
+                            false
+
+                        laterText.isEnabled =
+                            true
+
+
+                        return@runOnUiThread
+                    }
+
+
+                    // =================================================
+                    // NEW VERSION AVAILABLE
+                    // =================================================
 
                     latestVersionName =
                         selectedTag
@@ -415,7 +631,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     versionText.text =
-                        "Version $selectedTag is now available"
+                        "Current: $installedVersionName\nAvailable: $selectedTag"
 
 
                     messageText.text =
@@ -457,7 +673,7 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     versionText.text =
-                        "Unable to check for update"
+                        "Current Version $installedVersionName"
 
 
                     messageText.text =
@@ -473,6 +689,7 @@ class UpdateActivity : AppCompatActivity() {
                     laterText.isEnabled =
                         true
                 }
+
 
             } finally {
 
@@ -532,10 +749,12 @@ class UpdateActivity : AppCompatActivity() {
 
         thread {
 
-            var connection: HttpURLConnection? =
+            var connection:
+                    HttpURLConnection? =
                 null
 
-            var outputStream: FileOutputStream? =
+            var outputStream:
+                    FileOutputStream? =
                 null
 
 
@@ -554,7 +773,9 @@ class UpdateActivity : AppCompatActivity() {
                         )
 
 
-                if (!downloadDirectory.exists()) {
+                if (
+                    !downloadDirectory.exists()
+                ) {
 
                     if (
                         !downloadDirectory.mkdirs() &&
@@ -582,12 +803,16 @@ class UpdateActivity : AppCompatActivity() {
                     )
 
 
-                if (tempFile.exists()) {
+                if (
+                    tempFile.exists()
+                ) {
                     tempFile.delete()
                 }
 
 
-                if (apkFile.exists()) {
+                if (
+                    apkFile.exists()
+                ) {
                     apkFile.delete()
                 }
 
@@ -615,14 +840,9 @@ class UpdateActivity : AppCompatActivity() {
                 connection.readTimeout =
                     120000
 
-
                 connection.useCaches =
                     false
 
-
-                /*
-                 * GitHub Release APK redirect follow করবে।
-                 */
                 connection.instanceFollowRedirects =
                     true
 
@@ -631,7 +851,6 @@ class UpdateActivity : AppCompatActivity() {
                     "User-Agent",
                     "RoyalCyberTV"
                 )
-
 
                 connection.setRequestProperty(
                     "Accept",
@@ -694,12 +913,16 @@ class UpdateActivity : AppCompatActivity() {
                             )
 
 
-                        if (count == -1) {
+                        if (
+                            count == -1
+                        ) {
                             break
                         }
 
 
-                        if (count <= 0) {
+                        if (
+                            count <= 0
+                        ) {
                             continue
                         }
 
@@ -799,10 +1022,9 @@ class UpdateActivity : AppCompatActivity() {
                 }
 
 
-                /*
-                 * APK একটি ZIP file।
-                 * প্রথম দুই byte অবশ্যই PK হওয়া উচিত।
-                 */
+                // =================================================
+                // VERIFY APK ZIP HEADER
+                // =================================================
 
                 val header =
                     ByteArray(2)
@@ -943,6 +1165,7 @@ class UpdateActivity : AppCompatActivity() {
                             TEMP_APK_NAME
                         )
 
+
                     if (
                         tempFile.exists()
                     ) {
@@ -1031,6 +1254,7 @@ class UpdateActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
 
+
             updateButton.isEnabled =
                 true
 
@@ -1051,7 +1275,8 @@ class UpdateActivity : AppCompatActivity() {
         ) {
 
             if (
-                !packageManager.canRequestPackageInstalls()
+                !packageManager
+                    .canRequestPackageInstalls()
             ) {
 
                 pendingInstallFile =
@@ -1091,13 +1316,14 @@ class UpdateActivity : AppCompatActivity() {
 
 
                     messageText.text =
-                        "Install permission-এ Allow করুন।\n\nতারপর এখানে ফিরে আসুন।"
+                        "Install permission-এ Allow করুন।\n\nতারপর এখানে ফিরে আসুন."
 
 
                 } catch (e: Exception) {
 
                     waitingForInstallPermission =
                         false
+
 
                     updateButton.isEnabled =
                         true
@@ -1224,7 +1450,8 @@ class UpdateActivity : AppCompatActivity() {
         ) {
 
             if (
-                packageManager.canRequestPackageInstalls()
+                packageManager
+                    .canRequestPackageInstalls()
             ) {
 
                 waitingForInstallPermission =
