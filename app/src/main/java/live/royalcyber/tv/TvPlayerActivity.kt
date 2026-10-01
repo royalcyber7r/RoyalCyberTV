@@ -2,7 +2,8 @@ package live.royalcyber.tv
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.view.KeyEvent
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
@@ -19,6 +20,11 @@ class TvPlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // TV screen awake রাখবে
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        )
+
         setContentView(R.layout.activity_tv_player)
 
         playerView = findViewById(R.id.tv_player)
@@ -28,18 +34,18 @@ class TvPlayerActivity : AppCompatActivity() {
             intent.getStringExtra("channel_name")
                 ?: "RoyalCyber TV"
 
-        val url =
+        val streamUrl =
             intent.getStringExtra("channel_url")
                 ?: ""
 
         channelName.text = name
 
-        if (url.isNotEmpty()) {
-            playChannel(url)
+        if (streamUrl.isNotEmpty()) {
+            playChannel(streamUrl)
         }
     }
 
-    private fun playChannel(url: String) {
+    private fun playChannel(streamUrl: String) {
 
         player = ExoPlayer.Builder(this)
             .build()
@@ -47,13 +53,30 @@ class TvPlayerActivity : AppCompatActivity() {
         playerView.player = player
 
         val mediaItem =
-            MediaItem.fromUri(Uri.parse(url))
+            MediaItem.fromUri(
+                Uri.parse(streamUrl)
+            )
 
         player?.setMediaItem(mediaItem)
-
         player?.prepare()
-
         player?.playWhenReady = true
+    }
+
+    override fun dispatchKeyEvent(
+        event: KeyEvent
+    ): Boolean {
+
+        // TV remote-এর Back
+        if (
+            event.keyCode == KeyEvent.KEYCODE_BACK &&
+            event.action == KeyEvent.ACTION_UP
+        ) {
+
+            finish()
+            return true
+        }
+
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onStop() {
@@ -64,6 +87,7 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+
         playerView.player = null
 
         super.onDestroy()
