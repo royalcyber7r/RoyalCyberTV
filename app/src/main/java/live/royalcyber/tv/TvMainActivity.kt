@@ -1,15 +1,19 @@
 package live.royalcyber.tv
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
+import java.net.URL
+import kotlin.concurrent.thread
 
 class TvMainActivity : AppCompatActivity() {
 
@@ -60,14 +64,6 @@ class TvMainActivity : AppCompatActivity() {
 
         try {
 
-            /*
-             * ==========================================
-             * LOCAL TV CHANNEL JSON
-             *
-             * assets/tv_channels.json
-             * ==========================================
-             */
-
             val response =
                 assets.open(
                     "tv_channels.json"
@@ -80,7 +76,6 @@ class TvMainActivity : AppCompatActivity() {
                     }
 
             if (response.isBlank()) {
-
                 throw Exception(
                     "tv_channels.json is empty"
                 )
@@ -148,7 +143,6 @@ class TvMainActivity : AppCompatActivity() {
                     "No channels available"
 
                 return
-
             }
 
             emptyText.visibility =
@@ -161,12 +155,6 @@ class TvMainActivity : AppCompatActivity() {
 
                     openChannel(channel)
                 }
-
-            /*
-             * ==========================================
-             * FIRST CHANNEL FOCUS
-             * ==========================================
-             */
 
             recyclerView.post {
 
@@ -262,7 +250,6 @@ class TvMainActivity : AppCompatActivity() {
         }
 
         override fun getItemCount(): Int {
-
             return list.size
         }
 
@@ -278,12 +265,57 @@ class TvMainActivity : AppCompatActivity() {
                     R.id.channel_name
                 )
 
+            private val logoImage:
+                ImageView =
+                itemView.findViewById(
+                    R.id.channel_logo
+                )
+
             fun bind(
                 channel: TvChannel
             ) {
 
                 nameText.text =
                     channel.name
+
+                /*
+                 * Channel Logo
+                 */
+
+                logoImage.setImageDrawable(
+                    null
+                )
+
+                if (
+                    channel.logo.isNotEmpty()
+                ) {
+
+                    thread {
+
+                        try {
+
+                            val bitmap =
+                                BitmapFactory
+                                    .decodeStream(
+                                        URL(
+                                            channel.logo
+                                        ).openStream()
+                                    )
+
+                            logoImage.post {
+
+                                logoImage
+                                    .setImageBitmap(
+                                        bitmap
+                                    )
+                            }
+
+                        } catch (_: Exception) {
+                            // Logo না এলে
+                            // channel name থাকবে
+                        }
+                    }
+                }
 
                 /*
                  * Remote / OK
