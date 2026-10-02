@@ -1,19 +1,17 @@
 [
 {
-"name": "Wild Flix Hindi",
-"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/wildflix.webp",
-"streamUrl": "https://cc-qgrxgp51645lw.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-qgrxgp51645lw/IQJW/WBD/WildFlix_IN/WildFlix_IN.m3u8"
+"name": "TEST CHANNEL 01",
+"logo": "",
+"streamUrl": "https://example.com/01.m3u8"
 },
-
 {
-"name": "Zee Tv HD",
-"logo": "https://i.postimg.cc/x8BwX6QW/20240823_022929.png",
-"streamUrl": "https://drk6xq0vhn.gpcdn.net/live/zee_tv_hd_abr/index.m3u8"
+"name": "TEST CHANNEL 02",
+"logo": "",
+"streamUrl": "https://example.com/02.m3u8"
 },
-
 {
-"name": "Sonic Bangla",
-"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-"streamUrl": "http://198.195.239.50:8095/sonic/index.m3u8"
-}  
+"name": "TEST CHANNEL 03",
+"logo": "",
+"streamUrl": "https://example.com/03.m3u8"
+}
 ]
