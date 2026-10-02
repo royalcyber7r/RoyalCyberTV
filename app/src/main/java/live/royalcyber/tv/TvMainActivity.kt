@@ -23,7 +23,7 @@ class TvMainActivity : AppCompatActivity() {
     private val channels = ArrayList<TvChannel>()
 
     private val channelsUrl =
-        "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/assets/channels.json"
+        "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/assets/tv_channels.json"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
