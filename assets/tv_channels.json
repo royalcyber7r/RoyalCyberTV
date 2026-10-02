@@ -251,29 +251,14 @@
     "streamUrl": "http://livetv.akr4m.com:8080/bdtv/restrem/27.m3u8"
   },
   {
-    "name": "Nick Bangla",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "http://198.195.239.50:8095/nick/index.m3u8"
+    "name": "Colors Bangla HD (Ads only)",
+    "logo": "https://static.wikia.nocookie.net/logopedia/images/3/3e/Colors_Bangla_HD.jpg",
+    "streamUrl": "https://iptvcable.netlify.app/Altogether-007/Kolkata/ColorsBanglaHD.m3u8"
   },
   {
-    "name": "Pogo",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/pogo_sd_abr/index.m3u8"
-  },
-  {
-    "name": "Discovery Kids",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/discovery_kids_abr/index.m3u8"
-  },
-  {
-    "name": "&TV",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/and_tv_hd_abr/index.m3u8"
-  },
-  {
-    "name": "Animal Planet HD",
-    "logo": "https://i.postimg.cc/43NXkFx5/20240823_023458.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/animal_planet_hd/index.m3u8"
+    "name": "Sananda TV",
+    "logo": "https://static.wikia.nocookie.net/logopedia/images/4/49/Sananda_TV_logo.jpeg",
+    "streamUrl": "http://27.124.71.27/Zee_Bangla/tracks-v1a1/mono.m3u8"
   },
   {
     "name": "Sony Sab HD",
@@ -306,14 +291,19 @@
     "streamUrl": "http://202.70.146.135:8000/play/a05z/index.m3u8"
   },
   {
-    "name": "CR | Star Sports 1 Hindi",
-    "logo": "https://static.epg.best/cn/StarSports1.cn.png",
-    "streamUrl": "https://starsportshindiii.pages.dev/index.m3u8"
+    "name": "Enter TV",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/entertv.png",
+    "streamUrl": "https://live1.entertv.com.bd/entertv/tracks-v1a1/mono.m3u8"
   },
   {
     "name": "Zee Bangla Sonar",
     "logo": "https://dtil.tmsimg.com/assets/GNLZZGG00287G7K.png?lock=720x540",
     "streamUrl": "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8"
+  },
+  {
+    "name": "Global TV",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Global_Television_HD.webp",
+    "streamUrl": "https://tvsen6.aynaott.com/y0q9eFAuquAtvTxRzUHq/index.m3u8"
   },
   {
     "name": "Shemaroo TV",
@@ -341,6 +331,11 @@
     "streamUrl": "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:mtvindia.smil/playlist.m3u8"
   },
   {
+    "name": "Zee Bangla",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/zee-bangla.png",
+    "streamUrl": "https://d1rc86nwwc9fag.cloudfront.net/260723/smil:zeebangla.smil/chunklist_b2628000.m3u8"
+  },
+  {
     "name": "Zoom",
     "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/musicz.png",
     "streamUrl": "https://dai.google.com/linear/hls/event/JCAm25qkRXiKcK1AJMlvKQ/master.m3u8"
@@ -365,21 +360,7 @@
     "logo": "https://yt3.googleusercontent.com/FGx9xqm5eU1DZXDk4ZDRQDK9fyhvZ2LR6gKXhZcJeFunvG9SwT8SB01SxbiD3GDL8MqMKxWXHQ=s900-c-k-c0x00ffffff-no-rj",
     "streamUrl": "https://mumt05.tangotv.in/87NeALx2SANGEETBANGLA/index.m3u8"
   },
-  {
-    "name": "Tom & Jerry TV",
-    "logo": "https://image.tmdb.org/t/p/w500/pApniCXhegDnhxQda7RcpG8gFP0.jpg",
-    "streamUrl": "https://live20.bozztv.com/giatvplayout7/giatv-208314/tracks-v1a1/mono.ts.m3u8"
-  },
-  {
-    "name": "Pogo",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/pogo_sd_abr/index.m3u8"
-  },
-  {
-    "name": "Discovery Kids",
-    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
-    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/discovery_kids_abr/index.m3u8"
-  },
+
   {
     "name": "Hum Tv",
     "logo": "https://i.postimg.cc/vT4DKmf3/20240925_075103.png",
@@ -389,6 +370,12 @@
     "name": "8XM",
     "logo": "https://i.postimg.cc/CLZqyhh3/8XMhd.png",
     "streamUrl": "https://vodzong.mjunoon.tv:8087/streamtest/8XM-131/playlist.m3u8"
+  },
+
+  {
+    "name": "Quran TV",
+    "logo": "https://i.postimg.cc/T3f1NQyV/20260524-024937.png",
+    "streamUrl": "https://live.kwikmotion.com/sharjahtvquranlive/shqurantv.smil/sharjahtvquranpublish/shqurantv_source/chunks.m3u8"
   },
   {
     "name": "Music TV",
@@ -406,9 +393,44 @@
     "streamUrl": "https://livecdn.live247stream.com/joomusic/tv/playlist.m3u8"
   },
   {
-    "name": "Quran TV",
-    "logo": "https://i.postimg.cc/T3f1NQyV/20260524-024937.png",
-    "streamUrl": "https://live.kwikmotion.com/sharjahtvquranlive/shqurantv.smil/sharjahtvquranpublish/shqurantv_source/chunks.m3u8"
+    "name": "Tom & Jerry TV",
+    "logo": "https://image.tmdb.org/t/p/w500/pApniCXhegDnhxQda7RcpG8gFP0.jpg",
+    "streamUrl": "https://live20.bozztv.com/giatvplayout7/giatv-208314/tracks-v1a1/mono.ts.m3u8"
+  },
+  {
+    "name": "Nick Bangla",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
+    "streamUrl": "http://198.195.239.50:8095/nick/index.m3u8"
+  },
+  {
+    "name": "Pogo",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
+    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/pogo_sd_abr/index.m3u8"
+  },
+  {
+    "name": "Discovery Kids",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
+    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/discovery_kids_abr/index.m3u8"
+  },
+  {
+    "name": "&TV",
+    "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
+    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/and_tv_hd_abr/index.m3u8"
+  },
+  {
+    "name": "Animal Planet HD",
+    "logo": "https://i.postimg.cc/43NXkFx5/20240823_023458.png",
+    "streamUrl": "https://drk6xq0vhn.gpcdn.net/live/animal_planet_hd/index.m3u8"
+  },
+  {
+    "name": "Star Sports 2",
+    "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/star-sports-2.png",
+    "streamUrl": "https://tvsen7.aynaott.com/ssport2hd/index.m3u8"
+  },
+  {
+    "name": "CR | Star Sports 1 Hindi",
+    "logo": "https://static.epg.best/cn/StarSports1.cn.png",
+    "streamUrl": "https://starsportshindiii.pages.dev/index.m3u8"
   },
   {
     "name": "9X Jalwa",
