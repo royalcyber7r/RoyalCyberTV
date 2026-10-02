@@ -3,7 +3,6 @@
 <selector
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Remote Focus -->
     <item android:state_focused="true">
 
         <shape android:shape="rectangle">
@@ -21,7 +20,6 @@
 
     </item>
 
-    <!-- Normal -->
     <item>
 
         <shape android:shape="rectangle">
