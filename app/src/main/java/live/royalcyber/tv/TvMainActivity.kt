@@ -10,9 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlin.concurrent.thread
 
 class TvMainActivity : AppCompatActivity() {
 
@@ -20,19 +17,32 @@ class TvMainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var emptyText: TextView
 
-    private val channels = ArrayList<TvChannel>()
+    private val channels =
+        ArrayList<TvChannel>()
 
-    private val channelsUrl =
-        "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/assets/tv_channels.json"
-
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_tv_main)
+        setContentView(
+            R.layout.activity_tv_main
+        )
 
-        recyclerView = findViewById(R.id.tv_channel_list)
-        progressBar = findViewById(R.id.tv_progress)
-        emptyText = findViewById(R.id.tv_empty)
+        recyclerView =
+            findViewById(
+                R.id.tv_channel_list
+            )
+
+        progressBar =
+            findViewById(
+                R.id.tv_progress
+            )
+
+        emptyText =
+            findViewById(
+                R.id.tv_empty
+            )
 
         recyclerView.layoutManager =
             LinearLayoutManager(this)
@@ -42,155 +52,144 @@ class TvMainActivity : AppCompatActivity() {
 
     private fun loadChannels() {
 
-        progressBar.visibility = View.VISIBLE
-        emptyText.visibility = View.GONE
+        progressBar.visibility =
+            View.VISIBLE
 
-        thread {
+        emptyText.visibility =
+            View.GONE
 
-            var connection: HttpURLConnection? = null
+        try {
 
-            try {
+            /*
+             * ==========================================
+             * LOCAL TV CHANNEL JSON
+             *
+             * assets/tv_channels.json
+             * ==========================================
+             */
 
-                connection =
-                    URL(channelsUrl).openConnection()
-                        as HttpURLConnection
-
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 20000
-                connection.readTimeout = 30000
-
-                connection.useCaches = false
-                connection.defaultUseCaches = false
-
-                connection.instanceFollowRedirects = true
-
-                connection.setRequestProperty(
-                    "User-Agent",
-                    "Mozilla/5.0 (Android 7.0; RoyalCyberTV)"
+            val response =
+                assets.open(
+                    "tv_channels.json"
                 )
+                    .bufferedReader(
+                        Charsets.UTF_8
+                    )
+                    .use {
+                        it.readText()
+                    }
 
-                connection.setRequestProperty(
-                    "Accept",
-                    "application/json"
+            if (response.isBlank()) {
+
+                throw Exception(
+                    "tv_channels.json is empty"
                 )
+            }
 
-                connection.connect()
+            val jsonArray =
+                JSONArray(response)
 
-                val responseCode =
-                    connection.responseCode
+            val result =
+                ArrayList<TvChannel>()
 
-                if (responseCode != 200) {
-                    throw Exception(
-                        "HTTP $responseCode"
+            for (
+                i in 0 until jsonArray.length()
+            ) {
+
+                val item =
+                    jsonArray.optJSONObject(i)
+                        ?: continue
+
+                val name =
+                    item.optString(
+                        "name",
+                        ""
+                    ).trim()
+
+                val logo =
+                    item.optString(
+                        "logo",
+                        ""
+                    ).trim()
+
+                val streamUrl =
+                    item.optString(
+                        "streamUrl",
+                        ""
+                    ).trim()
+
+                if (
+                    name.isNotEmpty() &&
+                    streamUrl.isNotEmpty()
+                ) {
+
+                    result.add(
+                        TvChannel(
+                            name = name,
+                            logo = logo,
+                            streamUrl = streamUrl
+                        )
                     )
                 }
-
-                val response =
-                    connection.inputStream
-                        .bufferedReader(Charsets.UTF_8)
-                        .use { it.readText() }
-
-                if (response.isBlank()) {
-                    throw Exception("Empty response")
-                }
-
-                val jsonArray =
-                    JSONArray(response)
-
-                val result =
-                    ArrayList<TvChannel>()
-
-                for (i in 0 until jsonArray.length()) {
-
-                    val item =
-                        jsonArray.optJSONObject(i)
-                            ?: continue
-
-                    val name =
-                        item.optString("name").trim()
-
-                    val logo =
-                        item.optString("logo").trim()
-
-                    val streamUrl =
-                        item.optString("streamUrl").trim()
-
-                    if (
-                        name.isNotEmpty() &&
-                        streamUrl.isNotEmpty()
-                    ) {
-
-                        result.add(
-                            TvChannel(
-                                name = name,
-                                logo = logo,
-                                streamUrl = streamUrl
-                            )
-                        )
-                    }
-                }
-
-                runOnUiThread {
-
-                    progressBar.visibility =
-                        View.GONE
-
-                    channels.clear()
-                    channels.addAll(result)
-
-                    if (channels.isEmpty()) {
-
-                        emptyText.visibility =
-                            View.VISIBLE
-
-                        emptyText.text =
-                            "No channels available"
-
-                    } else {
-
-                        emptyText.visibility =
-                            View.GONE
-
-                        recyclerView.adapter =
-                            TvChannelAdapter(
-                                channels
-                            ) { channel ->
-
-                                openChannel(channel)
-                            }
-
-                        recyclerView.post {
-
-                            if (
-                                recyclerView.childCount > 0
-                            ) {
-
-                                recyclerView
-                                    .getChildAt(0)
-                                    ?.requestFocus()
-                            }
-                        }
-                    }
-                }
-
-            } catch (e: Exception) {
-
-                runOnUiThread {
-
-                    progressBar.visibility =
-                        View.GONE
-
-                    emptyText.visibility =
-                        View.VISIBLE
-
-                    emptyText.text =
-                        "Channels could not be loaded"
-                }
-
-            } finally {
-
-                connection?.disconnect()
             }
+
+            progressBar.visibility =
+                View.GONE
+
+            channels.clear()
+            channels.addAll(result)
+
+            if (channels.isEmpty()) {
+
+                emptyText.visibility =
+                    View.VISIBLE
+
+                emptyText.text =
+                    "No channels available"
+
+                return
+
+            }
+
+            emptyText.visibility =
+                View.GONE
+
+            recyclerView.adapter =
+                TvChannelAdapter(
+                    channels
+                ) { channel ->
+
+                    openChannel(channel)
+                }
+
+            /*
+             * ==========================================
+             * FIRST CHANNEL FOCUS
+             * ==========================================
+             */
+
+            recyclerView.post {
+
+                if (
+                    recyclerView.childCount > 0
+                ) {
+
+                    recyclerView
+                        .getChildAt(0)
+                        ?.requestFocus()
+                }
+            }
+
+        } catch (e: Exception) {
+
+            progressBar.visibility =
+                View.GONE
+
+            emptyText.visibility =
+                View.VISIBLE
+
+            emptyText.text =
+                "Channels could not be loaded"
         }
     }
 
@@ -230,8 +229,10 @@ class TvMainActivity : AppCompatActivity() {
 
     private class TvChannelAdapter(
         private val list: List<TvChannel>,
-        private val onClick: (TvChannel) -> Unit
-    ) : RecyclerView.Adapter<TvChannelAdapter.ChannelHolder>() {
+        private val onClick:
+            (TvChannel) -> Unit
+    ) : RecyclerView.Adapter<
+            TvChannelAdapter.ChannelHolder>() {
 
         override fun onCreateViewHolder(
             parent: android.view.ViewGroup,
@@ -255,25 +256,38 @@ class TvMainActivity : AppCompatActivity() {
             position: Int
         ) {
 
-            holder.bind(list[position])
+            holder.bind(
+                list[position]
+            )
         }
 
         override fun getItemCount(): Int {
+
             return list.size
         }
 
         inner class ChannelHolder(
             itemView: View
-        ) : RecyclerView.ViewHolder(itemView) {
+        ) : RecyclerView.ViewHolder(
+            itemView
+        ) {
 
-            private val nameText: TextView =
+            private val nameText:
+                TextView =
                 itemView.findViewById(
                     R.id.channel_name
                 )
 
-            fun bind(channel: TvChannel) {
+            fun bind(
+                channel: TvChannel
+            ) {
 
-                nameText.text = channel.name
+                nameText.text =
+                    channel.name
+
+                /*
+                 * Remote / OK
+                 */
 
                 itemView.setOnClickListener {
 
@@ -288,8 +302,12 @@ class TvMainActivity : AppCompatActivity() {
                     if (
                         event.action ==
                             KeyEvent.ACTION_UP &&
-                        keyCode ==
-                            KeyEvent.KEYCODE_DPAD_CENTER
+                        (
+                            keyCode ==
+                                KeyEvent.KEYCODE_DPAD_CENTER ||
+                            keyCode ==
+                                KeyEvent.KEYCODE_ENTER
+                        )
                     ) {
 
                         onClick(channel)
