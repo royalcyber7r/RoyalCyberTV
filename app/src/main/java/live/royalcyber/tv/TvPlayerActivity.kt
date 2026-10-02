@@ -8,8 +8,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.upstream.DefaultHttpDataSource
 import androidx.media3.ui.PlayerView
 
 class TvPlayerActivity : AppCompatActivity() {
@@ -54,15 +52,8 @@ private fun playChannel(
     streamUrl: String
 ) {
 
-    // আগের player থাকলে release
     player?.release()
     player = null
-
-    val dataSourceFactory =
-        DefaultHttpDataSource.Factory()
-            .setAllowCrossProtocolRedirects(true)
-            .setConnectTimeoutMs(15000)
-            .setReadTimeoutMs(30000)
 
     player =
         ExoPlayer.Builder(this)
@@ -75,16 +66,7 @@ private fun playChannel(
             Uri.parse(streamUrl)
         )
 
-    val hlsMediaSource =
-        HlsMediaSource.Factory(
-            dataSourceFactory
-        ).createMediaSource(
-            mediaItem
-        )
-
-    player?.setMediaSource(
-        hlsMediaSource
-    )
+    player?.setMediaItem(mediaItem)
 
     player?.prepare()
 
