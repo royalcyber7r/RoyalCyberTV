@@ -8,88 +8,119 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.upstream.DefaultHttpDataSource
 import androidx.media3.ui.PlayerView
 
 class TvPlayerActivity : AppCompatActivity() {
 
-    private var player: ExoPlayer? = null
+private var player: ExoPlayer? = null
 
-    private lateinit var playerView: PlayerView
-    private lateinit var channelName: TextView
+private lateinit var playerView: PlayerView
+private lateinit var channelName: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        // TV screen awake রাখবে
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-        )
+    // TV screen awake রাখবে
+    window.addFlags(
+        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+    )
 
-        setContentView(R.layout.activity_tv_player)
+    setContentView(R.layout.activity_tv_player)
 
-        playerView = findViewById(R.id.tv_player)
-        channelName = findViewById(R.id.tv_player_name)
+    playerView =
+        findViewById(R.id.tv_player)
 
-        val name =
-            intent.getStringExtra("channel_name")
-                ?: "RoyalCyber TV"
+    channelName =
+        findViewById(R.id.tv_player_name)
 
-        val streamUrl =
-            intent.getStringExtra("channel_url")
-                ?: ""
+    val name =
+        intent.getStringExtra("channel_name")
+            ?: "RoyalCyber TV"
 
-        channelName.text = name
+    val streamUrl =
+        intent.getStringExtra("channel_url")
+            ?: ""
 
-        if (streamUrl.isNotEmpty()) {
-            playChannel(streamUrl)
-        }
+    channelName.text = name
+
+    if (streamUrl.isNotEmpty()) {
+        playChannel(streamUrl)
     }
+}
 
-    private fun playChannel(streamUrl: String) {
+private fun playChannel(
+    streamUrl: String
+) {
 
-        player = ExoPlayer.Builder(this)
+    // আগের player থাকলে release
+    player?.release()
+    player = null
+
+    val dataSourceFactory =
+        DefaultHttpDataSource.Factory()
+            .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(15000)
+            .setReadTimeoutMs(30000)
+
+    player =
+        ExoPlayer.Builder(this)
             .build()
 
-        playerView.player = player
+    playerView.player = player
 
-        val mediaItem =
-            MediaItem.fromUri(
-                Uri.parse(streamUrl)
-            )
+    val mediaItem =
+        MediaItem.fromUri(
+            Uri.parse(streamUrl)
+        )
 
-        player?.setMediaItem(mediaItem)
-        player?.prepare()
-        player?.playWhenReady = true
+    val hlsMediaSource =
+        HlsMediaSource.Factory(
+            dataSourceFactory
+        ).createMediaSource(
+            mediaItem
+        )
+
+    player?.setMediaSource(
+        hlsMediaSource
+    )
+
+    player?.prepare()
+
+    player?.playWhenReady = true
+}
+
+override fun dispatchKeyEvent(
+    event: KeyEvent
+): Boolean {
+
+    // TV remote-এর Back
+    if (
+        event.keyCode == KeyEvent.KEYCODE_BACK &&
+        event.action == KeyEvent.ACTION_UP
+    ) {
+
+        finish()
+        return true
     }
 
-    override fun dispatchKeyEvent(
-        event: KeyEvent
-    ): Boolean {
+    return super.dispatchKeyEvent(event)
+}
 
-        // TV remote-এর Back
-        if (
-            event.keyCode == KeyEvent.KEYCODE_BACK &&
-            event.action == KeyEvent.ACTION_UP
-        ) {
+override fun onStop() {
 
-            finish()
-            return true
-        }
+    super.onStop()
 
-        return super.dispatchKeyEvent(event)
-    }
+    player?.release()
+    player = null
+}
 
-    override fun onStop() {
-        super.onStop()
+override fun onDestroy() {
 
-        player?.release()
-        player = null
-    }
+    playerView.player = null
 
-    override fun onDestroy() {
+    super.onDestroy()
+}
 
-        playerView.player = null
-
-        super.onDestroy()
-    }
 }
