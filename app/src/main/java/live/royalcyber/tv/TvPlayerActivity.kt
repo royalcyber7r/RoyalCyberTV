@@ -2,6 +2,8 @@ package live.royalcyber.tv
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
@@ -12,10 +14,9 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
 
@@ -38,16 +39,20 @@ class TvPlayerActivity : AppCompatActivity() {
     private var currentIndex = 0
 
     /*
-     * একই channel-এ fallback playback
-     * একবারের বেশি হবে না।
+     * একই channel-এর জন্য fallback
+     * একবারের বেশি করা হবে না।
      */
     private var fallbackTried = false
 
     /*
-     * Channel change-এর সময়
-     * পুরনো retry বন্ধ রাখার জন্য।
+     * Channel পরিবর্তন হলে পুরনো
+     * retry যেন নতুন channel-এ
+     * প্রভাব না ফেলে।
      */
     private var playbackGeneration = 0
+
+    private val handler =
+        Handler(Looper.getMainLooper())
 
 
     override fun onCreate(
@@ -56,7 +61,7 @@ class TvPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         /*
-         * TV screen সবসময় awake রাখবে
+         * TV screen awake রাখবে
          */
         window.addFlags(
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -118,11 +123,13 @@ class TvPlayerActivity : AppCompatActivity() {
                     "channel_url"
                 ) ?: ""
 
-            channelName.text = name
+            channelName.text =
+                name
 
-            if (streamUrl.isNotEmpty()) {
+            if (streamUrl.isNotBlank()) {
 
                 fallbackTried = false
+                playbackGeneration++
 
                 playChannel(
                     streamUrl,
@@ -190,12 +197,17 @@ class TvPlayerActivity : AppCompatActivity() {
         }
 
         /*
-         * নতুন channel হলে
-         * fallback আবার allow করা হবে।
+         * নতুন channel।
          */
         fallbackTried = false
-
         playbackGeneration++
+
+        /*
+         * পুরনো retry cancel
+         */
+        handler.removeCallbacksAndMessages(
+            null
+        )
 
         playChannel(
             streamUrl,
@@ -248,13 +260,9 @@ class TvPlayerActivity : AppCompatActivity() {
 
 
     /**
-     * TV Player
+     * Main TV Player
      *
-     * fallbackMode = false
-     * প্রথমবার normal HLS configuration
-     *
-     * fallbackMode = true
-     * MIME type force না করে আবার চেষ্টা
+     * Media3 1.5.1 compatible
      */
     private fun playChannel(
         streamUrl: String,
@@ -262,14 +270,18 @@ class TvPlayerActivity : AppCompatActivity() {
     ) {
 
         /*
-         * পুরনো player পুরো release
+         * পুরনো retry cancel
+         */
+        handler.removeCallbacksAndMessages(
+            null
+        )
+
+        /*
+         * পুরনো player release
          */
         player?.release()
         player = null
 
-        /*
-         * প্রতিবার নতুন generation
-         */
         val myGeneration =
             playbackGeneration
 
@@ -290,11 +302,7 @@ class TvPlayerActivity : AppCompatActivity() {
                 )
 
         /*
-         * TV-এর জন্য একটু বেশি stable buffer।
-         *
-         * পুরনো Android TV-তে
-         * খুব ছোট buffer দিলে বারবার
-         * rebuffer হতে পারে।
+         * TV-এর জন্য stable buffer
          */
         val loadControl =
             DefaultLoadControl.Builder()
@@ -319,7 +327,7 @@ class TvPlayerActivity : AppCompatActivity() {
             )
 
         /*
-         * নতুন ExoPlayer
+         * ExoPlayer
          */
         val newPlayer =
             ExoPlayer.Builder(this)
@@ -338,14 +346,14 @@ class TvPlayerActivity : AppCompatActivity() {
             newPlayer
 
         /*
-         * TV live playback
+         * TV video scaling
          */
         newPlayer.setVideoScalingMode(
             C.VIDEO_SCALING_MODE_SCALE_TO_FIT
         )
 
         /*
-         * Player listener
+         * Player Listener
          */
         newPlayer.addListener(
             object : Player.Listener {
@@ -364,15 +372,14 @@ class TvPlayerActivity : AppCompatActivity() {
                     android.util.Log.e(
                         "RoyalCyberTV",
                         "Error message: " +
-                            error.message
+                            (error.message
+                                ?: "Unknown")
                     )
 
                     /*
-                     * প্রথম error হলে fallback।
-                     *
-                     * কিছু server-এর ক্ষেত্রে
-                     * MIME type force করলে সমস্যা
-                     * হতে পারে।
+                     * প্রথম error হলে
+                     * MIME type ছাড়া fallback
+                     * চেষ্টা করবে।
                      */
                     if (
                         !fallbackMode &&
@@ -398,18 +405,15 @@ class TvPlayerActivity : AppCompatActivity() {
                     }
 
                     /*
-                     * Fallback-ও ব্যর্থ হলে
-                     * কয়েক সেকেন্ড পরে একই stream
-                     * আবার prepare করার চেষ্টা।
+                     * Fallback ব্যর্থ হলে
+                     * 4 সেকেন্ড পরে retry।
                      */
                     if (
                         myGeneration ==
                             playbackGeneration
                     ) {
 
-                        android.os.Handler(
-                            mainLooper
-                        ).postDelayed({
+                        handler.postDelayed({
 
                             if (
                                 !isFinishing &&
@@ -428,7 +432,7 @@ class TvPlayerActivity : AppCompatActivity() {
                                 )
                             }
 
-                        }, 3000)
+                        }, 4000)
                     }
                 }
 
@@ -497,9 +501,7 @@ class TvPlayerActivity : AppCompatActivity() {
                 )
 
         /*
-         * প্রথমবার HLS MIME type force করা।
-         *
-         * fallback-এ এটি বাদ দেওয়া হবে।
+         * প্রথমবার HLS MIME type
          */
         if (!fallbackMode) {
 
@@ -509,7 +511,7 @@ class TvPlayerActivity : AppCompatActivity() {
         }
 
         /*
-         * Live stream configuration
+         * Live configuration
          */
         mediaItemBuilder.setLiveConfiguration(
 
@@ -523,9 +525,8 @@ class TvPlayerActivity : AppCompatActivity() {
         val mediaItem =
             mediaItemBuilder.build()
 
-
         /*
-         * Player-এ stream দেওয়া
+         * Stream set
          */
         newPlayer.setMediaItem(
             mediaItem
@@ -537,7 +538,7 @@ class TvPlayerActivity : AppCompatActivity() {
         newPlayer.prepare()
 
         /*
-         * Automatically play
+         * Auto play
          */
         newPlayer.playWhenReady =
             true
@@ -545,7 +546,7 @@ class TvPlayerActivity : AppCompatActivity() {
 
 
     /**
-     * Stream আবার চেষ্টা
+     * Stream retry
      */
     private fun retryCurrentStream(
         streamUrl: String
@@ -556,16 +557,9 @@ class TvPlayerActivity : AppCompatActivity() {
         }
 
         /*
-         * Retry-তে নতুন player বানানো হবে।
-         */
-        player?.release()
-        player = null
-
-        /*
-         * fallback state reset করা হচ্ছে না।
-         *
-         * এতে error হলে infinite
-         * fallback loop হবে না।
+         * retry-তে fallback mode ব্যবহার
+         * করা হচ্ছে যাতে infinite fallback
+         * loop না হয়।
          */
         playChannel(
             streamUrl,
@@ -583,7 +577,7 @@ class TvPlayerActivity : AppCompatActivity() {
 
         /*
          * শুধুমাত্র ACTION_UP-এ
-         * channel change হবে।
+         * channel change
          */
         if (
             event.action ==
@@ -655,15 +649,21 @@ class TvPlayerActivity : AppCompatActivity() {
 
 
     /**
-     * Activity background হলে
-     * player release
+     * Activity stop
      */
     override fun onStop() {
 
-        super.onStop()
+        /*
+         * Pending retry cancel
+         */
+        handler.removeCallbacksAndMessages(
+            null
+        )
 
         player?.release()
         player = null
+
+        super.onStop()
     }
 
 
@@ -671,6 +671,10 @@ class TvPlayerActivity : AppCompatActivity() {
      * Activity destroy
      */
     override fun onDestroy() {
+
+        handler.removeCallbacksAndMessages(
+            null
+        )
 
         player?.release()
         player = null
