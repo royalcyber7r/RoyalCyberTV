@@ -2,10 +2,12 @@ package live.royalcyber.tv
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -14,6 +16,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
 class TvPlayerActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "RoyalCyberTV"
+    }
 
     private var player: ExoPlayer? = null
 
@@ -31,12 +37,16 @@ class TvPlayerActivity : AppCompatActivity() {
 
     private var currentIndex = 0
 
+    private var activityDestroyed = false
+
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
         super.onCreate(savedInstanceState)
 
-        // TV screen awake রাখবে
+        /*
+         * TV screen awake রাখবে
+         */
         window.addFlags(
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
@@ -58,7 +68,6 @@ class TvPlayerActivity : AppCompatActivity() {
         /*
          * Channel list গ্রহণ
          */
-
         channelNames =
             intent.getStringArrayListExtra(
                 "channel_names"
@@ -84,9 +93,8 @@ class TvPlayerActivity : AppCompatActivity() {
             )
 
         /*
-         * Safety check
+         * Single Channel mode
          */
-
         if (
             channelNames.isEmpty() ||
             channelUrls.isEmpty()
@@ -108,16 +116,24 @@ class TvPlayerActivity : AppCompatActivity() {
                 name
 
             if (streamUrl.isNotEmpty()) {
-                playChannel(streamUrl)
+
+                playChannel(
+                    streamUrl
+                )
+
+            } else {
+
+                showToast(
+                    "Stream URL পাওয়া যায়নি"
+                )
             }
 
             return
         }
 
         /*
-         * Index ঠিক রাখা
+         * Index safety
          */
-
         if (
             currentIndex < 0 ||
             currentIndex >= channelUrls.size
@@ -128,21 +144,27 @@ class TvPlayerActivity : AppCompatActivity() {
         /*
          * প্রথম channel play
          */
-
         playCurrentChannel()
     }
 
     /**
-     * বর্তমানে যে channel selected
-     * সেটি play করবে
+     * বর্তমানে selected channel play করবে
      */
     private fun playCurrentChannel() {
+
+        if (activityDestroyed) {
+            return
+        }
+
+        if (channelUrls.isEmpty()) {
+            return
+        }
 
         if (
             currentIndex < 0 ||
             currentIndex >= channelUrls.size
         ) {
-            return
+            currentIndex = 0
         }
 
         val name =
@@ -150,8 +172,11 @@ class TvPlayerActivity : AppCompatActivity() {
                 currentIndex <
                     channelNames.size
             ) {
+
                 channelNames[currentIndex]
+
             } else {
+
                 "RoyalCyber TV"
             }
 
@@ -163,14 +188,17 @@ class TvPlayerActivity : AppCompatActivity() {
 
         if (streamUrl.isEmpty()) {
 
-            Toast.makeText(
-                this,
-                "Stream URL পাওয়া যায়নি",
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast(
+                "Stream URL পাওয়া যায়নি"
+            )
 
             return
         }
+
+        Log.d(
+            TAG,
+            "Playing Channel: $name"
+        )
 
         playChannel(
             streamUrl
@@ -182,20 +210,21 @@ class TvPlayerActivity : AppCompatActivity() {
      */
     private fun nextChannel() {
 
+        if (activityDestroyed) {
+            return
+        }
+
         if (channelUrls.isEmpty()) {
             return
         }
 
         currentIndex++
 
-        /*
-         * শেষ channel-এর পর
-         * আবার প্রথম channel
-         */
         if (
             currentIndex >=
                 channelUrls.size
         ) {
+
             currentIndex = 0
         }
 
@@ -207,16 +236,16 @@ class TvPlayerActivity : AppCompatActivity() {
      */
     private fun previousChannel() {
 
+        if (activityDestroyed) {
+            return
+        }
+
         if (channelUrls.isEmpty()) {
             return
         }
 
         currentIndex--
 
-        /*
-         * প্রথম channel-এর আগে
-         * শেষ channel
-         */
         if (currentIndex < 0) {
 
             currentIndex =
@@ -226,114 +255,232 @@ class TvPlayerActivity : AppCompatActivity() {
         playCurrentChannel()
     }
 
+    /**
+     * Main Player
+     *
+     * এখানে কোনো custom buffering নেই।
+     *
+     * Media3-এর DEFAULT LoadControl ব্যবহার হচ্ছে।
+     *
+     * আগের stable player structure
+     * একই রাখা হয়েছে।
+     */
     private fun playChannel(
         streamUrl: String
     ) {
 
-        /*
-         * পুরনো player release
-         */
-        player?.release()
-        player = null
+        if (activityDestroyed) {
+            return
+        }
 
-        val newPlayer =
-            ExoPlayer.Builder(this)
-                .build()
+        try {
 
-        player =
-            newPlayer
+            /*
+             * পুরনো player release
+             */
+            try {
 
-        playerView.player =
-            newPlayer
+                player?.release()
 
-        /*
-         * Playback error
-         */
-        newPlayer.addListener(
-            object : Player.Listener {
+            } catch (e: Exception) {
 
-                override fun onPlayerError(
-                    error: PlaybackException
-                ) {
+                Log.e(
+                    TAG,
+                    "Old player release error",
+                    e
+                )
+            }
 
-                    android.util.Log.e(
-                        "RoyalCyberTV",
-                        "Playback Error: " +
-                            error.errorCodeName,
-                        error
-                    )
-                }
+            player = null
 
-                override fun onPlaybackStateChanged(
-                    playbackState: Int
-                ) {
+            /*
+             * নতুন ExoPlayer
+             *
+             * কোনো custom LoadControl নেই।
+             */
+            val newPlayer =
+                ExoPlayer.Builder(this)
+                    .build()
 
-                    when (playbackState) {
+            player =
+                newPlayer
 
-                        Player.STATE_BUFFERING -> {
+            playerView.player =
+                newPlayer
 
-                            android.util.Log.d(
-                                "RoyalCyberTV",
-                                "Buffering: " +
-                                    channelName.text
-                            )
-                        }
+            /*
+             * Playback Listener
+             */
+            newPlayer.addListener(
+                object : Player.Listener {
 
-                        Player.STATE_READY -> {
+                    override fun onPlayerError(
+                        error: PlaybackException
+                    ) {
 
-                            android.util.Log.d(
-                                "RoyalCyberTV",
-                                "READY: " +
-                                    channelName.text
-                            )
-                        }
+                        /*
+                         * Error হলে Activity বন্ধ করা হবে না।
+                         *
+                         * শুধু Logcat-এ error থাকবে।
+                         */
+                        Log.e(
+                            TAG,
+                            "Playback Error: " +
+                                error.errorCodeName,
+                            error
+                        )
 
-                        Player.STATE_ENDED -> {
+                        Log.e(
+                            TAG,
+                            "Error Code: " +
+                                error.errorCode
+                        )
 
-                            android.util.Log.d(
-                                "RoyalCyberTV",
-                                "ENDED: " +
-                                    channelName.text
-                            )
+                        Log.e(
+                            TAG,
+                            "Channel: " +
+                                channelName.text
+                        )
+                    }
+
+                    override fun onPlaybackStateChanged(
+                        playbackState: Int
+                    ) {
+
+                        when (
+                            playbackState
+                        ) {
+
+                            Player.STATE_BUFFERING -> {
+
+                                Log.d(
+                                    TAG,
+                                    "Buffering: " +
+                                        channelName.text
+                                )
+                            }
+
+                            Player.STATE_READY -> {
+
+                                Log.d(
+                                    TAG,
+                                    "READY: " +
+                                        channelName.text
+                                )
+                            }
+
+                            Player.STATE_ENDED -> {
+
+                                Log.d(
+                                    TAG,
+                                    "ENDED: " +
+                                        channelName.text
+                                )
+                            }
                         }
                     }
                 }
+            )
+
+            /*
+             * HLS MediaItem
+             *
+             * আগের stable code-এর মতো
+             * application/x-mpegURL রাখা হয়েছে।
+             */
+            val mediaItem =
+                MediaItem.Builder()
+                    .setUri(
+                        Uri.parse(streamUrl)
+                    )
+                    .setMimeType(
+                        "application/x-mpegURL"
+                    )
+                    .build()
+
+            /*
+             * MediaItem set
+             */
+            newPlayer.setMediaItem(
+                mediaItem
+            )
+
+            /*
+             * Prepare
+             */
+            newPlayer.prepare()
+
+            /*
+             * Auto Play
+             */
+            newPlayer.playWhenReady =
+                true
+
+        } catch (e: Exception) {
+
+            /*
+             * Player তৈরি/prepare করার সময়
+             * কোনো Java/Kotlin exception হলে
+             * Activity বন্ধ হবে না।
+             */
+            Log.e(
+                TAG,
+                "Player Exception",
+                e
+            )
+
+            player = null
+
+            if (!activityDestroyed) {
+
+                showToast(
+                    "এই Channel চালানো যাচ্ছে না"
+                )
             }
-        )
-
-        /*
-         * HLS MediaItem
-         */
-        val mediaItem =
-            MediaItem.Builder()
-                .setUri(
-                    Uri.parse(streamUrl)
-                )
-                .setMimeType(
-                    "application/x-mpegURL"
-                )
-                .build()
-
-        newPlayer.setMediaItem(
-            mediaItem
-        )
-
-        newPlayer.prepare()
-
-        newPlayer.playWhenReady =
-            true
+        }
     }
 
+    /**
+     * Safe Toast
+     */
+    private fun showToast(
+        message: String
+    ) {
+
+        if (activityDestroyed) {
+            return
+        }
+
+        try {
+
+            Toast.makeText(
+                this,
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Toast error",
+                e
+            )
+        }
+    }
+
+    /**
+     * TV Remote Key Control
+     */
     override fun dispatchKeyEvent(
         event: KeyEvent
     ): Boolean {
 
         /*
-         * শুধুমাত্র ACTION_UP-এ
-         * channel change হবে।
+         * শুধু ACTION_UP-এ কাজ করবে।
          *
-         * এতে একটি button ধরে রাখলে
-         * অযথা অনেকবার channel change হবে না।
+         * তাই button ধরে রাখলে
+         * বারবার channel change হবে না।
          */
         if (
             event.action ==
@@ -343,7 +490,7 @@ class TvPlayerActivity : AppCompatActivity() {
             when (event.keyCode) {
 
                 /*
-                 * Channel Up / CH+
+                 * Channel Up
                  */
                 KeyEvent.KEYCODE_CHANNEL_UP,
 
@@ -363,7 +510,7 @@ class TvPlayerActivity : AppCompatActivity() {
                 }
 
                 /*
-                 * Channel Down / CH-
+                 * Channel Down
                  */
                 KeyEvent.KEYCODE_CHANNEL_DOWN,
 
@@ -383,7 +530,7 @@ class TvPlayerActivity : AppCompatActivity() {
                 }
 
                 /*
-                 * TV Remote-এর Back
+                 * Back
                  */
                 KeyEvent.KEYCODE_BACK -> {
 
@@ -399,21 +546,66 @@ class TvPlayerActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Activity background
+     */
     override fun onStop() {
 
         super.onStop()
 
         /*
-         * Activity পুরোপুরি
-         * background-এ গেলে player release
+         * Background-এ গেলে player release
          */
-        player?.release()
+        try {
+
+            player?.release()
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "onStop release error",
+                e
+            )
+        }
+
         player = null
     }
 
+    /**
+     * Activity destroy
+     */
     override fun onDestroy() {
 
-        playerView.player = null
+        activityDestroyed = true
+
+        try {
+
+            playerView.player = null
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "PlayerView cleanup error",
+                e
+            )
+        }
+
+        try {
+
+            player?.release()
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Player release error",
+                e
+            )
+        }
+
+        player = null
 
         super.onDestroy()
     }
