@@ -12,10 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
 
 class TvPlayerActivity : AppCompatActivity() {
@@ -35,11 +34,18 @@ class TvPlayerActivity : AppCompatActivity() {
 
     private var currentIndex = 0
 
+    private var isDestroyed = false
+    private var errorToastShown = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TV screen সবসময় জাগ্রত রাখবে
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        /*
+         * TV screen বন্ধ হবে না
+         */
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        )
 
         setContentView(R.layout.activity_tv_player)
 
@@ -61,7 +67,9 @@ class TvPlayerActivity : AppCompatActivity() {
         currentIndex =
             intent.getIntExtra("channel_index", 0)
 
-        // Single channel mode
+        /*
+         * Single channel mode
+         */
         if (channelNames.isEmpty() || channelUrls.isEmpty()) {
 
             val name =
@@ -74,21 +82,20 @@ class TvPlayerActivity : AppCompatActivity() {
 
             channelName.text = name
 
-            if (streamUrl.isNotEmpty()) {
+            if (streamUrl.isNotBlank()) {
                 playChannel(streamUrl)
             } else {
-                Toast.makeText(
-                    this,
-                    "Stream URL পাওয়া যায়নি",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showMessage("Stream URL পাওয়া যায়নি")
             }
 
             return
         }
 
-        // Index নিরাপদ রাখা
-        if (currentIndex < 0 ||
+        /*
+         * Index নিরাপদ রাখা
+         */
+        if (
+            currentIndex < 0 ||
             currentIndex >= channelUrls.size
         ) {
             currentIndex = 0
@@ -98,13 +105,16 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * বর্তমান Channel চালু করবে
+     * বর্তমান channel play
      */
     private fun playCurrentChannel() {
 
+        if (isDestroyed) return
+
         if (channelUrls.isEmpty()) return
 
-        if (currentIndex < 0 ||
+        if (
+            currentIndex < 0 ||
             currentIndex >= channelUrls.size
         ) {
             currentIndex = 0
@@ -122,20 +132,30 @@ class TvPlayerActivity : AppCompatActivity() {
 
         channelName.text = name
 
+        errorToastShown = false
+
         if (streamUrl.isBlank()) {
 
-            Toast.makeText(
-                this,
-                "Stream URL পাওয়া যায়নি",
-                Toast.LENGTH_SHORT
-            ).show()
+            showMessage(
+                "এই Channel-এর Stream URL নেই"
+            )
 
             return
         }
 
         Log.d(
             TAG,
-            "Playing: $name"
+            "--------------------------------"
+        )
+
+        Log.d(
+            TAG,
+            "Channel: $name"
+        )
+
+        Log.d(
+            TAG,
+            "Index: $currentIndex"
         )
 
         Log.d(
@@ -147,9 +167,11 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * Next Channel
+     * Channel Up
      */
     private fun nextChannel() {
+
+        if (isDestroyed) return
 
         if (channelUrls.isEmpty()) return
 
@@ -163,9 +185,11 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * Previous Channel
+     * Channel Down
      */
     private fun previousChannel() {
+
+        if (isDestroyed) return
 
         if (channelUrls.isEmpty()) return
 
@@ -179,53 +203,59 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * Strong / Compatible TV Player
+     * Main TV Player
      *
      * গুরুত্বপূর্ণ:
+     *
      * এখানে কোনো custom buffering নেই।
-     * Media3 নিজের default LoadControl ব্যবহার করবে।
+     *
+     * ExoPlayer / Media3-এর DEFAULT LoadControl ব্যবহার হচ্ছে।
+     *
+     * তাই ইচ্ছাকৃতভাবে buffer খুব কমও করা হচ্ছে না,
+     * আবার অযথা অনেক বেশি করাও হচ্ছে না।
      */
     private fun playChannel(streamUrl: String) {
 
-        // আগের player পুরোপুরি বন্ধ
-        player?.release()
-        player = null
+        if (isDestroyed) return
+
+        /*
+         * পুরোনো player সম্পূর্ণ release
+         */
+        releasePlayer()
 
         try {
 
             /*
-             * Android TV-এর জন্য সাধারণ HTTP data source।
+             * HTTP Data Source
              *
-             * Default User-Agent রাখছি।
-             * কিছু পুরোনো IPTV server Android TV থেকে request
-             * ঠিকমতো নিতে পারে না, তাই এখানে একটি সাধারণ
-             * Android/Media3-compatible User-Agent ব্যবহার করা হচ্ছে।
+             * Cross protocol redirect allow করা হচ্ছে।
+             *
+             * এটি buffering বাড়ানোর setting নয়।
              */
             val httpDataSourceFactory =
                 DefaultHttpDataSource.Factory()
                     .setAllowCrossProtocolRedirects(true)
 
             /*
-             * DefaultMediaSourceFactory ব্যবহার করা হচ্ছে।
+             * HLS Media Source
              *
-             * এতে Media3 নিজে stream type বুঝতে পারে।
+             * সব channel URL .m3u8 হওয়ায় সরাসরি
+             * HlsMediaSource ব্যবহার করছি।
              */
             val mediaSourceFactory =
-                DefaultMediaSourceFactory(
+                HlsMediaSource.Factory(
                     httpDataSourceFactory
                 )
 
             /*
-             * ExoPlayer-এর DEFAULT LoadControl।
+             * ExoPlayer
              *
-             * কোনো zero buffer,
-             * custom buffer,
-             * aggressive buffering
-             * ব্যবহার করা হচ্ছে না।
+             * কোনো custom LoadControl নেই।
+             *
+             * Media3 Default LoadControl ব্যবহার করবে।
              */
             val newPlayer =
                 ExoPlayer.Builder(this)
-                    .setMediaSourceFactory(mediaSourceFactory)
                     .build()
 
             player = newPlayer
@@ -233,7 +263,7 @@ class TvPlayerActivity : AppCompatActivity() {
             playerView.player = newPlayer
 
             /*
-             * Player listener
+             * Player Listener
              */
             newPlayer.addListener(
                 object : Player.Listener {
@@ -266,6 +296,8 @@ class TvPlayerActivity : AppCompatActivity() {
                                     TAG,
                                     "READY: ${channelName.text}"
                                 )
+
+                                errorToastShown = false
                             }
 
                             Player.STATE_ENDED -> {
@@ -284,7 +316,8 @@ class TvPlayerActivity : AppCompatActivity() {
 
                         Log.d(
                             TAG,
-                            "isPlaying=$isPlaying, channel=${channelName.text}"
+                            "Playing=$isPlaying | " +
+                                "Channel=${channelName.text}"
                         )
                     }
 
@@ -292,9 +325,27 @@ class TvPlayerActivity : AppCompatActivity() {
                         error: PlaybackException
                     ) {
 
+                        /*
+                         * গুরুত্বপূর্ণ:
+                         *
+                         * Player error হলে এখানে Activity finish()
+                         * করা হচ্ছে না।
+                         *
+                         * তাই error-এর কারণে app বন্ধ হবে না।
+                         */
                         Log.e(
                             TAG,
-                            "Playback Error"
+                            "=============================="
+                        )
+
+                        Log.e(
+                            TAG,
+                            "PLAYBACK ERROR"
+                        )
+
+                        Log.e(
+                            TAG,
+                            "Channel: ${channelName.text}"
                         )
 
                         Log.e(
@@ -313,40 +364,65 @@ class TvPlayerActivity : AppCompatActivity() {
                             error
                         )
 
-                        /*
-                         * TV-তে stream না চললে user-কে
-                         * পরিষ্কারভাবে জানানো।
-                         */
-                        runOnUiThread {
+                        Log.e(
+                            TAG,
+                            "=============================="
+                        )
 
-                            Toast.makeText(
-                                this@TvPlayerActivity,
-                                "এই Channel TV-তে চালানো যাচ্ছে না",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        /*
+                         * Player-কে সঙ্গে সঙ্গে আবার তৈরি করছি না।
+                         *
+                         * কারণ বারবার recreate করলে পুরোনো TV-তে
+                         * repeated buffering / crash হওয়ার সম্ভাবনা
+                         * বাড়তে পারে।
+                         */
+                        if (!errorToastShown) {
+
+                            errorToastShown = true
+
+                            runOnUiThread {
+
+                                if (!isDestroyed) {
+
+                                    Toast.makeText(
+                                        this@TvPlayerActivity,
+                                        "এই Channel TV-তে চালানো যাচ্ছে না",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
                         }
                     }
                 }
             )
 
             /*
-             * URL থেকে MediaItem।
+             * MediaItem
              *
-             * এখানে জোর করে MIME type দেওয়া হচ্ছে না।
-             * Media3 URL দেখে HLS detect করবে।
-             *
-             * এটি বিভিন্ন server-এর m3u8 stream-এর
-             * compatibility বাড়াতে সাহায্য করতে পারে।
+             * MIME type জোর করে সেট করছি না।
+             * HlsMediaSource নিজেই HLS source হিসেবে ব্যবহার করবে।
              */
             val mediaItem =
                 MediaItem.Builder()
-                    .setUri(Uri.parse(streamUrl))
+                    .setUri(
+                        Uri.parse(streamUrl)
+                    )
                     .build()
 
             /*
-             * MediaItem set
+             * HLS MediaSource তৈরি
              */
-            newPlayer.setMediaItem(mediaItem)
+            val mediaSource =
+                mediaSourceFactory.createMediaSource(
+                    mediaItem
+                )
+
+            /*
+             * Source set
+             */
+            newPlayer.setMediaSource(
+                mediaSource
+            )
 
             /*
              * Prepare
@@ -354,28 +430,88 @@ class TvPlayerActivity : AppCompatActivity() {
             newPlayer.prepare()
 
             /*
-             * Automatically play
+             * Auto Play
              */
             newPlayer.playWhenReady = true
 
         } catch (e: Exception) {
 
+            /*
+             * কোনো Java/Kotlin exception হলে
+             * Activity বন্ধ হবে না।
+             */
             Log.e(
                 TAG,
-                "Player creation failed",
+                "Player setup failed",
                 e
             )
 
-            Toast.makeText(
-                this,
-                "Player চালু করা যায়নি",
-                Toast.LENGTH_SHORT
-            ).show()
+            showMessage(
+                "Channel চালু করা যাচ্ছে না"
+            )
         }
     }
 
     /**
-     * Remote / TV key control
+     * Player release
+     */
+    private fun releasePlayer() {
+
+        try {
+
+            playerView.player = null
+
+            player?.stop()
+
+            player?.release()
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Player release error",
+                e
+            )
+        }
+
+        player = null
+    }
+
+    /**
+     * Safe Toast
+     */
+    private fun showMessage(
+        message: String
+    ) {
+
+        if (isDestroyed) return
+
+        try {
+
+            runOnUiThread {
+
+                if (!isDestroyed) {
+
+                    Toast.makeText(
+                        this@TvPlayerActivity,
+                        message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        } catch (e: Exception) {
+
+            Log.e(
+                TAG,
+                "Toast error",
+                e
+            )
+        }
+    }
+
+    /**
+     * TV Remote Keys
      */
     override fun dispatchKeyEvent(
         event: KeyEvent
@@ -385,7 +521,9 @@ class TvPlayerActivity : AppCompatActivity() {
 
             when (event.keyCode) {
 
-                // Channel Up
+                /*
+                 * Channel Up
+                 */
                 KeyEvent.KEYCODE_CHANNEL_UP,
                 KeyEvent.KEYCODE_MEDIA_NEXT,
                 KeyEvent.KEYCODE_PLUS -> {
@@ -395,7 +533,9 @@ class TvPlayerActivity : AppCompatActivity() {
                     return true
                 }
 
-                // Channel Down
+                /*
+                 * Channel Down
+                 */
                 KeyEvent.KEYCODE_CHANNEL_DOWN,
                 KeyEvent.KEYCODE_MEDIA_PREVIOUS,
                 KeyEvent.KEYCODE_MINUS -> {
@@ -405,7 +545,9 @@ class TvPlayerActivity : AppCompatActivity() {
                     return true
                 }
 
-                // Back
+                /*
+                 * Back
+                 */
                 KeyEvent.KEYCODE_BACK -> {
 
                     finish()
@@ -419,14 +561,15 @@ class TvPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * Activity বন্ধ/পিছনে গেলে player release
+     * Activity background
+     *
+     * TV app-এর lifecycle-এর সময় player release।
      */
     override fun onStop() {
 
         super.onStop()
 
-        player?.release()
-        player = null
+        releasePlayer()
     }
 
     /**
@@ -434,10 +577,9 @@ class TvPlayerActivity : AppCompatActivity() {
      */
     override fun onDestroy() {
 
-        playerView.player = null
+        isDestroyed = true
 
-        player?.release()
-        player = null
+        releasePlayer()
 
         super.onDestroy()
     }
