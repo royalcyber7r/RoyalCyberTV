@@ -696,7 +696,7 @@
 {
 "name": "Deepto TV",
 "logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/main/app/src/main/logos/Deepto_TV.webp",
-"streamUrl": "https://byphdgllyk.gpcdn.net/hls/deeptotv/0_1/index.m3u8"
+"streamUrl": "https://byphdgllyk.gpcdn.net/hls/deeptotv/index.m3u8"
 },
 {
 "name": "My TV",
