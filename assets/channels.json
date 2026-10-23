@@ -1,5 +1,9 @@
 [
-
+{
+"name": "Jhankar TV",
+"logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/jhankar-tv.png",
+"streamUrl": "https://dbcanada.sonarbanglatv.com/jhankartv/jtv/index.m3u8"
+},
 {
 "name": "Amar Bangla Digital",
 "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/amar-bangla.png",
