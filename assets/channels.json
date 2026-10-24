@@ -1,6 +1,16 @@
 [
 
 {
+"name": "TSN2",
+"logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/tsn-2-ca.png",
+"streamUrl": "https://tvsen7.aynaott.com/tsn2/index.m3u8"
+},  
+{
+"name": "TSN3",
+"logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/tsn-3-ca.png",
+"streamUrl": "https://tvsen7.aynaott.com/tsn3/index.m3u8"
+},
+{
 "name": "HBO HD",
 "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/hbo.png",
 "streamUrl": "https://tvsen7.aynaott.com/hbo/index.m3u8"
