@@ -1,5 +1,9 @@
 [
-
+{
+"name": "RoyalCyber TV",
+"logo": "https://raw.githubusercontent.com/royalcyber7r/RoyalCyberTV/refs/heads/main/app/src/main/res/drawable/royalcyber_logo.png",
+"streamUrl": "https://desktop-mhatjsh.tail9ff891.ts.net/mystream/index.m3u8"
+},
 {
 "name": "TSN2",
 "logo": "https://raw.githubusercontent.com/saeidrahmanbd/BDIX-IPTV/main/logos/tsn-2-ca.png",
